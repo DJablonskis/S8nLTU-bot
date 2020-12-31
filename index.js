@@ -683,10 +683,11 @@ function allInOneOpera() {
             localStorage.setItem(JOBS_STORAGE, JSON.stringify(this.jobs))
         }
 
-        
+
         BOT.nextJobs = function () {
-            let jobs = this.jobs["c" + this.cID]    
-            let j = [].push(jobs[0])
+            let jobs = this.jobs["c" + this.cID]
+            let j = [jobs[0]]
+
 
             //Check if roman here too
             if(jobs.length>1){
@@ -694,10 +695,10 @@ function allInOneOpera() {
                 if(nj!==undefined){
                     j.push(nj)
                 }
-                console.log(j)
+
             }
-            this.jobs["c" + this.cID] = jobs.filter((j) => (j.pos !== job.pos || (j.pos === job.pos && j.to < job.to)))
-            localStorage.setItem(JOBS_STORAGE, JSON.stringify(this.jobs))
+
+          console.log("j array: ", j)
         }
 
         if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
@@ -729,7 +730,8 @@ function allInOneOpera() {
 
         initJobQueue(BOT);
         BOT.displayJobs()
-        console.log(BOT)
+        BOT.nextJobs()
+       // console.log(BOT)
     }
 }
 
