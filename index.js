@@ -100,6 +100,7 @@ function allInOneOpera() {
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
     const JOBS_STORAGE = "storedJobs";
+    const BOT_IN_PROGRESS = "bot_progress"
     const POSITION_UP = "UP";
     const POSITION_DOWN = "DOWN"
 
@@ -250,6 +251,8 @@ function allInOneOpera() {
                 v.queue = getBuildingQueue()
                 v.timestamp = Date.now()
                 cities.vil.push(v)
+                cities.current = v
+
 
             } else {
                 if (loadedCities) {
@@ -684,21 +687,75 @@ function allInOneOpera() {
         }
 
 
-        BOT.nextJobs = function () {
-            let jobs = this.jobs["c" + this.cID]
-            let j = [jobs[0]]
+        BOT.setNextJob = function () {
+            const inProgress = JSON.parse(localStorage.getItem(BOT_IN_PROGRESS))
+            console.log(inProgress)
+            if (location.pathname.includes("build.php")) {
+                if (inProgress !== null) {
+                    const params = location.search.slice(1).split('&').reduce((acc, s) => {
+                        const [k, v] = s.split('=')
+                        return Object.assign(acc, { [k]: v })
+                    }, {})
 
-
-            //Check if roman here too
-            if(jobs.length>1){
-                let nj = j[0].gid < 5 ? jobs.find(x=> x.gid > 4) : jobs.find(x=> x.gid < 5)
-                if(nj!==undefined){
-                    j.push(nj)
+                    if (inProgress.cid === Number(params.newdid) && inProgress.job.pos === Number(params.id) && inProgress.job.gid === Number(params.gid)) {
+                        setTimeout(() => {
+                            const b = document.querySelector(".upgradeBuilding .section1 button.green.build");
+                            if (b)
+                                b.click()
+                        }, 5000)
+                    }
+                    console.log(params)
                 }
+            }
+            else {
+                //start building
+                //document.querySelector(".upgradeBuilding .section1 button.green.build").click()
 
+                // const inProgress =
+                let jobs = this.jobs["c" + this.cID]
+                const { production, storage } = this.current.ress
+
+                //ANY JOBS SET?
+                if (jobs.length > 0) {
+                    let j = jobs[0]
+
+                    //ANYTHING BUILDING?
+                    if (this.current.queue.length > 0) {
+                        //Check if roman here and if can do alternative job instead
+                        //   j.push(nj)
+                        // if (jobs.length > 1) {
+                        //     let nj = j[0].gid < 5 ? jobs.find(x => x.gid > 4) : jobs.find(x => x.gid < 5)
+                        //     if (nj !== undefined) {
+
+                        //     }
+                        // }
+
+                    } else {
+                        //check storage:
+                        const cap = this.current.ress.capacity
+                        const stor = this.current.ress.storage
+                        const cost = this.buildingDB[j.gid - 1].getStat(j.to).cost
+                        console.log(cost)
+                        //check if enough storage:
+                        if (storage.l1 >= cost[0] && storage.l2 >= cost[1] && storage.l3 >= cost[2] && storage.l4 >= cost[3]) {
+                            console.log("enough ress starting job")
+                            localStorage.setItem(BOT_IN_PROGRESS, JSON.stringify({
+                                cid: this.cID,
+                                job: j,
+                                ress: this.current.ress
+                            }));
+
+                            setTimeout(() => {
+                                window.location.href = `/build.php?newdid=${this.cID}&id=${j.pos}`
+                            }, 5000)
+
+                        } else {
+                            console.log("not enough ress")
+                        }
+                    }
+                }
             }
 
-          console.log("j array: ", j)
         }
 
         if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
@@ -730,8 +787,8 @@ function allInOneOpera() {
 
         initJobQueue(BOT);
         BOT.displayJobs()
-        BOT.nextJobs()
-       // console.log(BOT)
+        BOT.setNextJob()
+        console.log(BOT)
     }
 }
 
