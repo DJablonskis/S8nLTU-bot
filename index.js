@@ -4,7 +4,7 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.5
+// @version        0.6
 // ==/UserScript==
 
 function allInOneOpera() {
@@ -12,6 +12,11 @@ function allInOneOpera() {
     const shouldRun = () => {
         return document.querySelectorAll("div#sidebarBoxVillagelist > div.content > ul > li").length > 0
     }
+
+    const getParams = (loc) => (loc.search.slice(1).split('&').reduce((acc, s) => {
+        const [k, v] = s.split('=')
+        return Object.assign(acc, { [k]: v })
+    }, {}))
 
     ////KIRILOID
 
@@ -546,8 +551,8 @@ function allInOneOpera() {
                 const count = pos_jobs.length
                 //  if (building.gid === 0 && pos_jobs > 0) {
                 if (building.gid === 0 && count > 0) {
-                    console.log("Jobs in empty field: ", pos_jobs)
-                    console.log("Field: ", building)
+                    //    console.log("Jobs in empty field: ", pos_jobs)
+                    //console.log("Field: ", building)
                     //New building in jobs here!
                     building.bot.style.display = "block";
                     building.gid = pos_jobs[0].gid
@@ -639,6 +644,10 @@ function allInOneOpera() {
         });
 
         BOT.addJob = function (job) {
+            if (!this.cap) {
+                alert("Capitol unknown. Open profile tab for BOT to update data first.")
+                return
+            }
             //Check if ress and max level ceiling
             if (job.gid < 5) {
                 if (job.to > 10) {
@@ -650,6 +659,18 @@ function allInOneOpera() {
                         alert("Max field level is 21!")
                         return
                     }
+                }
+            } else {
+
+                const b = this.buildingDB[job.gid - 1]
+                //is cap and not alowed in cap:
+                if (this.cap === this.cID && !b.cap) {
+                    alert("Cant build this in capitol!")
+                    return
+                }
+                if (this.cap !== this.cID && !b.xcap) {
+                    alert("Cant build this in non capitol city!")
+                    return
                 }
             }
 
@@ -689,35 +710,34 @@ function allInOneOpera() {
 
         BOT.setNextJob = function () {
             const inProgress = JSON.parse(localStorage.getItem(BOT_IN_PROGRESS))
-            console.log(inProgress)
             if (location.pathname.includes("build.php")) {
                 if (inProgress !== null) {
-                    const params = location.search.slice(1).split('&').reduce((acc, s) => {
-                        const [k, v] = s.split('=')
-                        return Object.assign(acc, { [k]: v })
-                    }, {})
-
-                    if (inProgress.cid === Number(params.newdid) && inProgress.job.pos === Number(params.id) && inProgress.job.gid === Number(params.gid)) {
+                    const params = getParams(window.location)
+                    if (inProgress.cid === Number(params.newdid) && inProgress.job.pos === Number(params.id)) {
+                        let b = undefined;
+                        if (inProgress.job.to === 1 && inProgress.job.cat) {
+                            b = document.querySelector(`img.g${inProgress.job.gid}`).parentNode.parentNode.querySelector(".contractLink button")
+                        } else { b = document.querySelector(".upgradeBuilding .section1 button.green.build"); }
                         setTimeout(() => {
-                            const b = document.querySelector(".upgradeBuilding .section1 button.green.build");
-                            if (b)
+                            if (b) {
+                                this.removeJob(inProgress.job)
                                 b.click()
-                        }, 5000)
+                            }
+                        }, 3500)
                     }
-                    console.log(params)
                 }
             }
             else {
-                //start building
-                //document.querySelector(".upgradeBuilding .section1 button.green.build").click()
 
-                // const inProgress =
                 let jobs = this.jobs["c" + this.cID]
                 const { production, storage } = this.current.ress
 
                 //ANY JOBS SET?
                 if (jobs.length > 0) {
                     let j = jobs[0]
+                    const cap = this.current.ress.capacity
+                    const stor = this.current.ress.storage
+                    const cost = this.buildingDB[j.gid - 1].getStat(j.to).cost
 
                     //ANYTHING BUILDING?
                     if (this.current.queue.length > 0) {
@@ -731,14 +751,8 @@ function allInOneOpera() {
                         // }
 
                     } else {
-                        //check storage:
-                        const cap = this.current.ress.capacity
-                        const stor = this.current.ress.storage
-                        const cost = this.buildingDB[j.gid - 1].getStat(j.to).cost
-                        console.log(cost)
                         //check if enough storage:
                         if (storage.l1 >= cost[0] && storage.l2 >= cost[1] && storage.l3 >= cost[2] && storage.l4 >= cost[3]) {
-                            console.log("enough ress starting job")
                             localStorage.setItem(BOT_IN_PROGRESS, JSON.stringify({
                                 cid: this.cID,
                                 job: j,
@@ -746,11 +760,11 @@ function allInOneOpera() {
                             }));
 
                             setTimeout(() => {
-                                window.location.href = `/build.php?newdid=${this.cID}&id=${j.pos}`
+                                const href = j.to === 1 && j.cat ? `/build.php?newdid=${this.cID}&id=${j.pos}&category=${j.cat}` : `/build.php?newdid=${this.cID}&id=${j.pos}&t=0&s=0`;
+
+                                window.location.href = href
                             }, 5000)
 
-                        } else {
-                            console.log("not enough ress")
                         }
                     }
                 }
@@ -759,10 +773,12 @@ function allInOneOpera() {
         }
 
         if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
+            const params = getParams(window.location)
+            const cat = params.category ? Number(params.category) : 1
+            console.log("cat: ", cat)
 
             const availableBuildings = document.querySelectorAll(".buildingWrapper > .build_desc > img.building");
             availableBuildings.forEach(b => {
-
                 let cont = b.parentNode.parentNode;
                 let gid = Number(cont.querySelector(".contract").id.replace("contract_building", ""))
                 let pos = window.location.search.split("=")[1]
@@ -777,8 +793,7 @@ function allInOneOpera() {
                 button.innerText = `Build later`
 
                 button.onclick = () => {
-
-                    BOT.addJob({ gid, pos, lvl: 0, to: 1 })
+                    BOT.addJob({ gid, pos, lvl: 0, to: 1, cat })
                     BOT.displayJobs()
                     window.location.href = '/dorf2.php'
                 };
