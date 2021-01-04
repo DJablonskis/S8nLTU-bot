@@ -4,7 +4,7 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.6
+// @version        0.62
 // ==/UserScript==
 
 function allInOneOpera() {
@@ -105,6 +105,9 @@ function allInOneOpera() {
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
     const JOBS_STORAGE = "storedJobs";
+    const BOT_POWER = 'bot_enabled';
+    const BOT_ON = '1';
+    const BOT_OFF = '0';
     const BOT_IN_PROGRESS = "bot_progress"
     const POSITION_UP = "UP";
     const POSITION_DOWN = "DOWN"
@@ -291,6 +294,7 @@ function allInOneOpera() {
     const createSidePanel = () => {
 
         const pos = localStorage.getItem(PANEL_POSITION)
+        const ON = localStorage.getItem(BOT_POWER) === BOT_ON
         const sideBar = document.querySelector("#sidebarBeforeContent > div")
         const panel = document.createElement("div");
         panel.classList.add("sidebarBox")
@@ -300,6 +304,21 @@ function allInOneOpera() {
 
         let btnWraper = sidePanelHeader.appendChild(document.createElement("div"))
         btnWraper.classList.add("buttonsWrapper")
+
+        let btnPower = btnWraper.appendChild(document.createElement("a"));
+        btnPower.classList.add("layoutButton", "buttonFramed", "withIcon", "round", "green")
+        btnPower.innerHTML = `<svg class="edit" style="width:30px; stroke-width:2; fill:${ON ? 'red' : 'white'};" viewBox="0 0 20 20"><path d="M10,6.978c-1.666,0-3.022,1.356-3.022,3.022S8.334,13.022,10,13.022s3.022-1.356,3.022-3.022S11.666,6.978,10,6.978M10,12.267c-1.25,0-2.267-1.017-2.267-2.267c0-1.25,1.016-2.267,2.267-2.267c1.251,0,2.267,1.016,2.267,2.267C12.267,11.25,11.251,12.267,10,12.267 M18.391,9.733l-1.624-1.639C14.966,6.279,12.563,5.278,10,5.278S5.034,6.279,3.234,8.094L1.609,9.733c-0.146,0.147-0.146,0.386,0,0.533l1.625,1.639c1.8,1.815,4.203,2.816,6.766,2.816s4.966-1.001,6.767-2.816l1.624-1.639C18.536,10.119,18.536,9.881,18.391,9.733 M16.229,11.373c-1.656,1.672-3.868,2.594-6.229,2.594s-4.573-0.922-6.23-2.594L2.41,10l1.36-1.374C5.427,6.955,7.639,6.033,10,6.033s4.573,0.922,6.229,2.593L17.59,10L16.229,11.373z"></path></svg >`
+        btnPower.onclick = (e) => {
+            localStorage.setItem(BOT_POWER, ON ? BOT_OFF : BOT_ON);
+            location.reload()
+        }
+
+
+        //  btnPower.href = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=rmbdeivis@hotmail.com&lc=GB&item_name=Buy%20me%20a%20coffee%20to%20stay%20awake%20while%20writing%20PingWinBot%21&currency_code=GBP&no_note=0&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHostedGuest"
+        // btnPower.target = "_blank"
+
+
+
 
         if (pos === POSITION_UP) {
             let btnDown = btnWraper.appendChild(document.createElement("a"));
@@ -322,11 +341,13 @@ function allInOneOpera() {
 
         }
 
+
+
         let btnHelp = btnWraper.appendChild(document.createElement("a"));
         btnHelp.href = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=rmbdeivis@hotmail.com&lc=GB&item_name=Buy%20me%20a%20coffee%20to%20stay%20awake%20while%20writing%20PingWinBot%21&currency_code=GBP&no_note=0&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHostedGuest"
         btnHelp.target = "_blank"
         btnHelp.classList.add("layoutButton", "buttonFramed", "withIcon", "round", "green")
-        btnHelp.innerHTML = `<svg class="edit" style="stroke-width:1; fill:white;" viewBox="0 0 20 20"> <path d="M9.719,17.073l-6.562-6.51c-0.27-0.268-0.504-0.567-0.696-0.888C1.385,7.89,1.67,5.613,3.155,4.14c0.864-0.856,2.012-1.329,3.233-1.329c1.924,0,3.115,1.12,3.612,1.752c0.499-0.634,1.689-1.752,3.612-1.752c1.221,0,2.369,0.472,3.233,1.329c1.484,1.473,1.771,3.75,0.693,5.537c-0.19,0.32-0.425,0.618-0.695,0.887l-6.562,6.51C10.125,17.229,9.875,17.229,9.719,17.073 M6.388,3.61C5.379,3.61,4.431,4,3.717,4.707C2.495,5.92,2.259,7.794,3.145,9.265c0.158,0.265,0.351,0.51,0.574,0.731L10,16.228l6.281-6.232c0.224-0.221,0.416-0.466,0.573-0.729c0.887-1.472,0.651-3.346-0.571-4.56C15.57,4,14.621,3.61,13.612,3.61c-1.43,0-2.639,0.786-3.268,1.863c-0.154,0.264-0.536,0.264-0.69,0C9.029,4.397,7.82,3.61,6.388,3.61"></path></svg >`
+        btnHelp.innerHTML = `<svg class="edit" style="stroke-width:1; translate: rotate(180); fill:white;" viewBox="0 0 20 20"> <path d="M9.719,17.073l-6.562-6.51c-0.27-0.268-0.504-0.567-0.696-0.888C1.385,7.89,1.67,5.613,3.155,4.14c0.864-0.856,2.012-1.329,3.233-1.329c1.924,0,3.115,1.12,3.612,1.752c0.499-0.634,1.689-1.752,3.612-1.752c1.221,0,2.369,0.472,3.233,1.329c1.484,1.473,1.771,3.75,0.693,5.537c-0.19,0.32-0.425,0.618-0.695,0.887l-6.562,6.51C10.125,17.229,9.875,17.229,9.719,17.073 M6.388,3.61C5.379,3.61,4.431,4,3.717,4.707C2.495,5.92,2.259,7.794,3.145,9.265c0.158,0.265,0.351,0.51,0.574,0.731L10,16.228l6.281-6.232c0.224-0.221,0.416-0.466,0.573-0.729c0.887-1.472,0.651-3.346-0.571-4.56C15.57,4,14.621,3.61,13.612,3.61c-1.43,0-2.639,0.786-3.268,1.863c-0.154,0.264-0.536,0.264-0.69,0C9.029,4.397,7.82,3.61,6.388,3.61"></path></svg >`
 
 
         function destroy() {
@@ -400,7 +421,7 @@ function allInOneOpera() {
         var ms = sec % 1000;
         sec = (sec - ms) / 1000;
 
-        var style = "display: flex; font-weight: 600; font-size: 11px; align-items: center;"
+        var style = "display: flex; font-size: 10px; align-items: center;"
 
         let p_r1 = Math.floor(ress.production.l1 * 1.0 / 3600 * sec + ress.storage.l1);
         p_r1 = p_r1 < ress.capacity.l1 ? p_r1 : ress.capacity.r1;
@@ -419,7 +440,7 @@ function allInOneOpera() {
         let c_r4 = cC(p_r4, ress.production.l4, ress.capacity.l4)
 
 
-        return ` <span style="${c_r1 + style}">${r1i(12)}${p_r1}</span>        <span style="${c_r2 + style}">${r2i(12)}${p_r2}</span>        <span style="${c_r3 + style}">${r3i(12)}${p_r3}</span>        <span style="${c_r4 + style}">${r4i(12)}${p_r4}</span>`
+        return ` <span style="${c_r1 + style}">${r1i(10)}${p_r1}</span>        <span style="${c_r2 + style}">${r2i(10)}${p_r2}</span>        <span style="${c_r3 + style}">${r3i(10)}${p_r3}</span>        <span style="${c_r4 + style}">${r4i(10)}${p_r4}</span>`
 
     }
 
@@ -428,33 +449,33 @@ function allInOneOpera() {
     const createCity = (vil, cities) => {
 
         const block = document.createElement("div");
-        block.style.borderBottom = "1px solid brown"
-        block.style.marginBottom = "12px"
-        const nameRow = document.createElement("div");
-        nameRow.style.display = "flex"
-        nameRow.style.justifyContent = "space-between"
-        block.appendChild(nameRow)
+        block.style.paddingBottom = '4px'
+        //  const nameRow = document.createElement("div");
+        //  nameRow.style.display = "flex"
+        //  nameRow.style.justifyContent = "space-between"
+        // block.appendChild(nameRow)
         const prodRow = document.createElement("div");
         prodRow.style.display = "flex"
         prodRow.style.justifyContent = "space-between"
+        prodRow.style.padding = '2px 12px'
         block.appendChild(prodRow)
         const queRow = document.createElement("div");
         queRow.style.padding = "2px"
         block.appendChild(queRow)
 
-        let capital_string = "";
+        //let capital_string = "";
 
-        if (cities.cap && cities.cap === vil.did) capital_string = "(Capital)"
+        //  if (cities.cap && cities.cap === vil.did) capital_string = "(Capital)"
 
         if (vil.ress) {
             const { capacity } = vil.ress;
-            nameRow.innerHTML = `<span style="font-weight:900; font-size:12px">${vil.name} </span>${capital_string}<div>${wi(16)}<span style="font-weight:600; font-size:10px ;  padding-right:4px;">${capacity.l1}</span>${gi(16)}<span style="font-weight:600; font-size:10px; padding-right:4px;">${capacity.l4}</span></div>`
+            // nameRow.innerHTML = `<div>${wi(16)}<span style="font-size:10px; padding-right:4px;">${capacity.l1}</span>${gi(16)}<span style="font-size:10px; padding-right:4px;">${capacity.l4}</span></div>`
             prodRow.innerHTML = iS(vil.timestamp, vil.ress)
             let resUpdate = setInterval(() => {
                 prodRow.innerHTML = iS(vil.timestamp, vil.ress)
             }, 2000)
         } else {
-            prodRow.innerHTML = `<span style="font-weight:900; font-size:12px">${vil.name}</span><div>No info yet.</div>`
+            prodRow.innerHTML = `<div style="font-size:10px">No info yet.</div>`
         }
 
 
@@ -464,11 +485,11 @@ function allInOneOpera() {
                 const task = document.createElement("div");
                 queRow.appendChild(task);
                 let timer = checkTime(x.finish)
-                task.innerHTML = `<span style="font-size:11px; padding-right:16px">${x.name} ${x.stufe - 1} -> ${x.stufe}</span><span style="font-size:11px; ${timer.completed ? "color:green;" : ""} align-items:center;">${timer.timer}</span>`
+                task.innerHTML = `<span style="font-size:11px; padding-left: 15px; padding-right:8px">${x.name} level ${x.stufe}</span><span style="font-size:11px;  ${timer.completed ? "color:green;" : ""} align-items:center;">${timer.timer}</span>`
                 if (!timer.completed) {
                     let updater = setInterval(() => {
                         timer = checkTime(x.finish)
-                        task.innerHTML = `<span style="font-size:11px; padding-right:16px">${x.name} ${x.stufe - 1} -> ${x.stufe}</span><span style="font-size:11px; ${timer.completed ? "color:green;" : ""} align-items:center;">${timer.timer}</span>`
+                        task.innerHTML = `<span style="font-size:11px; padding-left: 15px; padding-right:8px">${x.name} level ${x.stufe}</span><span style="font-size:11px; ${timer.completed ? "color:green;" : ""} align-items:center;">${timer.timer}</span>`
 
                         if (timer.completed) {
                             notifyMe("Building completed", x, vil);
@@ -529,6 +550,7 @@ function allInOneOpera() {
         while (panel.firstChild) {
             panel.removeChild(panel.firstChild);
         }
+
         if (window.location.pathname.includes("dorf1")) {
             this.fieldsCollection.forEach(field => {
                 //Number of currently beign guilt same type buildings
@@ -623,10 +645,12 @@ function allInOneOpera() {
 
 
     //STARTS HERE IF CAN SEE VILLAGE LIST
+
     if (shouldRun()) {
 
-        const botPanel = createSidePanel();
+        const botPanel = createSidePanel().addSection("BUILDING QUEUE");
         const BOT = getCities();
+        const villageLiArray = document.querySelectorAll("#sidebarBoxVillagelist li")
         if (window.location.pathname.includes("dorf1")) {
             BOT.fieldsCollection = setUpResFields()
         }
@@ -635,12 +659,14 @@ function allInOneOpera() {
             BOT.buildingCollection = setUpBuildings()
         }
 
-        BOT.villagesSection = botPanel.addSection("PINGWINBOT");
-        BOT.jobsSection = botPanel.addSection("BUILDING QUEUE");
+        // BOT.villagesSection = botPanel.addSection("PINGWINBOT");
+
+        BOT.jobsSection = botPanel.appendChild(document.createElement("div"))
 
         BOT.buildingDB = buildings;
-        BOT.vil.forEach((t) => {
-            BOT.villagesSection.appendChild(createCity(t, BOT).block)
+        BOT.vil.forEach((t, i) => {
+            //  BOT.villagesSection.appendChild(createCity(t, BOT).block)
+            villageLiArray[i].appendChild(createCity(t, BOT).block)
         });
 
         BOT.addJob = function (job) {
@@ -775,7 +801,6 @@ function allInOneOpera() {
         if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
             const params = getParams(window.location)
             const cat = params.category ? Number(params.category) : 1
-            console.log("cat: ", cat)
 
             const availableBuildings = document.querySelectorAll(".buildingWrapper > .build_desc > img.building");
             availableBuildings.forEach(b => {
@@ -803,7 +828,6 @@ function allInOneOpera() {
         initJobQueue(BOT);
         BOT.displayJobs()
         BOT.setNextJob()
-        console.log(BOT)
     }
 }
 
