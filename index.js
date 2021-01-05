@@ -9,7 +9,7 @@
 
 function allInOneOpera() {
 
-    const V = "0.64"
+    const V = "0.65"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -229,10 +229,16 @@ function allInOneOpera() {
     const getCities = () => {
         const cities = {}
         cities.vil = [];
+        console.log("getting cities info:")
 
         let loadedCities = JSON.parse(localStorage.getItem(CITIES_STORAGE))
+
+        console.log("loaded cities from storage: ", loadedCities)
+
         let villages = document.querySelectorAll("div#sidebarBoxVillagelist > div.content > ul > li");
-        villages.forEach((vil) => {
+        console.log("villages visible on website: ", villages)
+        console.log("total found: ", villages.length)
+        villages.forEach((vil, i) => {
             let data = vil.querySelector("a > span.coordinatesGrid")
             let name = data.getAttribute("data-villagename");
             if (!name) {
@@ -246,6 +252,8 @@ function allInOneOpera() {
             if (!did) { did = Number(vil.querySelector("a").href.slice(0, -1).split("?newdid=")[1]) }
 
             const v = { name, x, y, did }
+
+            console.log("basic data for village " + i, v)
 
             if (vil.classList.contains("active")) {
                 cities.cID = did;
@@ -272,8 +280,13 @@ function allInOneOpera() {
 
             if (window.location.pathname === "/profile") {
                 const cap = document.querySelector("td.name > .mainVillage").parentNode.querySelector("a").innerText.trim()
+                console.log("Capital name: ", cap)
+                console.log("Selected town name: ", name)
                 if (name === cap) {
+                    console.log("Matched! seting as capital ", cap)
                     cities.cap = did
+                } else {
+                    console.log("Did not match! capital not set ")
                 }
             } else {
                 if (loadedCities && loadedCities.cap) {
@@ -777,7 +790,7 @@ function allInOneOpera() {
                             localStorage.setItem(BOT_IN_PROGRESS, "")
                             this.completeJob(inProgress.job)
                             console.log("job was already done before")
-                            // window.location.href = '/dorf1.php'
+                            window.location.href = '/dorf1.php'
 
                         }, 5000)
                     }
