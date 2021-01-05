@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.7
+// @version        0.71
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const V = "0.7"
+    const V = "0.71"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -245,6 +245,9 @@ function allInOneOpera() {
         //SETTING TRIBE
         if (window.location.pathname.includes("dorf1") && !Object.keys(loadedCities).includes("tribe")) {
             cities.tribe = document.querySelector("div#resourceFieldContainer").classList[1]
+        } else if (Object.keys(loadedCities).includes("tribe")) {
+            cities.tribe = loadedCities.tribe
+
         }
 
         let villages = document.querySelectorAll("div#sidebarBoxVillagelist > div.content > ul > li");
@@ -811,9 +814,7 @@ function allInOneOpera() {
                         }, 5000)
                     }
                     if (inProgress.cid === Number(params.newdid) && inProgress.job.pos === Number(params.id)) {
-
                         let b = undefined;
-
                         if (inProgress.job.to === 1 && inProgress.job.cat) {
                             b = document.querySelector(`img.g${inProgress.job.gid}`).parentNode.parentNode.querySelector(".contractLink button")
                         } else {
@@ -856,6 +857,7 @@ function allInOneOpera() {
                                 const d1j = jobs.filter(j => j.gid < 5)
                                 if (d1j.length > 0) {
                                     j = d1j[0]
+                                    console.log("Resource field job found.")
                                     if (storage.l1 >= cost[0] && storage.l2 >= cost[1] && storage.l3 >= cost[2] && storage.l4 >= cost[3]) {
                                         if (j.gid > 4 && location.pathname.includes("dorf1")) {
                                             console.log("Wrong section. Navigating to building section for next job in 3s")
@@ -891,6 +893,7 @@ function allInOneOpera() {
                                 console.log("No buildings in progress. Checking jobs")
                                 const d2j = jobs.filter(j => j.gid > 4)
                                 if (d2j.length > 0) {
+
                                     j = d2j[0]
                                     if (storage.l1 >= cost[0] && storage.l2 >= cost[1] && storage.l3 >= cost[2] && storage.l4 >= cost[3]) {
                                         if (j.gid > 4 && location.pathname.includes("dorf1")) {
