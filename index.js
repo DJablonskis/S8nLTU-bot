@@ -746,7 +746,7 @@ function allInOneOpera() {
 
         BOT.completeJob = function (job) {
             let jobs = this.jobs["c" + this.cID]
-            this.jobs["c" + this.cID] = jobs.filter((j) => (j.pos !== job.pos || (j.pos === job.pos && j.to === job.to)))
+            this.jobs["c" + this.cID] = jobs.filter((j) => (j.pos !== job.pos || (j.pos === job.pos && j.to !== job.to)))
             localStorage.setItem(JOBS_STORAGE, JSON.stringify(this.jobs))
         }
 
@@ -769,14 +769,17 @@ function allInOneOpera() {
                     //check if job was done to this leve and if so, complete it
                     const currentLvl = Number(document.querySelector("div#build").classList[1].replace("level", ""))
                     console.log("Building level detected: ", currentLvl)
+                    console.log("job planed: ", inProgress)
                     if (currentLvl >= inProgress.job.to) {
+                        console.log()
+                        console.log("Job was already done before. Canceling in 5s!")
                         return setTimeout(() => {
                             localStorage.setItem(BOT_IN_PROGRESS, "")
                             this.completeJob(inProgress.job)
                             console.log("job was already done before")
-                            window.location.href = '/dorf1.php'
+                            // window.location.href = '/dorf1.php'
 
-                        }, 3500)
+                        }, 5000)
                     }
                     if (inProgress.cid === Number(params.newdid) && inProgress.job.pos === Number(params.id)) {
 
@@ -798,11 +801,13 @@ function allInOneOpera() {
             }
             else if (location.pathname.includes("dorf")) {
 
+
                 let jobs = this.jobs["c" + this.cID]
                 const { production, storage } = this.current.ress
-
+                console.log("Looking for jobs")
                 //ANY JOBS SET?
                 if (jobs.length > 0) {
+                    console.log("Found some jobs in current town")
                     let j = jobs[0]
                     const cap = this.current.ress.capacity
                     const stor = this.current.ress.storage
@@ -810,6 +815,7 @@ function allInOneOpera() {
 
                     //ANYTHING BUILDING?
                     if (this.current.queue.length > 0) {
+                        console.log("Something already building. Waiting...")
                         //Check if roman here and if can do alternative job instead
                         //   j.push(nj)
                         // if (jobs.length > 1) {
@@ -820,8 +826,10 @@ function allInOneOpera() {
                         // }
 
                     } else {
+                        console.log("Building queue empty. Can start building")
                         //check if enough storage:
                         if (storage.l1 >= cost[0] && storage.l2 >= cost[1] && storage.l3 >= cost[2] && storage.l4 >= cost[3]) {
+                            console.log("Enough resourses. Navigating to the building in 5 seconds!")
                             localStorage.setItem(BOT_IN_PROGRESS, JSON.stringify({
                                 cid: this.cID,
                                 job: j,
@@ -834,7 +842,12 @@ function allInOneOpera() {
                             }, 5000)
 
                         }
+                        else {
+                            console.log("Not enough resourses. Waiting....")
+                        }
                     }
+                } else {
+                    console.log("No planed jobs in this town. Waiting")
                 }
             }
 
@@ -844,7 +857,7 @@ function allInOneOpera() {
         initJobQueue(BOT);
         BOT.displayJobs()
         if (ON) {
-            console.log("Star")
+            console.log("Starting bot")
             BOT.setNextJob()
         }
 
