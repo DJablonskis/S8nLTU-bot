@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.64
+// @version        0.66
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const V = "0.65"
+    const V = "0.66"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -229,15 +229,21 @@ function allInOneOpera() {
     const getCities = () => {
         const cities = {}
         cities.vil = [];
-        console.log("getting cities info:")
+
+        //   console.log("getting cities info:")
 
         let loadedCities = JSON.parse(localStorage.getItem(CITIES_STORAGE))
 
-        console.log("loaded cities from storage: ", loadedCities)
+        //   console.log("loaded cities from storage: ", loadedCities)
+
+        //SETTING TRIBE
+        if (window.location.pathname.includes("dorf1") && !Object.keys(loadedCities).includes("tribe")) {
+            cities.tribe = document.querySelector("div#resourceFieldContainer").classList[1]
+        }
 
         let villages = document.querySelectorAll("div#sidebarBoxVillagelist > div.content > ul > li");
-        console.log("villages visible on website: ", villages)
-        console.log("total found: ", villages.length)
+        //   console.log("villages visible on website: ", villages)
+        //   console.log("total found: ", villages.length)
         villages.forEach((vil, i) => {
             let data = vil.querySelector("a > span.coordinatesGrid")
             let name = data.getAttribute("data-villagename");
@@ -253,7 +259,7 @@ function allInOneOpera() {
 
             const v = { name, x, y, did }
 
-            console.log("basic data for village " + i, v)
+            // console.log("basic data for village " + i, v)
 
             if (vil.classList.contains("active")) {
                 cities.cID = did;
@@ -278,21 +284,25 @@ function allInOneOpera() {
                 }
             }
 
+            //SETING CAPITAL
             if (window.location.pathname === "/profile") {
                 const cap = document.querySelector("td.name > .mainVillage").parentNode.querySelector("a").innerText.trim()
-                console.log("Capital name: ", cap)
-                console.log("Selected town name: ", name)
+                //   console.log("Capital name: ", cap)
+                //    console.log("Selected town name: ", name)
                 if (name === cap) {
-                    console.log("Matched! seting as capital ", cap)
+                    //  console.log("Matched! seting as capital ", cap)
                     cities.cap = did
                 } else {
-                    console.log("Did not match! capital not set ")
+                    //  console.log("Did not match! capital not set ")
                 }
             } else {
                 if (loadedCities && loadedCities.cap) {
                     cities.cap = loadedCities.cap
                 }
             }
+
+
+
 
 
 
@@ -708,7 +718,8 @@ function allInOneOpera() {
 
         BOT.addJob = function (job) {
             if (!this.cap) {
-                alert("Capitol unknown. Open profile tab for BOT to update data first.")
+                alert("Capital not set. Opening '/profile' section for you now. While on '/profile' section, please change your current city to your capital city for bot to update. You only need to do this once.")
+                location.href = '/profile'
                 return
             }
             //Check if ress and max level ceiling
@@ -782,9 +793,8 @@ function allInOneOpera() {
                     //check if job was done to this leve and if so, complete it
                     const currentLvl = Number(document.querySelector("div#build").classList[1].replace("level", ""))
                     console.log("Building level detected: ", currentLvl)
-                    console.log("job planed: ", inProgress)
+                    console.log("Job planed: ", inProgress)
                     if (currentLvl >= inProgress.job.to) {
-                        console.log()
                         console.log("Job was already done before. Canceling in 5s!")
                         return setTimeout(() => {
                             localStorage.setItem(BOT_IN_PROGRESS, "")
@@ -842,6 +852,18 @@ function allInOneOpera() {
                         console.log("Building queue empty. Can start building")
                         //check if enough storage:
                         if (storage.l1 >= cost[0] && storage.l2 >= cost[1] && storage.l3 >= cost[2] && storage.l4 >= cost[3]) {
+                            if (j.gid > 4 && location.pathname.includes("dorf1")) {
+                                console.log("Wrong section. Navigating to building section for next job in 3s")
+                                return setTimeout(() => {
+                                    window.location.href = "/dorf2.php"
+                                }, 3000)
+                            }
+                            if (j.gid < 5 && location.pathname.includes("dorf2")) {
+                                console.log("Wrong section. Navigating to fields section for next job in 3s")
+                                return setTimeout(() => {
+                                    window.location.href = "/dorf1.php"
+                                }, 3000)
+                            }
                             console.log("Enough resourses. Navigating to the building in 5 seconds!")
                             localStorage.setItem(BOT_IN_PROGRESS, JSON.stringify({
                                 cid: this.cID,
