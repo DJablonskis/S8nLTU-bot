@@ -4,11 +4,24 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.62
+// @version        0.64
 // ==/UserScript==
 
 function allInOneOpera() {
 
+    const V = "0.64"
+
+    const CITIES_STORAGE = "storedCities";
+    const PANEL_POSITION = "positionPanel"
+    const JOBS_STORAGE = "storedJobs";
+    const BOT_POWER = 'bot_enabled';
+    const BOT_ON = '1';
+    const BOT_OFF = '0';
+    const BOT_IN_PROGRESS = "bot_progress"
+    const POSITION_UP = "UP";
+    const POSITION_DOWN = "DOWN"
+
+    const ON = localStorage.getItem(BOT_POWER) === BOT_ON
     const shouldRun = () => {
         return document.querySelectorAll("div#sidebarBoxVillagelist > div.content > ul > li").length > 0
     }
@@ -102,15 +115,6 @@ function allInOneOpera() {
     buildings.forEach((b) => { b.getStat = getStat })
 
 
-    const CITIES_STORAGE = "storedCities";
-    const PANEL_POSITION = "positionPanel"
-    const JOBS_STORAGE = "storedJobs";
-    const BOT_POWER = 'bot_enabled';
-    const BOT_ON = '1';
-    const BOT_OFF = '0';
-    const BOT_IN_PROGRESS = "bot_progress"
-    const POSITION_UP = "UP";
-    const POSITION_DOWN = "DOWN"
 
     function setUpResFields() {
         const ressFields = []
@@ -181,11 +185,6 @@ function allInOneOpera() {
         return buildings
     }
 
-
-
-
-
-
     //GET TRIBE DORF 1
     // t = Number(document.querySelector("#resourceFieldContainer").classList[1].slice(-1))
 
@@ -199,8 +198,7 @@ function allInOneOpera() {
     const wi = (x) => (`<i style="background-image: url('https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/hud/topBar/header/stockBar/warehouse_medium.png'); margin-right:4px; width: ${x}px; height: ${x}px; background-size: contain;"></i>`);
     const gi = (x) => (`<i style="background-image: url('https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/hud/topBar/header/stockBar/granary_medium.png');margin-right:4px; width: ${x}px; height: ${x}px; background-size: contain;"></i>`);
 
-    const building = (id, tribe = "teuton", size = 120, big = true) =>
-        (`<span class="buildingsV3"><img src="/img/x.gif" class="building g${id} ${tribe} ${big ? "big" : ""}" style="width: ${size}px; height: ${size}px; background-size:contain;"></span>`)
+    const building = (id, tribe = "teuton", size = 120, big = true) => (`<span class="buildingsV3"><img src="/img/x.gif" class="building g${id} ${tribe} ${big ? "big" : ""}" style="width: ${size}px; height: ${size}px; background-size:contain;"></span>`)
 
     const getResources = () => {
         let arr = document.querySelector("#contentOuterContainer > script").text.split("=").pop().trim().slice(0, -1).split("},");
@@ -294,7 +292,6 @@ function allInOneOpera() {
     const createSidePanel = () => {
 
         const pos = localStorage.getItem(PANEL_POSITION)
-        const ON = localStorage.getItem(BOT_POWER) === BOT_ON
         const sideBar = document.querySelector("#sidebarBeforeContent > div")
         const panel = document.createElement("div");
         panel.classList.add("sidebarBox")
@@ -642,13 +639,40 @@ function allInOneOpera() {
         c.displayJobs = displayJobs
     }
 
+    if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
+        const params = getParams(window.location)
+        const cat = params.category ? Number(params.category) : 1
+
+        const availableBuildings = document.querySelectorAll(".buildingWrapper > .build_desc > img.building");
+        availableBuildings.forEach(b => {
+            let cont = b.parentNode.parentNode;
+            let gid = Number(cont.querySelector(".contract").id.replace("contract_building", ""))
+            let pos = window.location.search.split("=")[1]
+            pos = pos.includes("&") ? Number(pos.split("&")[0]) : Number(pos)
+
+            cont.style.position = "relative";
+            const button = cont.appendChild(document.createElement("button"));
+            button.classList.add("textButtonV1", "green", "new");
+            button.style.position = "absolute";
+            button.style.right = "0"
+            button.style.top = "0"
+            button.innerText = `Build later`
+
+            button.onclick = () => {
+                BOT.addJob({ gid, pos, lvl: 0, to: 1, cat })
+                BOT.displayJobs()
+                window.location.href = '/dorf2.php'
+            };
+        })
+    }
+
 
 
     //STARTS HERE IF CAN SEE VILLAGE LIST
 
     if (shouldRun()) {
 
-        const botPanel = createSidePanel().addSection("BUILDING QUEUE");
+        const botPanel = createSidePanel().addSection("S8nLTU BOT v" + V);
         const BOT = getCities();
         const villageLiArray = document.querySelectorAll("#sidebarBoxVillagelist li")
         if (window.location.pathname.includes("dorf1")) {
@@ -722,7 +746,7 @@ function allInOneOpera() {
 
         BOT.completeJob = function (job) {
             let jobs = this.jobs["c" + this.cID]
-            this.jobs["c" + this.cID] = jobs.filter((j) => (j.pos === job.pos && j.to !== job.to))
+            this.jobs["c" + this.cID] = jobs.filter((j) => (j.pos !== job.pos || (j.pos === job.pos && j.to === job.to)))
             localStorage.setItem(JOBS_STORAGE, JSON.stringify(this.jobs))
         }
 
@@ -735,25 +759,44 @@ function allInOneOpera() {
 
 
         BOT.setNextJob = function () {
-            const inProgress = JSON.parse(localStorage.getItem(BOT_IN_PROGRESS))
+            //TODO check if not empty string
+            let prog = localStorage.getItem(BOT_IN_PROGRESS)
+            const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
+
             if (location.pathname.includes("build.php")) {
                 if (inProgress !== null) {
                     const params = getParams(window.location)
+                    //check if job was done to this leve and if so, complete it
+                    const currentLvl = Number(document.querySelector("div#build").classList[1].replace("level", ""))
+                    console.log("Building level detected: ", currentLvl)
+                    if (currentLvl >= inProgress.job.to) {
+                        return setTimeout(() => {
+                            localStorage.setItem(BOT_IN_PROGRESS, "")
+                            this.completeJob(inProgress.job)
+                            console.log("job was already done before")
+                            window.location.href = '/dorf1.php'
+
+                        }, 3500)
+                    }
                     if (inProgress.cid === Number(params.newdid) && inProgress.job.pos === Number(params.id)) {
+
                         let b = undefined;
+
                         if (inProgress.job.to === 1 && inProgress.job.cat) {
                             b = document.querySelector(`img.g${inProgress.job.gid}`).parentNode.parentNode.querySelector(".contractLink button")
-                        } else { b = document.querySelector(".upgradeBuilding .section1 button.green.build"); }
+                        } else {
+                            b = document.querySelector(".upgradeBuilding .section1 button.green.build");
+                        }
                         setTimeout(() => {
                             if (b) {
-                                this.removeJob(inProgress.job)
+                                this.completeJob(inProgress.job)
                                 b.click()
                             }
                         }, 3500)
                     }
                 }
             }
-            else {
+            else if (location.pathname.includes("dorf")) {
 
                 let jobs = this.jobs["c" + this.cID]
                 const { production, storage } = this.current.ress
@@ -787,7 +830,6 @@ function allInOneOpera() {
 
                             setTimeout(() => {
                                 const href = j.to === 1 && j.cat ? `/build.php?newdid=${this.cID}&id=${j.pos}&category=${j.cat}` : `/build.php?newdid=${this.cID}&id=${j.pos}&t=0&s=0`;
-
                                 window.location.href = href
                             }, 5000)
 
@@ -798,36 +840,14 @@ function allInOneOpera() {
 
         }
 
-        if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
-            const params = getParams(window.location)
-            const cat = params.category ? Number(params.category) : 1
-
-            const availableBuildings = document.querySelectorAll(".buildingWrapper > .build_desc > img.building");
-            availableBuildings.forEach(b => {
-                let cont = b.parentNode.parentNode;
-                let gid = Number(cont.querySelector(".contract").id.replace("contract_building", ""))
-                let pos = window.location.search.split("=")[1]
-                pos = pos.includes("&") ? Number(pos.split("&")[0]) : Number(pos)
-
-                cont.style.position = "relative";
-                const button = cont.appendChild(document.createElement("button"));
-                button.classList.add("textButtonV1", "green", "new");
-                button.style.position = "absolute";
-                button.style.right = "0"
-                button.style.top = "0"
-                button.innerText = `Build later`
-
-                button.onclick = () => {
-                    BOT.addJob({ gid, pos, lvl: 0, to: 1, cat })
-                    BOT.displayJobs()
-                    window.location.href = '/dorf2.php'
-                };
-            })
-        }
 
         initJobQueue(BOT);
         BOT.displayJobs()
-        BOT.setNextJob()
+        if (ON) {
+            console.log("Star")
+            BOT.setNextJob()
+        }
+
     }
 }
 
