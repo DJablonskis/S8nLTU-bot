@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.66
+// @version        0.7
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const V = "0.66"
+    const V = "0.7"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -20,6 +20,12 @@ function allInOneOpera() {
     const BOT_IN_PROGRESS = "bot_progress"
     const POSITION_UP = "UP";
     const POSITION_DOWN = "DOWN"
+    const TRIBE_ROMAN = 'tribe1'
+    const TRIBE_TEUTON = 'tribe2'
+    const TRIBE_GAUL = 'tribe3'
+    const TRIBE_EGIPT = 'tribe6'
+    const TRIBE_HUN = 'tribe7'
+
 
     const ON = localStorage.getItem(BOT_POWER) === BOT_ON
     const shouldRun = () => {
@@ -838,7 +844,91 @@ function allInOneOpera() {
 
                     //ANYTHING BUILDING?
                     if (this.current.queue.length > 0) {
-                        console.log("Something already building. Waiting...")
+                        const d1q = this.current.queue.filter(q => q.gid < 5)
+                        console.log("d1q queue: ", d1q.length)
+                        const d2q = this.current.queue.filter(q => q.gid > 4)
+                        console.log("d2q queue: ", d2q.length)
+
+                        if (Object.keys(this).includes("tribe") && this.tribe === TRIBE_ROMAN) {
+                            console.log("Roman detected. Checking jobs")
+                            if (d1q.length === 0) {
+                                console.log("No fields in progress. Checking jobs")
+                                const d1j = jobs.filter(j => j.gid < 5)
+                                if (d1j.length > 0) {
+                                    j = d1j[0]
+                                    if (storage.l1 >= cost[0] && storage.l2 >= cost[1] && storage.l3 >= cost[2] && storage.l4 >= cost[3]) {
+                                        if (j.gid > 4 && location.pathname.includes("dorf1")) {
+                                            console.log("Wrong section. Navigating to building section for next job in 3s")
+                                            return setTimeout(() => {
+                                                window.location.href = "/dorf2.php"
+                                            }, 3000)
+                                        }
+                                        if (j.gid < 5 && location.pathname.includes("dorf2")) {
+                                            console.log("Wrong section. Navigating to fields section for next job in 3s")
+                                            return setTimeout(() => {
+                                                window.location.href = "/dorf1.php"
+                                            }, 3000)
+                                        }
+                                        console.log("Enough resourses. Navigating to the building in 5 seconds!")
+                                        localStorage.setItem(BOT_IN_PROGRESS, JSON.stringify({
+                                            cid: this.cID,
+                                            job: j,
+                                            ress: this.current.ress
+                                        }));
+
+                                        setTimeout(() => {
+                                            const href = j.to === 1 && j.cat ? `/build.php?newdid=${this.cID}&id=${j.pos}&category=${j.cat}` : `/build.php?newdid=${this.cID}&id=${j.pos}&t=0&s=0`;
+                                            window.location.href = href
+                                        }, 5000)
+
+                                    }
+                                    else {
+                                        console.log("Not enough resourses. Waiting....")
+                                    }
+                                }
+                            }
+                            if (d2q.length === 0) {
+                                console.log("No buildings in progress. Checking jobs")
+                                const d2j = jobs.filter(j => j.gid > 4)
+                                if (d2j.length > 0) {
+                                    j = d2j[0]
+                                    if (storage.l1 >= cost[0] && storage.l2 >= cost[1] && storage.l3 >= cost[2] && storage.l4 >= cost[3]) {
+                                        if (j.gid > 4 && location.pathname.includes("dorf1")) {
+                                            console.log("Wrong section. Navigating to building section for next job in 3s")
+                                            return setTimeout(() => {
+                                                window.location.href = "/dorf2.php"
+                                            }, 3000)
+                                        }
+                                        if (j.gid < 5 && location.pathname.includes("dorf2")) {
+                                            console.log("Wrong section. Navigating to fields section for next job in 3s")
+                                            return setTimeout(() => {
+                                                window.location.href = "/dorf1.php"
+                                            }, 3000)
+                                        }
+                                        console.log("Enough resourses. Navigating to the building in 5 seconds!")
+                                        localStorage.setItem(BOT_IN_PROGRESS, JSON.stringify({
+                                            cid: this.cID,
+                                            job: j,
+                                            ress: this.current.ress
+                                        }));
+
+                                        setTimeout(() => {
+                                            const href = j.to === 1 && j.cat ? `/build.php?newdid=${this.cID}&id=${j.pos}&category=${j.cat}` : `/build.php?newdid=${this.cID}&id=${j.pos}&t=0&s=0`;
+                                            window.location.href = href
+                                        }, 5000)
+
+                                    }
+                                    else {
+                                        console.log("Not enough resourses. Waiting....")
+                                    }
+                                }
+                            }
+
+                        } else {
+
+                            console.log("Something already building. Waiting...")
+
+                        }
                         //Check if roman here and if can do alternative job instead
                         //   j.push(nj)
                         // if (jobs.length > 1) {
