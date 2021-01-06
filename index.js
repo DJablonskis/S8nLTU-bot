@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.71
+// @version        0.72
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const V = "0.71"
+    const V = "0.72"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -671,32 +671,7 @@ function allInOneOpera() {
         c.displayJobs = displayJobs
     }
 
-    if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
-        const params = getParams(window.location)
-        const cat = params.category ? Number(params.category) : 1
 
-        const availableBuildings = document.querySelectorAll(".buildingWrapper > .build_desc > img.building");
-        availableBuildings.forEach(b => {
-            let cont = b.parentNode.parentNode;
-            let gid = Number(cont.querySelector(".contract").id.replace("contract_building", ""))
-            let pos = window.location.search.split("=")[1]
-            pos = pos.includes("&") ? Number(pos.split("&")[0]) : Number(pos)
-
-            cont.style.position = "relative";
-            const button = cont.appendChild(document.createElement("button"));
-            button.classList.add("textButtonV1", "green", "new");
-            button.style.position = "absolute";
-            button.style.right = "0"
-            button.style.top = "0"
-            button.innerText = `Build later`
-
-            button.onclick = () => {
-                BOT.addJob({ gid, pos, lvl: 0, to: 1, cat })
-                BOT.displayJobs()
-                window.location.href = '/dorf2.php'
-            };
-        })
-    }
 
 
 
@@ -706,6 +681,34 @@ function allInOneOpera() {
 
         const botPanel = createSidePanel().addSection("S8nLTU BOT v" + V);
         const BOT = getCities();
+
+        if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
+            const params = getParams(window.location)
+            const cat = params.category ? Number(params.category) : 1
+
+            const availableBuildings = document.querySelectorAll(".buildingWrapper > .build_desc > img.building");
+            availableBuildings.forEach(b => {
+                let cont = b.parentNode.parentNode;
+                let gid = Number(cont.querySelector(".contract").id.replace("contract_building", ""))
+                let pos = window.location.search.split("=")[1]
+                pos = pos.includes("&") ? Number(pos.split("&")[0]) : Number(pos)
+
+                cont.style.position = "relative";
+                const button = cont.appendChild(document.createElement("button"));
+                button.classList.add("textButtonV1", "green", "new");
+                button.style.position = "absolute";
+                button.style.right = "0"
+                button.style.top = "0"
+                button.innerText = `Build later`
+
+                button.onclick = () => {
+                    BOT.addJob({ gid, pos, lvl: 0, to: 1, cat })
+                    BOT.displayJobs()
+                    window.location.href = '/dorf2.php'
+                };
+            })
+        }
+
         const villageLiArray = document.querySelectorAll("#sidebarBoxVillagelist li")
         if (window.location.pathname.includes("dorf1")) {
             BOT.fieldsCollection = setUpResFields()
@@ -726,6 +729,7 @@ function allInOneOpera() {
         });
 
         BOT.addJob = function (job) {
+            console.log("adding job: ",)
             if (!this.cap) {
                 alert("Capital not set. Opening '/profile' section for you now. While on '/profile' section, please change your current city to your capital city for bot to update. You only need to do this once.")
                 location.href = '/profile'
