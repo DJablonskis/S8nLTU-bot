@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.73
+// @version        0.74
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const V = "0.73"
+    const V = "0.74"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -580,6 +580,10 @@ function allInOneOpera() {
             panel.removeChild(panel.firstChild);
         }
 
+        if (jobs.length === 0) {
+            this.jobsSection.innerText = "No jobs planed. Added jobs will show here."
+        }
+
         if (window.location.pathname.includes("dorf1")) {
             this.fieldsCollection.forEach(field => {
                 //Number of currently beign guilt same type buildings
@@ -720,7 +724,72 @@ function allInOneOpera() {
 
         // BOT.villagesSection = botPanel.addSection("PINGWINBOT");
 
-        BOT.jobsSection = botPanel.appendChild(document.createElement("div"))
+        const titleStyle = 'letter-spacing: .1em; font-family: "Noto Serif"; font-weight: bold; color: #5e463a; margin-bottom: 5px; margin-top: 5px;'
+
+        const jobQS = botPanel.appendChild(document.createElement("div"))
+        jobQS.style.cssText = "padding-bottom: 8px; border-bottom: 1px solid #5e463a;"
+        const jobQTitle = jobQS.appendChild(document.createElement("h4"))
+        jobQTitle.innerText = "Buildig queue:"
+        jobQTitle.style.cssText = titleStyle
+        BOT.jobsSection = jobQS.appendChild(document.createElement("div"))
+
+        //NPC SETUP
+        const npcS = botPanel.appendChild(document.createElement("div"))
+        npcS.style.cssText = "padding-bottom: 8px; border-bottom: 1px solid #5e463a;"
+        const npcTitle = npcS.appendChild(document.createElement("h4"))
+        npcTitle.style.cssText = titleStyle
+
+        npcTitle.innerText = "NPC rules"
+        BOT.npcPanel = npcS.appendChild(document.createElement("div"))
+        BOT.npcPanel.innerText = "No NPC rules so far. Press button bellow to add new NPC rules."
+        const addNpcButton = npcS.appendChild(document.createElement("button"))
+        addNpcButton.className = "textButtonV1 gold productionBoostButton"
+        addNpcButton.style.cssText = "margin-top: 8px;"
+        addNpcButton.innerText = "Add new rule"
+        addNpcButton.onclick = function () {
+
+            const typeNames = ['Lumber', 'Clay', 'Iron', 'Crop']
+            const iNPC = {}
+            const dir = prompt('Please enter "a" for above limit or "b" for bellow limit:').toLowerCase();
+            if (dir != "a" && dir !== 'b') {
+                alert("wrong input, canceled!")
+                return false
+            }
+            iNPC.dir = dir
+
+            const percent = Number(prompt('Please enter percentage storage limit at which NPC will be done:\n (between 0 and 100)').toLowerCase());
+            if (percent < 0 && percent > 100) {
+                alert("wrong input, canceled!")
+                return false
+            }
+            iNPC.percent = percent
+
+            const type = Number(prompt('which resource do you want to watch? \n1 - Lumber\n2 - Clay\n3 - Iron\n4 - Crop'))
+            if (type < 1 || type > 4) {
+                alert("wrong input, canceled!")
+                return false
+            }
+
+            const ratio = prompt('Enter wanted resource ratio seperated by comma:\n Example "10, 10, 10, 70", means resourses will be split to 10% lumber, 10% clay, 10% iron and 70% crop')
+            const ratioArr = ratio.split(",")
+            if (ratioArr.length !== 4) {
+                alert("wrong input, canceled!")
+                return false
+            }
+            iNPC.ratio = ratio
+
+            const s = 'You are setting up this NPC rule: \n'
+                + `if ${typeNames[type - 1]} is ${dir === "a" ? "above" : "below"} ${percent}%, then distribute to ratio ${ratio}`
+                + '\n'
+                + 'Press OK to confirm!'
+
+            if (confirm(s)) {
+                BOT.npcPanel.innerText = ""
+                const newSpan = BOT.npcPanel.appendChild(document.createElement("span"))
+                newSpan.innerText = `${typeNames[type - 1]} ${dir === "a" ? ">" : "<"} ${percent}% : ${ratio}`
+
+            }
+        }
 
         BOT.buildingDB = buildings;
         BOT.vil.forEach((t, i) => {
@@ -991,6 +1060,8 @@ function allInOneOpera() {
             }
 
         }
+
+
 
 
         initJobQueue(BOT);
