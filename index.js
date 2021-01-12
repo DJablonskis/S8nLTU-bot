@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.72
+// @version        0.73
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const V = "0.72"
+    const V = "0.73"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -802,19 +802,26 @@ function allInOneOpera() {
 
             if (location.pathname.includes("build.php")) {
                 if (inProgress !== null) {
+
                     const params = getParams(window.location)
+                    let currentLvl = 0
+
                     //check if job was done to this leve and if so, complete it
-                    const currentLvl = Number(document.querySelector("div#build").classList[1].replace("level", ""))
-                    console.log("Building level detected: ", currentLvl)
-                    console.log("Job planed: ", inProgress)
+                    if (Object.keys(params).includes("gid")) {
+                        currentLvl = Number(document.querySelector("div#build").classList[1].replace("level", ""))
+                        console.log(`Building level ${currentLvl} in position ${params.id}`)
+                    }
+                    else {
+                        console.log(`Empty space in position ${params.id}`)
+
+                    }
+
                     if (currentLvl >= inProgress.job.to) {
                         console.log("Job was already done before. Canceling in 5s!")
                         return setTimeout(() => {
                             localStorage.setItem(BOT_IN_PROGRESS, "")
                             this.completeJob(inProgress.job)
-                            console.log("job was already done before")
                             window.location.href = '/dorf1.php'
-
                         }, 5000)
                     }
                     if (inProgress.cid === Number(params.newdid) && inProgress.job.pos === Number(params.id)) {
