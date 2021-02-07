@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.75
+// @version        0.8
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const V = "0.75"
+    const VER = "0.8"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -26,8 +26,75 @@ function allInOneOpera() {
     const TRIBE_GAUL = 'tribe3'
     const TRIBE_EGIPT = 'tribe6'
     const TRIBE_HUN = 'tribe7'
+    const MIN_WAIT = 3 * 1000 * 60
+    const MAX_WAIT = 15 * 1000 * 60
+
+    function notifyMe(title, action, village) {
+        // Let's check if the browser supports notifications
+        if (!("Notification" in window)) {
+            alert("This browser does not support desktop notification");
+        }
+
+        // Let's check whether notification permissions have already been granted
+        else if (Notification.permission === "granted") {
+            // If it's okay let's create a notification
+            var notification = new Notification(title, {
+                body: `${action.name} was upgraded to level ${action.stufe} in "${village.name}"`,
+                icon: 'https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png',
+                image: 'https://cdnb.artstation.com/p/assets/images/images/006/367/267/large/ahmed-hmaim-final-c2.jpg?1498055051'
+            });
+            notification.onclick = function () {
+                parent.focus();
+            }
+
+        }
+        // Otherwise, we need to ask the user for permission
+        else if (Notification.permission !== "denied") {
+
+            Notification.requestPermission().then(function (permission) {
+                // If the user accepts, let's create a notification
+                if (permission === "granted") {
+                    var notification = new Notification(title, {
+                        body: `${action.name} was upgraded to level ${action.stufe} in "${village.name}"`,
+                        icon: 'https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png'
+                    });
+                    notification.onclick = function () {
+                        parent.focus();
+                    }
+                }
+            });
+        } else if (Notification.permission === "denied") {
+            alert("Please allow notifications for script to work properly")
+        }
+    }
 
 
+
+    function delay() {
+        let d = (Math.floor(Math.random() * 11) + 5) * 1000
+        console.log("delay in ms: ", d)
+        return d;
+    }
+
+
+    function shuffleArray(array) {
+        var currentIndex = array.length, temporaryValue, randomIndex;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
+
+        return array;
+    }
 
     const ON = localStorage.getItem(BOT_POWER) === BOT_ON
     const shouldRun = () => {
@@ -39,11 +106,37 @@ function allInOneOpera() {
         return Object.assign(acc, { [k]: v })
     }, {}))
 
-    ////KIRILOID
-
     function RoundMul(v, n) {
         return Math.round(v / n) * n;
     }
+
+    function getStorageMax(capacity, storage, production) {
+
+        if (capacity === storage) {
+            new Notification("Prisipilde resursai!", {
+                body: `Resources are full!`,
+                icon: 'https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png',
+                image: 'https://cdnb.artstation.com/p/assets/images/images/006/367/267/large/ahmed-hmaim-final-c2.jpg?1498055051'
+            });
+        }
+
+        if (storage === 0 && production < 0) {
+            new Notification("Baigesi grudai!!!!", {
+                body: `Granary is empty!`,
+                icon: 'https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png',
+                image: 'https://cdnb.artstation.com/p/assets/images/images/006/367/267/large/ahmed-hmaim-final-c2.jpg?1498055051'
+            });
+        }
+
+        if (production == 0) {
+            return MIN_WAIT
+        }
+        if (production > 0) {
+            return Math.ceil((capacity - storage) / production * 60 * 60 * 1000)
+        }
+        return Math.ceil(storage / production * 60 * 60 * 1000 * -1)
+    }
+
     function TimeT3(a, k, b) {
         this.a = a;
         if (arguments.length < 3) {
@@ -70,9 +163,6 @@ function allInOneOpera() {
             cu: cu
         });
     }
-
-
-
 
     const buildings = [
         { xcap: true, cap: true, tribe: 0, gid: 1, xgid: [], name: "Woodcutter", cost: [40, 100, 50, 60], k: 1.67, cu: 2, cp: 1, maxLvl: 20 },
@@ -268,6 +358,21 @@ function allInOneOpera() {
                 v.ress = getResources()
                 v.queue = getBuildingQueue()
                 v.timestamp = Date.now()
+
+                v.l1Max = getStorageMax(v.ress.capacity.l1, v.ress.storage.l1, v.ress.production.l1)
+                v.l2Max = getStorageMax(v.ress.capacity.l2, v.ress.storage.l2, v.ress.production.l2)
+                v.l3Max = getStorageMax(v.ress.capacity.l3, v.ress.storage.l3, v.ress.production.l3)
+                v.l4Max = getStorageMax(v.ress.capacity.l4, v.ress.storage.l4, v.ress.production.l4)
+
+                v.nextRessCheck = Math.min(v.l1Max, v.l2Max, v.l3Max, v.l4Max)
+
+
+                console.log(`mediena prisipildys: `, v.l1Max / 1000 / 60 / 60);
+                console.log(`molis prisipildys: `, v.l2Max / 1000 / 60 / 60);
+                console.log(`gelezis prisipildys: `, v.l3Max / 1000 / 60 / 60)
+                console.log(`grudai ${v.ress.production.l4 < 0 ? "baigsis" : "prisipildys"} : `, v.l4Max / 1000 / 60 / 60)
+                console.log(`Artimiausiais tikrinimas: `, v.nextRessCheck / 1000 / 60 / 60)
+
                 cities.vil.push(v)
                 cities.current = v
 
@@ -514,44 +619,6 @@ function allInOneOpera() {
         return { block }
     }
 
-
-
-    function notifyMe(title, action, village) {
-        // Let's check if the browser supports notifications
-        if (!("Notification" in window)) {
-            alert("This browser does not support desktop notification");
-        }
-
-        // Let's check whether notification permissions have already been granted
-        else if (Notification.permission === "granted") {
-            // If it's okay let's create a notification
-            var notification = new Notification(title, {
-                body: `${action.name} was upgraded to level ${action.stufe} in "${village.name}"`,
-                icon: 'https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png',
-                image: 'https://cdnb.artstation.com/p/assets/images/images/006/367/267/large/ahmed-hmaim-final-c2.jpg?1498055051'
-            });
-            notification.onclick = function () {
-                parent.focus();
-            }
-        }
-
-        // Otherwise, we need to ask the user for permission
-        else if (Notification.permission !== "denied") {
-
-            Notification.requestPermission().then(function (permission) {
-                // If the user accepts, let's create a notification
-                if (permission === "granted") {
-                    var notification = new Notification(title, {
-                        body: `${action.name} was upgraded to level ${action.stufe} in "${village.name}"`,
-                        icon: 'https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png'
-                    });
-                }
-            });
-        } else if (Notification.permission === "denied") {
-            alert("Please allow notifications for script to work properly")
-        }
-    }
-
     function displayJobs() {
         //REMOVE PREVIOUS CHILDREN
         let jobs = this.jobs["c" + this.cID]
@@ -671,7 +738,7 @@ function allInOneOpera() {
 
     if (shouldRun()) {
 
-        const botPanel = createSidePanel().addSection("S8nLTU BOT v" + V);
+        const botPanel = createSidePanel().addSection("S8nLTU BOT v" + VER);
         const BOT = getCities();
 
         if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
@@ -808,6 +875,66 @@ function allInOneOpera() {
             localStorage.setItem(JOBS_STORAGE, JSON.stringify(this.jobs))
         }
 
+        BOT.switchCity = function () {
+
+            if (location.pathname.includes("dorf1")) {
+
+                let filtered = this.vil.filter(v => {
+                    console.log("Tikrina miesta: ", v.name)
+                    console.log("----------------------------")
+                    //TODO: npc, completion times
+                    //Has not been updated for minimum time with aditional checks
+                    if (v.timestamp + MIN_WAIT < Date.now()) {
+                        console.log("Minimal time since last check has passed")
+
+                        const buildInProgress = v.queue.filter(b => b.finish > Date.now())
+
+                        if (buildInProgress.length > 0) {
+                            console.log("city skipped because building: ", buildInProgress.length)
+                            return false
+                        }
+                        if (this.jobs["c" + v.did].length > 0) {
+                            console.log("has some jobs planed")
+                            return true
+                        }
+
+                    }
+                    //Was not updated for too long enough
+                    if (v.timestamp + MAX_WAIT < Date.now()) {
+                        console.log("maximum time since last check has passed")
+                        return true
+                    }
+                    console.log("End of checks")
+                    return false
+                })
+
+                if (filtered.length > 0) {
+                    filtered = shuffleArray(filtered)
+                    //switch to some city
+                    let t = delay()
+
+                    console.log("Switching to " + filtered[0].name + " in " + t + " seconds",)
+                    setTimeout(() => {
+                        document.querySelector("#sidebarBoxVillagelist li a[href*='" + filtered[0].did + "']").click()
+                    }, t);
+                }
+                else {
+                    console.log("Nothing to do, will check in " + MIN_WAIT + "miliseconds")
+                    setTimeout(() => {
+                        BOT.switchCity()
+                    }, MIN_WAIT);
+                }
+                console.log("filtered: ", filtered)
+            } else {
+                let t = delay();
+                console.log("switching to fields view in ms: ", t)
+                setTimeout(() => {
+                    location.href = "/dorf1.php"
+                }, t);
+
+            }
+        }
+
         BOT.setNextJob = function () {
             //TODO check if not empty string
             let prog = localStorage.getItem(BOT_IN_PROGRESS)
@@ -856,7 +983,6 @@ function allInOneOpera() {
                 }
             }
             else if (location.pathname.includes("dorf")) {
-
 
                 let jobs = this.jobs["c" + this.cID]
                 const { production, storage } = this.current.ress
@@ -910,6 +1036,7 @@ function allInOneOpera() {
                                     }
                                     else {
                                         console.log("Not enough resourses. Waiting....")
+                                        BOT.switchCity()
                                     }
                                 }
                             }
@@ -947,23 +1074,15 @@ function allInOneOpera() {
                                     }
                                     else {
                                         console.log("Not enough resourses. Waiting....")
+                                        BOT.switchCity()
                                     }
                                 }
                             }
 
                         } else {
-
                             console.log("Something already building. Waiting...")
-
+                            BOT.switchCity()
                         }
-                        //Check if roman here and if can do alternative job instead
-                        //   j.push(nj)
-                        // if (jobs.length > 1) {
-                        //     let nj = j[0].gid < 5 ? jobs.find(x => x.gid > 4) : jobs.find(x => x.gid < 5)
-                        //     if (nj !== undefined) {
-
-                        //     }
-                        // }
 
                     } else {
                         console.log("Building queue empty. Can start building")
@@ -996,10 +1115,15 @@ function allInOneOpera() {
                         }
                         else {
                             console.log("Not enough resourses. Waiting....")
+
+                            //TODO:
+                            //CALCULATE WHEN WILL BE ENOUGH AND IF LESS THAN MINIMAL WAIT TIME WAIT, ELSE SWITCH CITY
+                            BOT.switchCity()
                         }
                     }
                 } else {
                     console.log("No planed jobs in this town. Waiting")
+                    BOT.switchCity()
                 }
             }
 
@@ -1093,6 +1217,7 @@ function allInOneOpera() {
             BOT.setNextJob()
         }
 
+        console.log(BOT)
     }
 }
 
