@@ -4,15 +4,16 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.74
+// @version        0.75
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const V = "0.74"
+    const V = "0.75"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
+    const NPC_RULES = "npcRules"
     const JOBS_STORAGE = "storedJobs";
     const BOT_POWER = 'bot_enabled';
     const BOT_ON = '1';
@@ -27,12 +28,13 @@ function allInOneOpera() {
     const TRIBE_HUN = 'tribe7'
 
 
+
     const ON = localStorage.getItem(BOT_POWER) === BOT_ON
     const shouldRun = () => {
         return document.querySelectorAll("div#sidebarBoxVillagelist > div.content > ul > li").length > 0
     }
 
-    const getParams = (loc) => (loc.search.slice(1).split('&').reduce((acc, s) => {
+    const getParams = (loc) => (loc.slice(1).split('&').reduce((acc, s) => {
         const [k, v] = s.split('=')
         return Object.assign(acc, { [k]: v })
     }, {}))
@@ -68,6 +70,8 @@ function allInOneOpera() {
             cu: cu
         });
     }
+
+
 
 
     const buildings = [
@@ -191,19 +195,17 @@ function allInOneOpera() {
         return buildings
     }
 
-    //GET TRIBE DORF 1
-    // t = Number(document.querySelector("#resourceFieldContainer").classList[1].slice(-1))
-
     //DETECTS incoming attacks
     //document.querySelectorAll("table#movements > tbody > tr >td.typ > a > img.att1 ").length>0
 
-    const r1i = (x) => (`<i class="lumber_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:4px;"></i>`);
-    const r2i = (x) => (`<i class="clay_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:4px;"></i>`);
-    const r3i = (x) => (`<i class="iron_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:4px;"></i>`);
-    const r4i = (x) => (`<i class="crop_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:4px;"></i>`);
+    const r1i = (x) => (`<i class="lumber_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:1px;"></i>`);
+    const r2i = (x) => (`<i class="clay_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:1px;"></i>`);
+    const r3i = (x) => (`<i class="iron_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:1px;"></i>`);
+    const r4i = (x) => (`<i class="crop_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:1px;"></i>`);
     const wi = (x) => (`<i style="background-image: url('https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/hud/topBar/header/stockBar/warehouse_medium.png'); margin-right:4px; width: ${x}px; height: ${x}px; background-size: contain;"></i>`);
     const gi = (x) => (`<i style="background-image: url('https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/hud/topBar/header/stockBar/granary_medium.png');margin-right:4px; width: ${x}px; height: ${x}px; background-size: contain;"></i>`);
 
+    const typeNames = [{ name: "Lumber", icon: r1i }, { name: "Clay", icon: r2i }, { name: "Iron", icon: r3i }, { name: 'Crop', icon: r4i }]
     const building = (id, tribe = "teuton", size = 120, big = true) => (`<span class="buildingsV3"><img src="/img/x.gif" class="building g${id} ${tribe} ${big ? "big" : ""}" style="width: ${size}px; height: ${size}px; background-size:contain;"></span>`)
 
     const getResources = () => {
@@ -218,7 +220,8 @@ function allInOneOpera() {
         if (window.location.pathname.includes("dorf")) {
             let buildingQ = document.querySelectorAll("div.buildingList > ul > li");
             if (buildingQ && buildingQ.length > 0) {
-                let buildingLevels = document.querySelector("#content > script").text.split("=").pop();
+                let buildString = document.querySelector("#content > script").text.includes("var bld") ? document.querySelector("#content > script").text : document.querySelector("#content .village1Content > script").text;
+                let buildingLevels = buildString.split("=").pop();
                 const q = JSON.parse(buildingLevels);
                 buildingQ.forEach((element, index) => {
                     if (q[index]) {
@@ -236,39 +239,25 @@ function allInOneOpera() {
         const cities = {}
         cities.vil = [];
 
-        //   console.log("getting cities info:")
-
         let loadedCities = JSON.parse(localStorage.getItem(CITIES_STORAGE))
 
-        //   console.log("loaded cities from storage: ", loadedCities)
-
         //SETTING TRIBE
-        if (window.location.pathname.includes("dorf1") && !Object.keys(loadedCities).includes("tribe")) {
+        if (loadedCities && window.location.pathname.includes("dorf1") && !Object.keys(loadedCities).includes("tribe")) {
             cities.tribe = document.querySelector("div#resourceFieldContainer").classList[1]
-        } else if (Object.keys(loadedCities).includes("tribe")) {
+        } else if (loadedCities && Object.keys(loadedCities).includes("tribe")) {
             cities.tribe = loadedCities.tribe
 
         }
 
         let villages = document.querySelectorAll("div#sidebarBoxVillagelist > div.content > ul > li");
-        //   console.log("villages visible on website: ", villages)
-        //   console.log("total found: ", villages.length)
         villages.forEach((vil, i) => {
             let data = vil.querySelector("a > span.coordinatesGrid")
-            let name = data.getAttribute("data-villagename");
-            if (!name) {
-                name = vil.querySelector("span.name").textContent.trim()
-            }
-            let x = Number(data.getAttribute("data-x"));
-            if (!x) { x = Number(vil.querySelector("span.coordinateX").textContent.trim().slice(1).replace(/\u202c|\u202d|/g, '').replace(/\u2212/g, '-')); }
-            let y = Number(data.getAttribute("data-y"));
-            if (!y) { y = Number(vil.querySelector("span.coordinateY").textContent.trim().slice(0, -1).replace(/\u202c|\u202d|/g, '').replace(/\u2212/g, '-')); }
-            let did = Number(data.getAttribute("data-did"));
-            if (!did) { did = Number(vil.querySelector("a").href.slice(0, -1).split("?newdid=")[1]) }
+            let name = vil.querySelector("span.name").textContent.trim()
+            let x = Number(vil.querySelector("span.coordinateX").textContent.trim().slice(1).replace(/\u202c|\u202d|/g, '').replace(/\u2212/g, '-'));
+            let y = Number(vil.querySelector("span.coordinateY").textContent.trim().slice(0, -1).replace(/\u202c|\u202d|/g, '').replace(/\u2212/g, '-'));
+            let did = Number(getParams("?" + vil.querySelector("a").href.split("?")[1]).newdid)
 
             const v = { name, x, y, did }
-
-            // console.log("basic data for village " + i, v)
 
             if (vil.classList.contains("active")) {
                 cities.cID = did;
@@ -296,8 +285,7 @@ function allInOneOpera() {
             //SETING CAPITAL
             if (window.location.pathname === "/profile") {
                 const cap = document.querySelector("td.name > .mainVillage").parentNode.querySelector("a").innerText.trim()
-                //   console.log("Capital name: ", cap)
-                //    console.log("Selected town name: ", name)
+
                 if (name === cap) {
                     //  console.log("Matched! seting as capital ", cap)
                     cities.cap = did
@@ -322,7 +310,6 @@ function allInOneOpera() {
     }
 
     const createSidePanel = () => {
-
         const pos = localStorage.getItem(PANEL_POSITION)
         const sideBar = document.querySelector("#sidebarBeforeContent > div")
         const panel = document.createElement("div");
@@ -338,14 +325,10 @@ function allInOneOpera() {
         btnPower.classList.add("layoutButton", "buttonFramed", "withIcon", "round", "green")
         btnPower.innerHTML = `<svg class="edit" style="width:30px; stroke-width:2; fill:${ON ? 'red' : 'white'};" viewBox="0 0 20 20"><path d="M10,6.978c-1.666,0-3.022,1.356-3.022,3.022S8.334,13.022,10,13.022s3.022-1.356,3.022-3.022S11.666,6.978,10,6.978M10,12.267c-1.25,0-2.267-1.017-2.267-2.267c0-1.25,1.016-2.267,2.267-2.267c1.251,0,2.267,1.016,2.267,2.267C12.267,11.25,11.251,12.267,10,12.267 M18.391,9.733l-1.624-1.639C14.966,6.279,12.563,5.278,10,5.278S5.034,6.279,3.234,8.094L1.609,9.733c-0.146,0.147-0.146,0.386,0,0.533l1.625,1.639c1.8,1.815,4.203,2.816,6.766,2.816s4.966-1.001,6.767-2.816l1.624-1.639C18.536,10.119,18.536,9.881,18.391,9.733 M16.229,11.373c-1.656,1.672-3.868,2.594-6.229,2.594s-4.573-0.922-6.23-2.594L2.41,10l1.36-1.374C5.427,6.955,7.639,6.033,10,6.033s4.573,0.922,6.229,2.593L17.59,10L16.229,11.373z"></path></svg >`
         btnPower.onclick = (e) => {
+            localStorage.setItem(BOT_IN_PROGRESS, "")
             localStorage.setItem(BOT_POWER, ON ? BOT_OFF : BOT_ON);
             location.reload()
         }
-
-
-        //  btnPower.href = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=rmbdeivis@hotmail.com&lc=GB&item_name=Buy%20me%20a%20coffee%20to%20stay%20awake%20while%20writing%20PingWinBot%21&currency_code=GBP&no_note=0&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHostedGuest"
-        // btnPower.target = "_blank"
-
 
 
 
@@ -478,7 +461,7 @@ function allInOneOpera() {
     const createCity = (vil, cities) => {
 
         const block = document.createElement("div");
-        block.style.paddingBottom = '4px'
+        block.style.paddingBottom = '3px'
         //  const nameRow = document.createElement("div");
         //  nameRow.style.display = "flex"
         //  nameRow.style.justifyContent = "space-between"
@@ -486,10 +469,9 @@ function allInOneOpera() {
         const prodRow = document.createElement("div");
         prodRow.style.display = "flex"
         prodRow.style.justifyContent = "space-between"
-        prodRow.style.padding = '2px 12px'
+        prodRow.style.padding = '0 12px'
         block.appendChild(prodRow)
         const queRow = document.createElement("div");
-        queRow.style.padding = "2px"
         block.appendChild(queRow)
 
         //let capital_string = "";
@@ -572,7 +554,9 @@ function allInOneOpera() {
 
     function displayJobs() {
         //REMOVE PREVIOUS CHILDREN
-        const jobs = this.jobs["c" + this.cID]
+        let jobs = this.jobs["c" + this.cID]
+
+        jobs = !jobs ? [] : jobs
 
         const cVillage = this.vil.find((v) => v.did === this.cID);
         const panel = this.jobsSection
@@ -638,15 +622,6 @@ function allInOneOpera() {
                     let i = whichChild(e.target.parentNode)
                     this.removeJob(jobs[i])
                     this.displayJobs()
-
-                    // if (removed.length > 0) {
-                    //     localStorage.setItem(JOBS_STORAGE, JSON.stringify(j))
-                    //     jobs = JSON.parse(localStorage.getItem(JOBS_STORAGE))
-                    //     e.target.parentNode.remove()
-
-                    // } else {
-                    //     console.log("could not remove")
-                    // }
                 }
                 this.jobsSection.appendChild(node);
                 nodeText.textContent = job.to === 1 ? `Build new ${this.buildingDB[job.gid - 1].name}(${job.pos}).` : `Upgrade ${this.buildingDB[job.gid - 1].name}(${job.pos}) to lvl${job.to}`
@@ -675,6 +650,19 @@ function allInOneOpera() {
         c.displayJobs = displayJobs
     }
 
+    function initNPCRules(b) {
+        let rules = JSON.parse(localStorage.getItem(NPC_RULES))
+
+        if (!rules || !rules[b.cID]) {
+            rules = rules ? rules : {}
+            if (window.location.pathname.includes("dorf")) {
+                rules[b.cID] = rules[b.cID] ? rules[b.cID] : []
+            }
+            localStorage.setItem(NPC_RULES, JSON.stringify(rules))
+        }
+        b.npcRules = rules
+    }
+
 
 
 
@@ -687,7 +675,7 @@ function allInOneOpera() {
         const BOT = getCities();
 
         if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
-            const params = getParams(window.location)
+            const params = getParams(window.location.search)
             const cat = params.category ? Number(params.category) : 1
 
             const availableBuildings = document.querySelectorAll(".buildingWrapper > .build_desc > img.building");
@@ -738,58 +726,16 @@ function allInOneOpera() {
         npcS.style.cssText = "padding-bottom: 8px; border-bottom: 1px solid #5e463a;"
         const npcTitle = npcS.appendChild(document.createElement("h4"))
         npcTitle.style.cssText = titleStyle
-
         npcTitle.innerText = "NPC rules"
         BOT.npcPanel = npcS.appendChild(document.createElement("div"))
-        BOT.npcPanel.innerText = "No NPC rules so far. Press button bellow to add new NPC rules."
+        BOT.npcPanel.innerText = "Warning - this is still experimental, and spends gold. Do not add rules if you are not ready to lose some gold."
         const addNpcButton = npcS.appendChild(document.createElement("button"))
         addNpcButton.className = "textButtonV1 gold productionBoostButton"
         addNpcButton.style.cssText = "margin-top: 8px;"
         addNpcButton.innerText = "Add new rule"
-        addNpcButton.onclick = function () {
+        addNpcButton.onclick = () => BOT.addNPCRule()
 
-            const typeNames = ['Lumber', 'Clay', 'Iron', 'Crop']
-            const iNPC = {}
-            const dir = prompt('Please enter "a" for above limit or "b" for bellow limit:').toLowerCase();
-            if (dir != "a" && dir !== 'b') {
-                alert("wrong input, canceled!")
-                return false
-            }
-            iNPC.dir = dir
 
-            const percent = Number(prompt('Please enter percentage storage limit at which NPC will be done:\n (between 0 and 100)').toLowerCase());
-            if (percent < 0 && percent > 100) {
-                alert("wrong input, canceled!")
-                return false
-            }
-            iNPC.percent = percent
-
-            const type = Number(prompt('which resource do you want to watch? \n1 - Lumber\n2 - Clay\n3 - Iron\n4 - Crop'))
-            if (type < 1 || type > 4) {
-                alert("wrong input, canceled!")
-                return false
-            }
-
-            const ratio = prompt('Enter wanted resource ratio seperated by comma:\n Example "10, 10, 10, 70", means resourses will be split to 10% lumber, 10% clay, 10% iron and 70% crop')
-            const ratioArr = ratio.split(",")
-            if (ratioArr.length !== 4) {
-                alert("wrong input, canceled!")
-                return false
-            }
-            iNPC.ratio = ratio
-
-            const s = 'You are setting up this NPC rule: \n'
-                + `if ${typeNames[type - 1]} is ${dir === "a" ? "above" : "below"} ${percent}%, then distribute to ratio ${ratio}`
-                + '\n'
-                + 'Press OK to confirm!'
-
-            if (confirm(s)) {
-                BOT.npcPanel.innerText = ""
-                const newSpan = BOT.npcPanel.appendChild(document.createElement("span"))
-                newSpan.innerText = `${typeNames[type - 1]} ${dir === "a" ? ">" : "<"} ${percent}% : ${ratio}`
-
-            }
-        }
 
         BOT.buildingDB = buildings;
         BOT.vil.forEach((t, i) => {
@@ -856,13 +802,11 @@ function allInOneOpera() {
             localStorage.setItem(JOBS_STORAGE, JSON.stringify(this.jobs))
         }
 
-
         BOT.removeJob = function (job) {
             let jobs = this.jobs["c" + this.cID]
             this.jobs["c" + this.cID] = jobs.filter((j) => (j.pos !== job.pos || (j.pos === job.pos && j.to < job.to)))
             localStorage.setItem(JOBS_STORAGE, JSON.stringify(this.jobs))
         }
-
 
         BOT.setNextJob = function () {
             //TODO check if not empty string
@@ -871,8 +815,7 @@ function allInOneOpera() {
 
             if (location.pathname.includes("build.php")) {
                 if (inProgress !== null) {
-
-                    const params = getParams(window.location)
+                    const params = getParams(window.location.search)
                     let currentLvl = 0
 
                     //check if job was done to this leve and if so, complete it
@@ -894,15 +837,18 @@ function allInOneOpera() {
                         }, 5000)
                     }
                     if (inProgress.cid === Number(params.newdid) && inProgress.job.pos === Number(params.id)) {
+
                         let b = undefined;
                         if (inProgress.job.to === 1 && inProgress.job.cat) {
                             b = document.querySelector(`img.g${inProgress.job.gid}`).parentNode.parentNode.querySelector(".contractLink button")
                         } else {
-                            b = document.querySelector(".upgradeBuilding .section1 button.green.build");
+                            //changed to work in older lt version. effects on other servers unknown
+                            b = document.querySelector(".section1 button.green.build");
                         }
                         setTimeout(() => {
                             if (b) {
                                 this.completeJob(inProgress.job)
+                                localStorage.setItem(BOT_IN_PROGRESS, "")
                                 b.click()
                             }
                         }, 3500)
@@ -926,9 +872,7 @@ function allInOneOpera() {
                     //ANYTHING BUILDING?
                     if (this.current.queue.length > 0) {
                         const d1q = this.current.queue.filter(q => q.gid < 5)
-                        console.log("d1q queue: ", d1q.length)
                         const d2q = this.current.queue.filter(q => q.gid > 4)
-                        console.log("d2q queue: ", d2q.length)
 
                         if (Object.keys(this).includes("tribe") && this.tribe === TRIBE_ROMAN) {
                             console.log("Roman detected. Checking jobs")
@@ -1061,11 +1005,89 @@ function allInOneOpera() {
 
         }
 
+        BOT.addNPCRule = function () {
+            const iNPC = {}
+            const dir = prompt('Please enter "a" for above limit or "b" for bellow limit:').toLowerCase();
+            if (dir != "a" && dir !== 'b') {
+                alert("wrong input, canceled!")
+                return false
+            }
+            iNPC.dir = dir
 
+            const percent = Number(prompt('Please enter percentage storage limit at which NPC will be done:\n (between 0 and 100)').toLowerCase());
+            if (percent < 0 && percent > 100) {
+                alert("wrong input, canceled!")
+                return false
+            }
+            iNPC.percent = percent
 
+            const type = Number(prompt('which resource do you want to watch? \n1 - Lumber\n2 - Clay\n3 - Iron\n4 - Crop'))
+            if (type < 1 || type > 4) {
+                alert("wrong input, canceled!")
+                return false
+            }
+            iNPC.type = type
 
-        initJobQueue(BOT);
+            const ratio = prompt('Enter wanted resource ratio seperated by comma:\n Example "10, 10, 10, 70", means resourses will be split to 10% lumber, 10% clay, 10% iron and 70% crop')
+            let ratioArr = ratio.split(",").map(x => Number(x))
+            if (ratioArr.length !== 4 && ratioArr.reduce((a, b) => a + b, 0) !== 100) {
+                alert("wrong input, total needs to add to 100%. Canceled!")
+                return false
+            }
+            const p = 100.0 / ratioArr.reduce((a, b) => a + b, 0)
+            ratioArr = ratioArr.map(x => Math.round((x * p)))
+            console.log(`Total: ${p} `, ratioArr)
+
+            iNPC.ratio = ratioArr
+
+            const s = 'You are setting up this NPC rule: \n'
+                + `if ${typeNames[type - 1].name} is ${dir === "a" ? "above" : "below"} ${percent}%, then distribute to ratio ${ratioArr[0]}% ${ratioArr[1]}% ${ratioArr[2]}% ${ratioArr[3]}%`
+                + '\n'
+                + 'Press OK to confirm!'
+
+            if (confirm(s)) {
+                this.npcRules[this.cID].push(iNPC)
+                localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules))
+                this.displayNPCRules()
+
+                ///RERENDER function here later
+                // const newSpan = this.npcPanel.appendChild(document.createElement("span"))
+                //  newSpan.innerText = `${typeNames[type - 1]} ${dir === "a" ? ">" : "<"} ${percent}% : ${ratio}`
+            }
+
+        }
+
+        BOT.displayNPCRules = function () {
+            let rules = this.npcRules[this.cID]
+            rules.forEach((r, i) => {
+                const node = document.createElement("div");
+                const nodeButton = node.appendChild(document.createElement('span'))
+                const nodeText = node.appendChild(document.createElement('span'))
+                nodeText.style.cssText = "display: inline-flex; align-items: center;"
+                node.style.cssText = "font-size: 10px; line-height:10px; display: flex; align-items: center;"
+                nodeButton.style.cssText = "width:14px; height:14; border-radius:2px; background-color:red;color:white; text-align:center; font-size:12px; padding:2px; display:inline-block; border:1px solid black; margin-right:4px"
+                nodeButton.textContent = "x";
+                nodeButton.onclick = (e) => {
+                    this.npcRules[this.cid] = this.npcRules[this.cID].splice(i, 1)
+                    localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules))
+                    node.remove()
+                    this.displayNPCRules()
+                }
+                nodeText.innerHTML = `${typeNames[r.type - 1].icon(12)} ${r.dir === "a" ? ">" : "<"} ${r.percent}% &nbsp;=&nbsp;${typeNames[0].icon(12)}${r.ratio[0]}%, &nbsp;${typeNames[1].icon(12)}${r.ratio[1]}%, &nbsp;${typeNames[2].icon(12)}${r.ratio[2]}%, &nbsp;${typeNames[3].icon(12)}${r.ratio[3]}%`
+                this.npcPanel.appendChild(node);
+            })
+        }
+
+        initJobQueue(BOT)
         BOT.displayJobs()
+
+        initNPCRules(BOT)
+        BOT.displayNPCRules()
+
+        // let prog = localStorage.getItem(BOT_IN_PROGRESS)
+        // const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
+
+
         if (ON) {
             console.log("Starting bot")
             BOT.setNextJob()
