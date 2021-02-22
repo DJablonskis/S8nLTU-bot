@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.86
+// @version        0.87.1
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const VER = "0.86"
+    const VER = "0.87.1"
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -228,7 +228,7 @@ function allInOneOpera() {
 
     function setUpResFields() {
         const ressFields = []
-        const res_fields = document.querySelectorAll("div#resourceFieldContainer > div.level")
+        const res_fields = document.querySelectorAll("#resourceFieldContainer > .level")
         res_fields.forEach((node) => {
             let lvl = Number(node.classList.value.split("level").pop())
             let pos = Number(node.classList.value.split("buildingSlot")[1].split(" ")[0])
@@ -238,8 +238,8 @@ function allInOneOpera() {
             let BOT_inc_res = node.parentNode.appendChild(document.createElement("div"))
             BOT_inc_res.classList.add("level", "buildingSlot" + pos)
             BOT_inc_res_spacer.classList.add("level", "buildingSlot" + pos)
-            BOT_inc_res_spacer.style.cssText = " z-index:1;width: 27px;height: 23px;margin-top: 2px;background-color: none;background-image: none;margin-left: -14px; border-top: 2px ridge #fdfd75;border-bottom: 2px ridge #fdfd75;"
-            BOT_inc_res.style.cssText = "font-weight:900; border:2px ridge #fdfd75; margin-left:-28px; margin-top:2px; background-image:none; border-radius:50%; background-color:rgba(41, 61, 113,0.5); color: white;"
+            BOT_inc_res_spacer.style.cssText = "display:block; border-radius:0;z-index:1;width: 27px;height: 23px;margin-top: 2px;background-color: none;background-image: none;margin-left: -14px; border-top: 2px ridge #fdfd75;border-bottom: 2px ridge #fdfd75;"
+            BOT_inc_res.style.cssText = "text-align: center;font-weight:900; border:2px ridge #fdfd75; margin-left:-28px; margin-top:2px; background-image:none; border-radius:50%; background-color:rgba(41, 61, 113,0.5); color: white;"
             ressFields.push(
                 {
                     node,
@@ -276,11 +276,11 @@ function allInOneOpera() {
             BOT_inc_build.classList.add("level", "buildingSlot", "a" + pos)
             BOT_inc_build.dataset.lvl = lvl;
 
-            BOT_inc_build.style.cssText = "font-weight:900; border:2px ridge #fdfd75; margin-left:-28px; margin-top:2px; background-image:none; border-radius:50%; background-color:rgba(41, 61, 113,0.5); color: white; line-height:23px"
+            BOT_inc_build.style.cssText = "text-align:center;font-weight:900; border:2px ridge #fdfd75; margin-left:-28px; margin-top:2px; background-image:none; border-radius:50%; background-color:rgba(41, 61, 113,0.5); color: white; line-height:23px"
             BOT_inc_build.textContent = "+"
             let BOT_inc_buid_spacer = node.appendChild(document.createElement("div"))
             BOT_inc_buid_spacer.classList.add("level", "buildingSlot", "a" + pos)
-            BOT_inc_buid_spacer.style.cssText = "z-index:1;width: 27px;height: 23px;margin-top: 2px;background-color: none;background-image: none;margin-left: -14px; border-top: 2px ridge #fdfd75;border-bottom: 2px ridge #fdfd75;"
+            BOT_inc_buid_spacer.style.cssText = "border-radius:0;z-index:1;width: 27px;height: 23px;margin-top: 2px;background-color: none;background-image: none;margin-left: -14px; border-top: 2px ridge #fdfd75;border-bottom: 2px ridge #fdfd75;"
             buildings.push({ node, pos, gid, lvl, bot: BOT_inc_build })
 
             if (gid === 0) {
@@ -620,7 +620,7 @@ function allInOneOpera() {
 
         let q1Node = flexBlock.appendChild(document.createElement("div"))
         q1Node.style.height = "8px"
-        let q1 = vil.queue.filter(q => q.gid < 5)
+        let q1 = vil.queue ? vil.queue.filter(q => q.gid < 5) : []
         q1.forEach(b => {
             let dot = q1Node.appendChild(document.createElement("span"))
             dot.innerText = "•"
@@ -632,9 +632,10 @@ function allInOneOpera() {
             } else { dot.style.color = "#4cc500" }
         })
 
+
         let q2Node = flexBlock.appendChild(document.createElement("div"))
         q2Node.style.height = "8px"
-        let q2 = vil.queue.filter(q => q.gid > 4)
+       let q2 = vil.queue ? vil.queue.filter(q => q.gid > 4) : []
         q2.forEach(b => {
             let dot = q2Node.appendChild(document.createElement("span"))
             dot.innerText = "•"
@@ -1050,14 +1051,14 @@ function allInOneOpera() {
                     console.log("Some jobs in planed")
                     let nextJob = null
                     //ANYTHING BUILDING?
-                    if (this.current.queue.length === 0) {
-                        nextJob = jobs[0]
-                    } else if (this.tribe === TRIBE_ROMAN) {
+                    if (this.tribe === TRIBE_ROMAN) {
                         if (d1q.length === 0 && d1j.length > 0) {
                             nextJob = d1j[0]
                         } else if (d2q.length === 0 && d2j.length > 0) {
                             nextJob = d2j[0]
                         }
+                    } else if (this.current.queue.length === 0) {
+                        nextJob = jobs[0]
                     }
                     if (nextJob !== null) {
                         console.log(`${nextJob.gid > 4 ? "Building " : "Resource "} job found.`)
