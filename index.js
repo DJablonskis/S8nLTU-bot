@@ -4,12 +4,15 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.87.1
+// @version        0.9
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const VER = "0.87.1"
+    const VER = "0.9"
+    const APP_NAME = "PingWin"
+
+    let BOT;
 
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
@@ -20,7 +23,10 @@ function allInOneOpera() {
     const BOT_STATS = 'bot_statistics';
     const BOT_ON = '1';
     const BOT_OFF = '0';
+
     const BOT_IN_PROGRESS = "bot_progress"
+    const NPC_IN_PROGRESS = "npc_progress"
+
     const POSITION_UP = "UP";
     const POSITION_DOWN = "DOWN"
     const TRIBE_ROMAN = 'tribe1'
@@ -28,8 +34,8 @@ function allInOneOpera() {
     const TRIBE_GAUL = 'tribe3'
     const TRIBE_EGIPT = 'tribe6'
     const TRIBE_HUN = 'tribe7'
-    const MIN_WAIT = 2 * 1000 * 60
-    const MAX_WAIT = 12 * 1000 * 60
+    const MIN_WAIT = 3 * 1000 * 60
+    const MAX_WAIT = 20 * 1000 * 60
 
     const Q1 = "q1"
     const Q2 = "q2"
@@ -74,10 +80,16 @@ function allInOneOpera() {
     }
 
 
+    function clickSite(id) {
+        setTimeout(() => {
+            document.querySelector(`${id < 19 ? "#resourceFieldContainer" : "#village_map"} a[href*="build.php?id=${id}"]`).click()
+        }, delay("Clicking site " + id));
+    }
 
-    function delay() {
-        let d = (Math.floor(Math.random() * 5) + 5) * 1000
-        console.log("delay in ms: ", d)
+
+    function delay(message, extraTime = 0) {
+        let d = (Math.floor(Math.random() * 5) + 5) * 1000 + extraTime
+        BOT.setStatus(message, d)
         return d;
     }
 
@@ -111,7 +123,7 @@ function allInOneOpera() {
 
 
 
-    const getParams = (loc) => (loc.slice(1).split('&').reduce((acc, s) => {
+    const getParams = (loc = window.location.search) => (loc.slice(1).split('&').reduce((acc, s) => {
         const [k, v] = s.split('=')
         return Object.assign(acc, { [k]: v })
     }, {}))
@@ -377,11 +389,11 @@ function allInOneOpera() {
                 v.nextRessCheck = Math.min(v.l1Max, v.l2Max, v.l3Max, v.l4Max)
 
 
-                console.log(`mediena prisipildys: `, v.l1Max / 1000 / 60 / 60);
-                console.log(`molis prisipildys: `, v.l2Max / 1000 / 60 / 60);
-                console.log(`gelezis prisipildys: `, v.l3Max / 1000 / 60 / 60)
-                console.log(`grudai ${v.ress.production.l4 < 0 ? "baigsis" : "prisipildys"} : `, v.l4Max / 1000 / 60 / 60)
-                console.log(`Artimiausiais tikrinimas: `, v.nextRessCheck / 1000 / 60 / 60)
+                // console.log(`mediena prisipildys: `, v.l1Max / 1000 / 60 / 60);
+                // console.log(`molis prisipildys: `, v.l2Max / 1000 / 60 / 60);
+                // console.log(`gelezis prisipildys: `, v.l3Max / 1000 / 60 / 60)
+                // console.log(`grudai ${v.ress.production.l4 < 0 ? "baigsis" : "prisipildys"} : `, v.l4Max / 1000 / 60 / 60)
+                // console.log(`Artimiausiais tikrinimas: `, v.nextRessCheck / 1000 / 60 / 60)
 
                 cities.vil.push(v)
                 cities.current = v
@@ -635,7 +647,7 @@ function allInOneOpera() {
 
         let q2Node = flexBlock.appendChild(document.createElement("div"))
         q2Node.style.height = "8px"
-       let q2 = vil.queue ? vil.queue.filter(q => q.gid > 4) : []
+        let q2 = vil.queue ? vil.queue.filter(q => q.gid > 4) : []
         q2.forEach(b => {
             let dot = q2Node.appendChild(document.createElement("span"))
             dot.innerText = "•"
@@ -795,7 +807,7 @@ function allInOneOpera() {
     if (shouldRun()) {
 
         const botPanel = createSidePanel().addSection("S8nLTU BOT v" + VER);
-        const BOT = getCities();
+        BOT = getCities();
 
         if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
             const params = getParams(window.location.search)
@@ -857,7 +869,36 @@ function allInOneOpera() {
         addNpcButton.style.cssText = "margin-top: 8px;"
         addNpcButton.innerText = "Add new rule"
         addNpcButton.onclick = () => BOT.addNPCRule()
+        //status setup
+        const status = botPanel.appendChild(document.createElement("div"))
+        status.style.cssText = "padding-bottom: 8px; border-bottom: 1px solid #5e463a;"
+        const statusTitle = status.appendChild(document.createElement("h4"))
+        statusTitle.style.cssText = titleStyle
+        statusTitle.innerText = "Status:"
+        let statusMessage = status.appendChild(document.createElement("div"))
+        statusMessage.innerText = "Waiting for instructions"
 
+        const loadingBar = status.appendChild(document.createElement("div"))
+        loadingBar.style.cssText = "margin-top: 4px; position: relative; height:8px; border:1px solid #52372a; overflow: hidden; border-radius:2px; background-color: #52372a"
+        const loadingBarProgress = loadingBar.appendChild(document.createElement("div"))
+        loadingBarProgress.style.cssText = "height:6px; width:0; background-color: #546e39; border: 1px solid transparent; border-color: #699e32 #6db024 #71c117; width: 100%"
+        BOT.setStatus = function (message = "", time = 5000) {
+            let width = 0;
+            let timestamp = Date.now()
+            statusMessage.innerText = message
+            var id = setInterval(frame, 30);
+            function frame() {
+                width = (Date.now() - timestamp) / time * 100.0
+                if (width >= 100) {
+                    clearInterval(id);
+                } else {
+                    width++;
+                    loadingBarProgress.style.width = width + "%";
+                }
+            }
+        }
+
+        //   BOT.setStatus("hello ", 6000)
 
 
         BOT.buildingDB = buildings;
@@ -931,7 +972,9 @@ function allInOneOpera() {
         BOT.switchCity = function () {
             if (location.pathname.includes("dorf1")) {
 
+                console.log("Tikrina miestus.")
                 let filtered = this.vil.filter(v => {
+                    let shouldCheck = false
                     let jobs = this.jobs["c" + v.did]
                     let q1 = jobs.filter(q => q.gid < 5)
                     let q2 = jobs.filter(q => q.gid > 4)
@@ -939,68 +982,81 @@ function allInOneOpera() {
                     const p = v.queue.filter(b => b.finish > Date.now())
                     const p1 = p.filter(_p => _p.gid < 5)
                     const p2 = p.filter(_p => _p.gid > 4)
-
-                    console.log("Tikrina miesta: ", v.name)
-                    console.log("Planed jobs q1: ", q1)
-                    console.log("Planed jobs q2: ", q2)
-                    console.log("constructions: ", v.queue)
-                    console.log("p1: ", p1)
-                    console.log("p2: ", p2)
-
-
+                    // console.log("Planed jobs q1: ", q1)
+                    // console.log("Planed jobs q2: ", q2)
+                    // console.log("constructions: ", v.queue)
+                    // console.log("p1: ", p1)
+                    // console.log("p2: ", p2)
                     if (jobs.length > 0 && v.timestamp + MIN_WAIT < Date.now()) {
 
-                        console.log("Not visited in minimum time.")
-                        console.log("Not visited in minimum time.")
                         if (this.tribe === TRIBE_ROMAN) {
-
-                            return (q1.length > 0 && p1.length === 0) || (q2.length > 0 && p2.length === 0)
-                        } else return p.length === 0
+                            shouldCheck = (q1.length > 0 && p1.length === 0) || (q2.length > 0 && p2.length === 0)
+                        } else shouldCheck = (p.length === 0)
+                        if (shouldCheck) {
+                            console.log(`Village ${v.name} should be checked. Min time + job queue + nothing building.`)
+                        }
+                        return shouldCheck
                     }
-                    console.log("-----------------------")
-
-                    return v.timestamp + MAX_WAIT < Date.now()
+                    shouldCheck = v.timestamp + MAX_WAIT < Date.now()
+                    if (shouldCheck) {
+                        console.log(`Village ${v.name} should be checked. Max time.`)
+                    }
+                    return shouldCheck
                 })
 
                 if (filtered.length > 0) {
                     filtered = shuffleArray(filtered)
-                    //switch to some city
-                    let t = delay()
-
-                    console.log("Switching to " + filtered[0].name + " in " + t + " seconds",)
+                    //switch to some city                    
                     setTimeout(() => {
                         document.querySelector("#sidebarBoxVillagelist li a[href*='" + filtered[0].did + "']").click()
-                    }, t);
+                    }, delay(`Switching to ${filtered[0].name}`));
                 }
                 else {
-                    console.log("Nothing to do, will check in " + MIN_WAIT + " miliseconds")
                     setTimeout(() => {
                         location.reload()
-                    }, MIN_WAIT + delay());
+                    }, delay("Cooldown, waiting minimal time.", MIN_WAIT));
                 }
-                console.log("filtered: ", filtered)
+                //  console.log("filtered: ", filtered)
             } else {
-                let t = delay();
-                console.log("switching to fields view in ms: ", t)
                 setTimeout(() => {
                     location.href = "/dorf1.php"
-                }, t);
-
+                }, delay("Switching to resources view"));
             }
         }
+
+        BOT.checkNPC = function () {
+            //TODO check if not empty string
+            if (this.npcRules[this.cID].length > 0) {
+                let prog = localStorage.getItem(NPC_IN_PROGRESS)
+                const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
+                console.log("check npc")
+                console.log("rules found")
+                //1. check storage against rules
+                //2. navigate to center
+                //3. find market and click or abort
+                //4. switch to correct tab
+                //5. open NPC and fill in
+
+                let capacity = this.current.ress.capacity
+                let storage = this.current.ress.storage
+            } else {
+                console.log("no NPC rules in this city")
+            }
+        }
+
 
         BOT.setNextJob = function () {
             //TODO check if not empty string
             let prog = localStorage.getItem(BOT_IN_PROGRESS)
-            console.log("setNext called")
+            console.log("setNextJob")
 
             const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
 
             if (location.pathname.includes("build.php")) {
                 if (inProgress !== null) {
                     const params = getParams(window.location.search)
+                    console.log("read params: ", params)
                     let currentLvl = 0
-
                     //check if job was done to this leve and if so, complete it
                     if (Object.keys(params).includes("gid")) {
                         currentLvl = Number(document.querySelector("div#build").classList[1].replace("level", ""))
@@ -1019,21 +1075,40 @@ function allInOneOpera() {
                             window.location.href = '/dorf1.php'
                         }, 5000)
                     }
-                    if (inProgress.cid === Number(params.newdid) && inProgress.job.pos === Number(params.id)) {
+                    if (inProgress.cid === this.cID && inProgress.job.pos === Number(params.id)) {
                         let b = undefined;
-                        if (inProgress.job.to === 1 && inProgress.job.cat) {
-                            b = document.querySelector(`img.g${inProgress.job.gid}`).parentNode.parentNode.querySelector(".contractLink button")
+
+                        if (inProgress.job.to === 1) {
+                            if (inProgress.job.cat) {
+                                let tab = document.querySelector(`#content .contentNavi .content a[href*="category=${inProgress.job.cat}"]`)
+                                if (tab && !tab.classList.contains("active")) {
+                                    return setTimeout(() => { tab.click() }, delay("Wrong tab detected. switching tab!"));
+                                }
+                                b = document.querySelector(`img.g${inProgress.job.gid}`).parentNode.parentNode.querySelector(".contractLink button")
+                            }
+                            //New res field
+                            else {
+                                b = document.querySelector(".section1 button.green.build");
+                            }
+
                         } else {
-                            //changed to work in older lt version. effects on other servers unknown
+                            //switching tab
+                            let tab = document.querySelector("#content .contentNavi .content a")
+
+                            if (tab && !tab.classList.contains("active")) {
+                                return setTimeout(() => { tab.click() }, delay("Wrong tab detected. switching tab!"));
+                            }
+
                             b = document.querySelector(".section1 button.green.build");
+
                         }
-                        setTimeout(() => {
+                        return setTimeout(() => {
                             if (b) {
                                 this.completeJob(inProgress.job)
                                 localStorage.setItem(BOT_IN_PROGRESS, "")
                                 b.click()
-                            }
-                        }, 3500)
+                            } else console.log("Error! Button for upgrade not found!")
+                        }, delay("Perssing build Button"))
                     }
                 }
             }
@@ -1048,7 +1123,7 @@ function allInOneOpera() {
 
                 //ANY JOBS SET?
                 if (jobs.length > 0) {
-                    console.log("Some jobs in planed")
+                    console.log("Some jobs planed")
                     let nextJob = null
                     //ANYTHING BUILDING?
                     if (this.tribe === TRIBE_ROMAN) {
@@ -1071,10 +1146,9 @@ function allInOneOpera() {
                             console.log("Enough resourses. Navigating to the building")
 
                             if (nextJob.gid > 4 && location.pathname.includes("dorf1") || nextJob.gid < 5 && location.pathname.includes("dorf2")) {
-                                console.log("Wrong section. Navigating to correct section", nextJob.gid)
                                 return setTimeout(() => {
                                     window.location.href = `/dorf${nextJob.gid > 4 ? "2" : "1"}.php`
-                                }, delay())
+                                }, delay("Wrong section. Navigating to correct section"))
                             }
 
                             localStorage.setItem(BOT_IN_PROGRESS, JSON.stringify({
@@ -1083,12 +1157,7 @@ function allInOneOpera() {
                                 ress: this.current.ress
                             }));
 
-                            return setTimeout(() => {
-                                const href = nextJob.to === 1 && nextJob.cat
-                                    ? `/build.php?newdid=${this.cID}&id=${nextJob.pos}&category=${nextJob.cat}`
-                                    : `/build.php?newdid=${this.cID}&id=${nextJob.pos}&t=0&s=0`;
-                                window.location.href = href
-                            }, delay())
+                            return clickSite(nextJob.pos)
 
                         }
                         else console.log("Not enough resourses")
@@ -1099,8 +1168,6 @@ function allInOneOpera() {
             }
             this.switchCity()
         }
-
-
 
         BOT.addNPCRule = function () {
             const iNPC = {}
@@ -1187,6 +1254,7 @@ function allInOneOpera() {
 
         if (ON) {
             console.log("Starting bot")
+            // BOT.checkNPC()
             BOT.setNextJob()
         }
 
