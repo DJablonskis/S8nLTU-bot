@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.91b
+// @version        0.91rc
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const VER = "0.91b"
+    const VER = "0.91rc"
     const APP_NAME = "PingWin"
 
     let BOT;
@@ -780,23 +780,6 @@ function allInOneOpera() {
         c.displayJobs = displayJobs
     }
 
-    function initNPCRules(b) {
-        let rules = JSON.parse(localStorage.getItem(NPC_RULES))
-
-        if (!rules || !rules[b.cID]) {
-            rules = rules ? rules : {}
-            if (window.location.pathname.includes("dorf")) {
-                rules[b.cID] = rules[b.cID] ? rules[b.cID] : []
-            }
-            localStorage.setItem(NPC_RULES, JSON.stringify(rules))
-        }
-        b.npcRules = rules
-    }
-
-
-
-
-
     //STARTS HERE IF CAN SEE VILLAGE LIST
 
     if (shouldRun()) {
@@ -857,8 +840,12 @@ function allInOneOpera() {
         const npcTitle = npcS.appendChild(document.createElement("h4"))
         npcTitle.style.cssText = titleStyle
         npcTitle.innerText = "NPC rules"
+
+        const npcSubtitle = npcS.appendChild(document.createElement("h6"))
+        npcSubtitle.innerText = "Warning: experimental feature. High gold usage possible."
+        npcSubtitle.style.cssText = "margin: 0; color: red;"
         BOT.npcPanel = npcS.appendChild(document.createElement("div"))
-        BOT.npcPanel.innerText = "Warning - this is still experimental, and spends gold. Do not add rules if you are not ready to lose some gold."
+
         const addNpcButton = npcS.appendChild(document.createElement("button"))
         addNpcButton.className = "textButtonV1 gold productionBoostButton"
         addNpcButton.style.cssText = "margin-top: 8px;"
@@ -892,9 +879,6 @@ function allInOneOpera() {
                 }
             }
         }
-
-        //   BOT.setStatus("hello ", 6000)
-
 
         BOT.buildingDB = buildings;
         BOT.vil.forEach((t, i) => createCity(t, villageLiArray[i]));
@@ -1147,16 +1131,19 @@ function allInOneOpera() {
 
         //#region NPC 
 
-        BOT.setNPCCooldown = function (rule) {
-            const timestamp = Date.now() + NPC_COOLDOWN
-            const i = this.npcRules[this.cID].indexOf(rule)
-            if (i !== -1) {
-                console.log("before", this.npcRules[this.cID][i])
-                this.npcRules[this.cID][i].cooldown = timestamp
-                console.log("after", this.npcRules[this.cID][i])
-                localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules))
+        function initNPCRules(b) {
+            let rules = JSON.parse(localStorage.getItem(NPC_RULES))
+            if (!rules) {
+                rules = []
+                localStorage.setItem(NPC_RULES, JSON.stringify(rules))
             }
-            this.displayNPCRules()
+            b.npcRules = rules
+            console.log("rules: ", rules)
+        }
+
+        BOT.setNPCCooldown = function (rule) {
+            this.npcRules.find(x => x.id === rule.id).cooldown = Date.now() + NPC_COOLDOWN
+            localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules))
         }
 
         BOT.checkNPC = function () {
@@ -1177,12 +1164,17 @@ function allInOneOpera() {
 
             console.log(percent)
             console.log(storage)
-            const rules = this.npcRules[this.cID]
+            const rules = this.npcRules.filter(x => x.cid === this.cID)
 
             //TODO && gold >= 3
             if (rules.length > 0) {
                 let prog = localStorage.getItem(NPC_IN_PROGRESS)
                 const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
+                if (inProgress && inProgress.cid !== this.cID) {
+                    localStorage.setItem(NPC_IN_PROGRESS, "")
+                    inProgress = null
+                }
+
                 //&& ruleTriggered
                 if (inProgress && gold >= 3 && Date.now() > inProgress.cooldown && ((inProgress.dir === "a" && inProgress.percent < percent[inProgress.type - 1]) || (inProgress.dir === "b" && inProgress.percent > percent[inProgress.type - 1]))) {
                     this.busy = true
@@ -1265,16 +1257,7 @@ function allInOneOpera() {
                         }
                     })
                 }
-
-                //implement minimal cooldown and filter out
-
-
                 console.log("rules found")
-
-                //2. navigate to center
-                //3. find market and click or abort
-                //4. switch to correct tab
-                //5. open NPC and fill in
             } else {
                 console.log("no NPC rules in this city")
             }
@@ -1322,39 +1305,43 @@ function allInOneOpera() {
 
             if (confirm(s)) {
                 const cooldown = Date.now()
-                iNPC.id = dir + type + ratio + cooldown;
+                iNPC.id = dir + type + "_" + this.cID + percent + "_" + cooldown;
+                iNPC.cid = this.cID
                 iNPC.cooldown = cooldown;
-                this.npcRules[this.cID].push(iNPC)
+                this.npcRules.push(iNPC)
                 localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules))
                 this.displayNPCRules()
-
                 ///RERENDER function here later
                 // const newSpan = this.npcPanel.appendChild(document.createElement("span"))
                 //  newSpan.innerText = `${typeNames[type - 1]} ${dir === "a" ? ">" : "<"} ${percent}% : ${ratio}`
             }
-
         }
 
         BOT.displayNPCRules = function () {
-
-            let rules = this.npcRules[this.cID]
-            rules.forEach((r, i) => {
-                const node = document.createElement("div");
-                const nodeButton = node.appendChild(document.createElement('span'))
-                const nodeText = node.appendChild(document.createElement('span'))
-                nodeText.style.cssText = "display: inline-flex; align-items: center;"
-                node.style.cssText = "font-size: 10px; line-height:10px; display: flex; align-items: center;"
-                nodeButton.style.cssText = "width:14px; height:14; border-radius:2px; background-color:red;color:white; text-align:center; font-size:12px; padding:2px; display:inline-block; border:1px solid black; margin-right:4px"
-                nodeButton.textContent = "x";
-                nodeButton.onclick = (e) => {
-                    this.npcRules[this.cid] = this.npcRules[this.cID].splice(i, 1)
-                    localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules))
-                    node.remove()
-                    this.displayNPCRules()
-                }
-                nodeText.innerHTML = `${typeNames[r.type - 1].icon(12)} ${r.dir === "a" ? ">" : "<"} ${r.percent}% &nbsp;=&nbsp;${typeNames[0].icon(12)}${r.ratio[0]}%, &nbsp;${typeNames[1].icon(12)}${r.ratio[1]}%, &nbsp;${typeNames[2].icon(12)}${r.ratio[2]}%, &nbsp;${typeNames[3].icon(12)}${r.ratio[3]}%`
-                this.npcPanel.appendChild(node);
-            })
+            let rules = this.npcRules.filter(x => x.cid === this.cID)
+            this.npcPanel.innerHTML = ''
+            if (rules.length > 0) {
+                rules.forEach(r => {
+                    const node = document.createElement("div");
+                    const nodeButton = node.appendChild(document.createElement('span'))
+                    const nodeText = node.appendChild(document.createElement('span'))
+                    nodeText.style.cssText = "display: inline-flex; align-items: center;"
+                    node.style.cssText = "font-size: 10px; line-height:10px; display: flex; align-items: center;"
+                    nodeButton.style.cssText = "width:14px; height:14; border-radius:2px; background-color:red;color:white; text-align:center; font-size:12px; padding:2px; display:inline-block; border:1px solid black; margin-right:4px"
+                    nodeButton.textContent = "x";
+                    nodeButton.onclick = (e) => {
+                        this.npcRules = this.npcRules.filter(x => x.id !== r.id)
+                        localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules))
+                        localStorage.setItem(NPC_IN_PROGRESS, "")
+                        node.remove()
+                        this.displayNPCRules()
+                    }
+                    nodeText.innerHTML = `${typeNames[r.type - 1].icon(12)} ${r.dir === "a" ? ">" : "<"} ${r.percent}% &nbsp;=&nbsp;${typeNames[0].icon(12)}${r.ratio[0]}%, &nbsp;${typeNames[1].icon(12)}${r.ratio[1]}%, &nbsp;${typeNames[2].icon(12)}${r.ratio[2]}%, &nbsp;${typeNames[3].icon(12)}${r.ratio[3]}%`
+                    this.npcPanel.appendChild(node);
+                })
+            } else {
+                this.npcPanel.innerText = "No rules created yet."
+            }
         }
 
         initJobQueue(BOT)
