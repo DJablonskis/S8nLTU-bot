@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.9
+// @version        0.91b
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const VER = "0.9"
+    const VER = "0.91b"
     const APP_NAME = "PingWin"
 
     let BOT;
@@ -36,57 +36,21 @@ function allInOneOpera() {
     const TRIBE_HUN = 'tribe7'
     const MIN_WAIT = 3 * 1000 * 60
     const MAX_WAIT = 20 * 1000 * 60
+    const NPC_COOLDOWN = 10 * 1000 * 60;
 
     const Q1 = "q1"
     const Q2 = "q2"
 
     function notifyMe(title, action, village) {
-        // Let's check if the browser supports notifications
-        if (!("Notification" in window)) {
-            alert("This browser does not support desktop notification");
-        }
-
-        // Let's check whether notification permissions have already been granted
-        else if (Notification.permission === "granted" && ON_N) {
-            // If it's okay let's create a notification
-            var notification = new Notification(title, {
-                body: `${action.name} was upgraded to level ${action.stufe} in "${village.name}"`,
-                icon: 'https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png',
-                image: 'https://cdnb.artstation.com/p/assets/images/images/006/367/267/large/ahmed-hmaim-final-c2.jpg?1498055051'
-            });
-            notification.onclick = function () {
-                parent.focus();
-            }
-
-        }
-        // Otherwise, we need to ask the user for permission
-        else if (Notification.permission !== "denied") {
-
-            Notification.requestPermission().then(function (permission) {
-                // If the user accepts, let's create a notification
-                if (permission === "granted" && ON_N) {
-                    var notification = new Notification(title, {
-                        body: `${action.name} was upgraded to level ${action.stufe} in "${village.name}"`,
-                        icon: 'https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png'
-                    });
-                    notification.onclick = function () {
-                        parent.focus();
-                    }
-                }
-            });
-        } else if (Notification.permission === "denied") {
-            alert("Please allow notifications for script to work properly")
+        var notification = new Notification(title, {
+            body: `${action.name} was upgraded to level ${action.stufe} in "${village.name}"`,
+            icon: 'https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png',
+            image: 'https://cdnb.artstation.com/p/assets/images/images/006/367/267/large/ahmed-hmaim-final-c2.jpg?1498055051'
+        });
+        notification.onclick = function () {
+            if (parent) parent.focus();
         }
     }
-
-
-    function clickSite(id) {
-        setTimeout(() => {
-            document.querySelector(`${id < 19 ? "#resourceFieldContainer" : "#village_map"} a[href*="build.php?id=${id}"]`).click()
-        }, delay("Clicking site " + id));
-    }
-
-
     function delay(message, extraTime = 0) {
         let d = (Math.floor(Math.random() * 5) + 5) * 1000 + extraTime
         BOT.setStatus(message, d)
@@ -237,6 +201,17 @@ function allInOneOpera() {
     buildings.forEach((b) => { b.getStat = getStat })
 
 
+    function clickSite(id) {
+        setTimeout(() => {
+            document.querySelector(`${id < 19 ? "#resourceFieldContainer" : "#village_map"} a[href*="build.php?id=${id}"]`).click()
+        }, delay("Clicking site " + id));
+    }
+
+    function clickGid(gid) {
+        setTimeout(() => {
+            document.querySelector(`${gid < 5 ? "#resourceFieldContainer" : "#village_map"} a[href*="&gid=${gid}"]`).click()
+        }, delay("Clicking " + buildings[gid - 1].name));
+    }
 
     function setUpResFields() {
         const ressFields = []
@@ -450,20 +425,40 @@ function allInOneOpera() {
             location.reload()
         }
 
-        let btnNotif = btnWraper.appendChild(document.createElement("a"));
-        btnNotif.classList.add("layoutButton", "buttonFramed", "withIcon", "round", "green")
-        btnNotif.innerHTML = `<svg class="edit" style=" stroke-width:2; fill:${ON_N ? 'red' : 'white'};" viewBox="0 0 20 20"><path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path></svg >`
-        btnNotif.onclick = (e) => {
-            localStorage.setItem(BOT_IN_PROGRESS, "")
-            localStorage.setItem(BOT_NOTIFICATIONS, ON_N ? BOT_OFF : BOT_ON);
-            location.reload()
+        if ("Notification" in window) {
+            let btnNotif = btnWraper.appendChild(document.createElement("a"));
+            btnNotif.classList.add("layoutButton", "buttonFramed", "withIcon", "round", "green")
+            btnNotif.innerHTML = `<svg class="edit" style=" stroke-width:2; fill:${ON_N ? 'red' : 'white'};" viewBox="0 0 20 20"><path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path></svg >`
+            btnNotif.onclick = (e) => {
+                if (Notification.permission === "denied") {
+                    return alert("Notification permission was previously denied.")
+                }
+                else if (!ON_N) {
+                    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+
+                        Notification.requestPermission().then((permission) => {
+                            if (permission === "granted") {
+                                localStorage.setItem(BOT_NOTIFICATIONS, ON_N ? BOT_OFF : BOT_ON);
+                                location.reload()
+
+                            } else {
+                                return alert("This feature requires you to enable notifications permission for this website in the browser!")
+                            }
+                        });
+                    }
+                }
+                if (Notification.permission === "granted") {
+                    localStorage.setItem(BOT_NOTIFICATIONS, ON_N ? BOT_OFF : BOT_ON);
+                    location.reload()
+                }
+            }
         }
+
 
         let btnStats = btnWraper.appendChild(document.createElement("a"));
         btnStats.classList.add("layoutButton", "buttonFramed", "withIcon", "round", "green")
         btnStats.innerHTML = `<svg class="edit" style="stroke-width:2; fill:${ON_S ? 'red' : 'white'};" viewBox="0 0 20 20"><path d="M17.431,2.156h-3.715c-0.228,0-0.413,0.186-0.413,0.413v6.973h-2.89V6.687c0-0.229-0.186-0.413-0.413-0.413H6.285c-0.228,0-0.413,0.184-0.413,0.413v6.388H2.569c-0.227,0-0.413,0.187-0.413,0.413v3.942c0,0.228,0.186,0.413,0.413,0.413h14.862c0.228,0,0.413-0.186,0.413-0.413V2.569C17.844,2.342,17.658,2.156,17.431,2.156 M5.872,17.019h-2.89v-3.117h2.89V17.019zM9.587,17.019h-2.89V7.1h2.89V17.019z M13.303,17.019h-2.89v-6.651h2.89V17.019z M17.019,17.019h-2.891V2.982h2.891V17.019z"></path></svg >`
         btnStats.onclick = (e) => {
-            localStorage.setItem(BOT_IN_PROGRESS, "")
             localStorage.setItem(BOT_STATS, ON_S ? BOT_OFF : BOT_ON);
             location.reload()
         }
@@ -748,10 +743,10 @@ function allInOneOpera() {
             jobs.forEach((job) => {
                 //if new building display!
                 const node = document.createElement("div");
-                node.style.cssText = "font-size: 10px; line-height:10px;"
+                node.style.cssText = "font-size: 10px; line-height:10px; margin-bottom:2px;"
                 const nodeButton = node.appendChild(document.createElement('span'))
                 const nodeText = node.appendChild(document.createElement('span'))
-                nodeButton.style.cssText = "width:14px; height:14; border-radius:2px; background-color:red;color:white; text-align:center; font-size:12px; padding:2px; display:inline-block; border:1px solid black; margin-right:4px"
+                nodeButton.style.cssText = "cursor: pointer; width:14px; height:14; border-radius:2px; background-color:red;color:white; text-align:center; font-size:12px; padding:2px; display:inline-block; border:1px solid black; margin-right:4px; "
                 nodeButton.textContent = "x";
                 nodeButton.onclick = (e) => {
                     let i = whichChild(e.target.parentNode)
@@ -759,7 +754,7 @@ function allInOneOpera() {
                     this.displayJobs()
                 }
                 this.jobsSection.appendChild(node);
-                nodeText.textContent = job.to === 1 ? `Build new ${this.buildingDB[job.gid - 1].name}(${job.pos}).` : `Upgrade ${this.buildingDB[job.gid - 1].name}(${job.pos}) to lvl${job.to}`
+                nodeText.textContent = `[${job.pos}] ${this.buildingDB[job.gid - 1].name} to level ${job.to}`
             })
         }
     }
@@ -806,7 +801,7 @@ function allInOneOpera() {
 
     if (shouldRun()) {
 
-        const botPanel = createSidePanel().addSection("S8nLTU BOT v" + VER);
+        const botPanel = createSidePanel().addSection(`${APP_NAME} v${VER}`);
         BOT = getCities();
 
         if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
@@ -1024,26 +1019,6 @@ function allInOneOpera() {
             }
         }
 
-        BOT.checkNPC = function () {
-            //TODO check if not empty string
-            if (this.npcRules[this.cID].length > 0) {
-                let prog = localStorage.getItem(NPC_IN_PROGRESS)
-                const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
-                console.log("check npc")
-                console.log("rules found")
-                //1. check storage against rules
-                //2. navigate to center
-                //3. find market and click or abort
-                //4. switch to correct tab
-                //5. open NPC and fill in
-
-                let capacity = this.current.ress.capacity
-                let storage = this.current.ress.storage
-            } else {
-                console.log("no NPC rules in this city")
-            }
-        }
-
 
         BOT.setNextJob = function () {
             //TODO check if not empty string
@@ -1169,6 +1144,142 @@ function allInOneOpera() {
             this.switchCity()
         }
 
+
+        //#region NPC 
+
+        BOT.setNPCCooldown = function (rule) {
+            const timestamp = Date.now() + NPC_COOLDOWN
+            const i = this.npcRules[this.cID].indexOf(rule)
+            if (i !== -1) {
+                console.log("before", this.npcRules[this.cID][i])
+                this.npcRules[this.cID][i].cooldown = timestamp
+                console.log("after", this.npcRules[this.cID][i])
+                localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules))
+            }
+            this.displayNPCRules()
+        }
+
+        BOT.checkNPC = function () {
+
+            let gold = parseInt(document.querySelector("#header .currency .value").innerText.trim().replace(/\D/g, ''));
+            let warehouse_capacity = parseInt(document.querySelector("#stockBar .warehouse .capacity .value").innerText.trim().replace(/\D/g, ''));
+            let granary_capacity = parseInt(document.querySelector("#stockBar .granary .capacity .value").innerText.trim().replace(/\D/g, ''));
+
+            let percent = []
+            document.querySelectorAll("#stockBar .barBox .bar").forEach(b => percent.push(parseInt(b.style.width.replace("%", ""))))
+
+            let storage = []
+            document.querySelectorAll("#stockBar .stockBarButton .value").forEach(b => storage.push(parseInt(b.innerText.trim().replace(/\D/g, ''))))
+
+            console.log("Gold balance:", gold)
+            console.log("warehouse capacity:", warehouse_capacity)
+            console.log("granary capacity:", granary_capacity)
+
+            console.log(percent)
+            console.log(storage)
+            const rules = this.npcRules[this.cID]
+
+            //TODO && gold >= 3
+            if (rules.length > 0) {
+                let prog = localStorage.getItem(NPC_IN_PROGRESS)
+                const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
+                //&& ruleTriggered
+                if (inProgress && gold >= 3 && Date.now() > inProgress.cooldown && ((inProgress.dir === "a" && inProgress.percent < percent[inProgress.type - 1]) || (inProgress.dir === "b" && inProgress.percent > percent[inProgress.type - 1]))) {
+                    this.busy = true
+                    console.log("rule in progress recovered")
+                    if (window.location.pathname.includes("dorf2")) {
+                        return clickGid(17)
+                    }
+                    //find and open marketplace
+                    else if (window.location.pathname.includes("build.php") && getParams().gid === "17") {
+                        //switching tab
+                        let tab = document.querySelector("#content .contentNavi .content a")
+                        if (tab && !tab.classList.contains("active")) {
+                            return setTimeout(() => { tab.click() }, delay("NPC: Wrong tab detected. switching tab!"));
+                        }
+
+                        b = document.querySelector("#build .npcMerchant button")
+                        console.log(b)
+                        setTimeout(() => {
+                            b.click()
+                            setTimeout(() => {
+                                // BOT.distributeNPC(document.getElementById("npc"))
+                                const npc = document.getElementById("npc")
+                                let distButton = document.querySelector("#submitText button")
+                                let submitButton = document.querySelector("#submitButton button")
+                                let total = parseInt(document.querySelector("#sum").innerText)
+                                let inputs = document.querySelectorAll("td.sel input")
+
+                                setTimeout(() => {
+                                    inputs[0].value = Math.floor(total / 100 * inProgress.ratio[0])
+                                    inputs[1].value = Math.floor(total / 100 * inProgress.ratio[1])
+                                    inputs[2].value = Math.floor(total / 100 * inProgress.ratio[2])
+                                    inputs[3].value = Math.floor(total / 100 * inProgress.ratio[3])
+                                    inputs[0].dispatchEvent(new KeyboardEvent('keyup', { 'key': '0' }))
+
+                                    setTimeout(() => {
+                                        distButton.click()
+                                        setTimeout(() => {
+                                            localStorage.setItem(NPC_IN_PROGRESS, "")
+                                            this.setNPCCooldown(inProgress)
+                                            submitButton.click()
+                                        }, delay("NPC: Pressing confirm."));
+
+                                    }, delay("NPC: Pressing distribute."));
+
+                                }, delay("NPC: Filling in fields"));
+
+                                console.log(total)
+                                console.log(inProgress)
+                                console.log(inputs)
+
+                            }, 300);
+
+                        }, delay("NPC: Pressing npc button"));
+
+
+
+                    } else {
+                        return setTimeout(() => {
+                            localStorage.setItem(NPC_IN_PROGRESS, "")
+                            location.href = "/dorf1.php"
+                        }, delay("NPC: Wrong location. Canceling"));
+                    }
+
+
+                } else {
+                    rules.forEach((rule) => {
+                        //TODO replace with ruleTriggered() function
+                        if (gold >= 3 && Date.now() > rule.cooldown && ((rule.dir === "a" && rule.percent < percent[rule.type - 1]) || (rule.dir === "b" && rule.percent > percent[rule.type - 1]))) {
+                            console.log("Rule matched: ", rule)
+                            this.busy = true
+                            localStorage.setItem(NPC_IN_PROGRESS, JSON.stringify(rule))
+                            //City center? click marketplace else go to dorf2
+                            if (window.location.pathname.includes("dorf2")) {
+                                return clickGid(17)
+                            } else return setTimeout(() => {
+                                location.href = "/dorf2.php"
+                            }, delay("NPC: Navigating to city center"))
+                        } else {
+                            console.log("rules checked, no valid rules found")
+                        }
+                    })
+                }
+
+                //implement minimal cooldown and filter out
+
+
+                console.log("rules found")
+
+                //2. navigate to center
+                //3. find market and click or abort
+                //4. switch to correct tab
+                //5. open NPC and fill in
+            } else {
+                console.log("no NPC rules in this city")
+            }
+        }
+
         BOT.addNPCRule = function () {
             const iNPC = {}
             const dir = prompt('Please enter "a" for above limit or "b" for bellow limit:').toLowerCase();
@@ -1192,7 +1303,7 @@ function allInOneOpera() {
             }
             iNPC.type = type
 
-            const ratio = prompt('Enter wanted resource ratio seperated by comma:\n Example "10, 10, 10, 70", means resourses will be split to 10% lumber, 10% clay, 10% iron and 70% crop')
+            const ratio = prompt('Resource percent ratio seperated by comma (must add up to 100):\n i.e.: "30, 30, 30, 10" , will be changed to 30% Lumber, 30% Clay, 30% Iron, 10% Crop after NPC')
             let ratioArr = ratio.split(",").map(x => Number(x))
             if (ratioArr.length !== 4 && ratioArr.reduce((a, b) => a + b, 0) !== 100) {
                 alert("wrong input, total needs to add to 100%. Canceled!")
@@ -1210,6 +1321,9 @@ function allInOneOpera() {
                 + 'Press OK to confirm!'
 
             if (confirm(s)) {
+                const cooldown = Date.now()
+                iNPC.id = dir + type + ratio + cooldown;
+                iNPC.cooldown = cooldown;
                 this.npcRules[this.cID].push(iNPC)
                 localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules))
                 this.displayNPCRules()
@@ -1222,6 +1336,7 @@ function allInOneOpera() {
         }
 
         BOT.displayNPCRules = function () {
+
             let rules = this.npcRules[this.cID]
             rules.forEach((r, i) => {
                 const node = document.createElement("div");
@@ -1254,8 +1369,9 @@ function allInOneOpera() {
 
         if (ON) {
             console.log("Starting bot")
-            // BOT.checkNPC()
-            BOT.setNextJob()
+            BOT.checkNPC()
+            if (!BOT.busy)
+                BOT.setNextJob()
         }
 
         console.log(BOT)
