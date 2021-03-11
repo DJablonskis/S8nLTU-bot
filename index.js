@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.91rc
+// @version        0.9.5rc
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const VER = "0.91rc"
+    const VER = "0.9.5rc"
     const APP_NAME = "PingWin"
 
     let BOT;
@@ -37,6 +37,8 @@ function allInOneOpera() {
     const MIN_WAIT = 3 * 1000 * 60
     const MAX_WAIT = 20 * 1000 * 60
     const NPC_COOLDOWN = 10 * 1000 * 60;
+    const DELAY_FAST = 1
+    const DELAY_SLOW = 4
 
     const Q1 = "q1"
     const Q2 = "q2"
@@ -51,8 +53,9 @@ function allInOneOpera() {
             if (parent) parent.focus();
         }
     }
-    function delay(message, extraTime = 0) {
-        let d = (Math.floor(Math.random() * 5) + 5) * 1000 + extraTime
+    function delay(message, fast = false, extraTime = 0) {
+        speed = fast ? DELAY_FAST : DELAY_SLOW
+        let d = (Math.floor(Math.random() * 4) + speed) * 1000 + extraTime
         BOT.setStatus(message, d)
         return d;
     }
@@ -364,12 +367,6 @@ function allInOneOpera() {
                 v.nextRessCheck = Math.min(v.l1Max, v.l2Max, v.l3Max, v.l4Max)
 
 
-                // console.log(`mediena prisipildys: `, v.l1Max / 1000 / 60 / 60);
-                // console.log(`molis prisipildys: `, v.l2Max / 1000 / 60 / 60);
-                // console.log(`gelezis prisipildys: `, v.l3Max / 1000 / 60 / 60)
-                // console.log(`grudai ${v.ress.production.l4 < 0 ? "baigsis" : "prisipildys"} : `, v.l4Max / 1000 / 60 / 60)
-                // console.log(`Artimiausiais tikrinimas: `, v.nextRessCheck / 1000 / 60 / 60)
-
                 cities.vil.push(v)
                 cities.current = v
 
@@ -389,10 +386,7 @@ function allInOneOpera() {
                 const cap = document.querySelector("td.name > .mainVillage").parentNode.querySelector("a").innerText.trim()
 
                 if (name === cap) {
-                    //  console.log("Matched! seting as capital ", cap)
                     cities.cap = did
-                } else {
-                    //  console.log("Did not match! capital not set ")
                 }
             } else {
                 if (loadedCities && loadedCities.cap) {
@@ -667,7 +661,7 @@ function allInOneOpera() {
                         task.innerHTML = `<span style="font-size:11px; padding-left: 15px; padding-right:8px">${x.name} level ${x.stufe}</span><span style="font-size:11px; ${timer.completed ? "color:green;" : ""} align-items:center;">${timer.timer}</span>`
 
                         if (timer.completed) {
-                            notifyMe("Building completed", x, vil);
+                            if (ON_N) { notifyMe("Building completed", x, vil); }
                             clearInterval(updater);
                         }
                     }, 1000)
@@ -683,12 +677,10 @@ function allInOneOpera() {
     }
 
     function displayJobs() {
-        //REMOVE PREVIOUS CHILDREN
+
         let jobs = this.jobs["c" + this.cID]
-
         jobs = !jobs ? [] : jobs
-
-        const cVillage = this.vil.find((v) => v.did === this.cID);
+        const cVillage = this.current;
         const panel = this.jobsSection
         while (panel.firstChild) {
             panel.removeChild(panel.firstChild);
@@ -700,14 +692,20 @@ function allInOneOpera() {
 
         if (window.location.pathname.includes("dorf1")) {
             this.fieldsCollection.forEach(field => {
-                //Number of currently beign guilt same type buildings
-                const buildingNow = cVillage.queue.filter((bn) => Number(bn.pos) === field.pos).length
+                const buildingNow = cVillage.queue.filter(bn => Number(bn.aid) === field.pos)
+                const min = field.lvl + buildingNow.length + 1
+                const old_jobs = jobs.filter(job => job.pos === field.pos && job.to < min)
+                if (old_jobs.length > 0) {
+                    old_jobs.forEach(job => {
+                        jobs = this.completeJob(job)
+                    })
+                }
 
                 const count = jobs.filter(x => x.pos === field.pos).length
                 field.bot.textContent = count === 0 ? "+" : count
                 field.bot.dataset.lvl = count
                 field.bot.onclick = () => {
-                    this.addJob({ gid: field.gid, pos: field.pos, lvl: field.lvl, to: Number(field.bot.dataset.lvl) + 1 + Number(field.lvl) + buildingNow })
+                    this.addJob({ gid: field.gid, pos: field.pos, lvl: field.lvl, to: Number(field.bot.dataset.lvl) + 1 + Number(field.lvl) + buildingNow.length })
                     this.displayJobs()
                 };
             });
@@ -715,26 +713,30 @@ function allInOneOpera() {
         if (window.location.pathname.includes("dorf2")) {
             this.buildingCollection.forEach(building => {
                 //Number of currently beign built same type buildings
-                const buildingNow = cVillage.queue.filter((bn) => Number(bn.pos) === building.pos).length
+                const buildingNow = cVillage.queue.filter((bn) => Number(bn.aid) === building.pos)
+
+                const min = building.lvl + buildingNow.length + 1
+                const old_jobs = jobs.filter(job => job.pos === building.pos && job.to < min)
+                if (old_jobs.length > 0) {
+                    old_jobs.forEach(job => {
+                        jobs = this.completeJob(job)
+                    })
+                }
+
                 const pos_jobs = jobs.filter(x => x.pos === building.pos)
                 const count = pos_jobs.length
-                //  if (building.gid === 0 && pos_jobs > 0) {
+
                 if (building.gid === 0 && count > 0) {
-                    //    console.log("Jobs in empty field: ", pos_jobs)
-                    //console.log("Field: ", building)
-                    //New building in jobs here!
                     building.bot.style.display = "block";
                     building.gid = pos_jobs[0].gid
                     let image = building.node.querySelector("img")
                     image.classList.add("g" + pos_jobs[0].gid)
                     image.style.opacity = "0.5"
                 }
-
-                // }
                 building.bot.textContent = count === 0 ? "+" : count
                 building.bot.dataset.lvl = count
                 building.bot.onclick = () => {
-                    this.addJob({ gid: building.gid, pos: building.pos, lvl: building.lvl, to: Number(building.bot.dataset.lvl) + 1 + Number(building.lvl) + buildingNow })
+                    this.addJob({ gid: building.gid, pos: building.pos, lvl: building.lvl, to: Number(building.bot.dataset.lvl) + 1 + Number(building.lvl) + buildingNow.length })
                     this.displayJobs()
                 };
             });
@@ -839,11 +841,9 @@ function allInOneOpera() {
         npcS.style.cssText = "padding-bottom: 8px; border-bottom: 1px solid #5e463a;"
         const npcTitle = npcS.appendChild(document.createElement("h4"))
         npcTitle.style.cssText = titleStyle
-        npcTitle.innerText = "NPC rules"
+        npcTitle.innerText = "Auto NPC"
 
-        const npcSubtitle = npcS.appendChild(document.createElement("h6"))
-        npcSubtitle.innerText = "Warning: experimental feature. High gold usage possible."
-        npcSubtitle.style.cssText = "margin: 0; color: red;"
+
         BOT.npcPanel = npcS.appendChild(document.createElement("div"))
 
         const addNpcButton = npcS.appendChild(document.createElement("button"))
@@ -851,6 +851,10 @@ function allInOneOpera() {
         addNpcButton.style.cssText = "margin-top: 8px;"
         addNpcButton.innerText = "Add new rule"
         addNpcButton.onclick = () => BOT.addNPCRule()
+
+        const npcSubtitle = npcS.appendChild(document.createElement("p"))
+        npcSubtitle.innerHTML = "<strong>Warning:</strong> Still experimental. Spends gold and could contain bugs causing high gold usage. Use at your own risks!"
+        npcSubtitle.style.cssText = "margin: 8px 0; color: red;"
         //status setup
         const status = botPanel.appendChild(document.createElement("div"))
         status.style.cssText = "padding-bottom: 8px; border-bottom: 1px solid #5e463a;"
@@ -884,7 +888,6 @@ function allInOneOpera() {
         BOT.vil.forEach((t, i) => createCity(t, villageLiArray[i]));
 
         BOT.addJob = function (job) {
-            console.log("adding job: ", job)
             if (!this.cap) {
                 alert("Capital not set. Opening '/profile' section for you now. While on '/profile' section, please change your current city to your capital city for bot to update. You only need to do this once.")
                 location.href = '/profile'
@@ -940,6 +943,7 @@ function allInOneOpera() {
             let jobs = this.jobs["c" + this.cID]
             this.jobs["c" + this.cID] = jobs.filter((j) => (j.pos !== job.pos || (j.pos === job.pos && j.to !== job.to)))
             localStorage.setItem(JOBS_STORAGE, JSON.stringify(this.jobs))
+            return this.jobs["c" + this.cID]
         }
 
         BOT.removeJob = function (job) {
@@ -951,34 +955,25 @@ function allInOneOpera() {
         BOT.switchCity = function () {
             if (location.pathname.includes("dorf1")) {
 
-                console.log("Tikrina miestus.")
                 let filtered = this.vil.filter(v => {
                     let shouldCheck = false
                     let jobs = this.jobs["c" + v.did]
-                    let q1 = jobs.filter(q => q.gid < 5)
-                    let q2 = jobs.filter(q => q.gid > 4)
+                    if (jobs && jobs.length > 0) {
+                        let q1 = jobs.filter(q => q.gid < 5)
+                        let q2 = jobs.filter(q => q.gid > 4)
 
-                    const p = v.queue.filter(b => b.finish > Date.now())
-                    const p1 = p.filter(_p => _p.gid < 5)
-                    const p2 = p.filter(_p => _p.gid > 4)
-                    // console.log("Planed jobs q1: ", q1)
-                    // console.log("Planed jobs q2: ", q2)
-                    // console.log("constructions: ", v.queue)
-                    // console.log("p1: ", p1)
-                    // console.log("p2: ", p2)
-                    if (jobs.length > 0 && v.timestamp + MIN_WAIT < Date.now()) {
+                        const p = v.queue.filter(b => b.finish > Date.now())
+                        const p1 = p.filter(_p => _p.gid < 5)
+                        const p2 = p.filter(_p => _p.gid > 4)
+                        if (v.timestamp + MIN_WAIT < Date.now()) {
 
-                        if (this.tribe === TRIBE_ROMAN) {
-                            shouldCheck = (q1.length > 0 && p1.length === 0) || (q2.length > 0 && p2.length === 0)
-                        } else shouldCheck = (p.length === 0)
-                        if (shouldCheck) {
-                            console.log(`Village ${v.name} should be checked. Min time + job queue + nothing building.`)
+                            if (this.tribe === TRIBE_ROMAN) {
+                                shouldCheck = (q1.length > 0 && p1.length === 0) || (q2.length > 0 && p2.length === 0)
+                            } else { shouldCheck = (p.length === 0) }
+
+                            return shouldCheck
                         }
-                        return shouldCheck
-                    }
-                    shouldCheck = v.timestamp + MAX_WAIT < Date.now()
-                    if (shouldCheck) {
-                        console.log(`Village ${v.name} should be checked. Max time.`)
+                        shouldCheck = v.timestamp + MAX_WAIT < Date.now()
                     }
                     return shouldCheck
                 })
@@ -988,14 +983,13 @@ function allInOneOpera() {
                     //switch to some city                    
                     setTimeout(() => {
                         document.querySelector("#sidebarBoxVillagelist li a[href*='" + filtered[0].did + "']").click()
-                    }, delay(`Switching to ${filtered[0].name}`));
+                    }, delay(`Switching to ${filtered[0].name}`, true, 0));
                 }
                 else {
                     setTimeout(() => {
                         location.reload()
-                    }, delay("Cooldown, waiting minimal time.", MIN_WAIT));
+                    }, delay("Cooldown, waiting minimal time.", false, MIN_WAIT));
                 }
-                //  console.log("filtered: ", filtered)
             } else {
                 setTimeout(() => {
                     location.href = "/dorf1.php"
@@ -1007,27 +1001,19 @@ function allInOneOpera() {
         BOT.setNextJob = function () {
             //TODO check if not empty string
             let prog = localStorage.getItem(BOT_IN_PROGRESS)
-            console.log("setNextJob")
 
             const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
 
             if (location.pathname.includes("build.php")) {
                 if (inProgress !== null) {
                     const params = getParams(window.location.search)
-                    console.log("read params: ", params)
                     let currentLvl = 0
                     //check if job was done to this leve and if so, complete it
                     if (Object.keys(params).includes("gid")) {
                         currentLvl = Number(document.querySelector("div#build").classList[1].replace("level", ""))
-                        console.log(`Building level ${currentLvl} in position ${params.id}`)
-                    }
-                    else {
-                        console.log(`Empty space in position ${params.id}`)
-
                     }
 
                     if (currentLvl >= inProgress.job.to) {
-                        console.log("Job was already done before. Canceling in 5s!")
                         return setTimeout(() => {
                             localStorage.setItem(BOT_IN_PROGRESS, "")
                             this.completeJob(inProgress.job)
@@ -1041,7 +1027,7 @@ function allInOneOpera() {
                             if (inProgress.job.cat) {
                                 let tab = document.querySelector(`#content .contentNavi .content a[href*="category=${inProgress.job.cat}"]`)
                                 if (tab && !tab.classList.contains("active")) {
-                                    return setTimeout(() => { tab.click() }, delay("Wrong tab detected. switching tab!"));
+                                    return setTimeout(() => { tab.click() }, delay("Wrong tab detected. switching tab!"), true);
                                 }
                                 b = document.querySelector(`img.g${inProgress.job.gid}`).parentNode.parentNode.querySelector(".contractLink button")
                             }
@@ -1055,7 +1041,7 @@ function allInOneOpera() {
                             let tab = document.querySelector("#content .contentNavi .content a")
 
                             if (tab && !tab.classList.contains("active")) {
-                                return setTimeout(() => { tab.click() }, delay("Wrong tab detected. switching tab!"));
+                                return setTimeout(() => { tab.click() }, delay("Wrong tab detected. switching tab!", true));
                             }
 
                             b = document.querySelector(".section1 button.green.build");
@@ -1067,7 +1053,7 @@ function allInOneOpera() {
                                 localStorage.setItem(BOT_IN_PROGRESS, "")
                                 b.click()
                             } else console.log("Error! Button for upgrade not found!")
-                        }, delay("Perssing build Button"))
+                        }, delay("Perssing build Button"), true)
                     }
                 }
             }
@@ -1082,7 +1068,6 @@ function allInOneOpera() {
 
                 //ANY JOBS SET?
                 if (jobs.length > 0) {
-                    console.log("Some jobs planed")
                     let nextJob = null
                     //ANYTHING BUILDING?
                     if (this.tribe === TRIBE_ROMAN) {
@@ -1095,14 +1080,10 @@ function allInOneOpera() {
                         nextJob = jobs[0]
                     }
                     if (nextJob !== null) {
-                        console.log(`${nextJob.gid > 4 ? "Building " : "Resource "} job found.`)
                         const building = this.buildingDB[nextJob.gid - 1]
-                        console.log("Building: ", building)
                         const cost = building.getStat(nextJob.to).cost
-                        console.log("calculated upgrade costs: ", cost)
 
                         if (storage.l1 >= cost[0] && storage.l2 >= cost[1] && storage.l3 >= cost[2] && storage.l4 >= cost[3]) {
-                            console.log("Enough resourses. Navigating to the building")
 
                             if (nextJob.gid > 4 && location.pathname.includes("dorf1") || nextJob.gid < 5 && location.pathname.includes("dorf2")) {
                                 return setTimeout(() => {
@@ -1117,12 +1098,10 @@ function allInOneOpera() {
                             }));
 
                             return clickSite(nextJob.pos)
-
                         }
-                        else console.log("Not enough resourses")
-                    } else console.log("No posible jobs found")
+                    }
 
-                } else console.log("No jobs planed in here")
+                }
 
             }
             this.switchCity()
@@ -1138,7 +1117,6 @@ function allInOneOpera() {
                 localStorage.setItem(NPC_RULES, JSON.stringify(rules))
             }
             b.npcRules = rules
-            console.log("rules: ", rules)
         }
 
         BOT.setNPCCooldown = function (rule) {
@@ -1157,13 +1135,6 @@ function allInOneOpera() {
 
             let storage = []
             document.querySelectorAll("#stockBar .stockBarButton .value").forEach(b => storage.push(parseInt(b.innerText.trim().replace(/\D/g, ''))))
-
-            console.log("Gold balance:", gold)
-            console.log("warehouse capacity:", warehouse_capacity)
-            console.log("granary capacity:", granary_capacity)
-
-            console.log(percent)
-            console.log(storage)
             const rules = this.npcRules.filter(x => x.cid === this.cID)
 
             //TODO && gold >= 3
@@ -1178,7 +1149,6 @@ function allInOneOpera() {
                 //&& ruleTriggered
                 if (inProgress && gold >= 3 && Date.now() > inProgress.cooldown && ((inProgress.dir === "a" && inProgress.percent < percent[inProgress.type - 1]) || (inProgress.dir === "b" && inProgress.percent > percent[inProgress.type - 1]))) {
                     this.busy = true
-                    console.log("rule in progress recovered")
                     if (window.location.pathname.includes("dorf2")) {
                         return clickGid(17)
                     }
@@ -1187,11 +1157,10 @@ function allInOneOpera() {
                         //switching tab
                         let tab = document.querySelector("#content .contentNavi .content a")
                         if (tab && !tab.classList.contains("active")) {
-                            return setTimeout(() => { tab.click() }, delay("NPC: Wrong tab detected. switching tab!"));
+                            return setTimeout(() => { tab.click() }, delay("NPC: Wrong tab detected. switching tab!"), true);
                         }
 
                         b = document.querySelector("#build .npcMerchant button")
-                        console.log(b)
                         setTimeout(() => {
                             b.click()
                             setTimeout(() => {
@@ -1215,18 +1184,13 @@ function allInOneOpera() {
                                             localStorage.setItem(NPC_IN_PROGRESS, "")
                                             this.setNPCCooldown(inProgress)
                                             submitButton.click()
-                                        }, delay("NPC: Pressing confirm."));
+                                        }, delay("NPC: Pressing confirm.", true));
 
-                                    }, delay("NPC: Pressing distribute."));
+                                    }, delay("NPC: Pressing distribute.", true));
 
                                 }, delay("NPC: Filling in fields"));
 
-                                console.log(total)
-                                console.log(inProgress)
-                                console.log(inputs)
-
                             }, 300);
-
                         }, delay("NPC: Pressing npc button"));
 
 
@@ -1235,7 +1199,7 @@ function allInOneOpera() {
                         return setTimeout(() => {
                             localStorage.setItem(NPC_IN_PROGRESS, "")
                             location.href = "/dorf1.php"
-                        }, delay("NPC: Wrong location. Canceling"));
+                        }, delay("NPC: Wrong location. Canceling", true));
                     }
 
 
@@ -1243,7 +1207,6 @@ function allInOneOpera() {
                     rules.forEach((rule) => {
                         //TODO replace with ruleTriggered() function
                         if (gold >= 3 && Date.now() > rule.cooldown && ((rule.dir === "a" && rule.percent < percent[rule.type - 1]) || (rule.dir === "b" && rule.percent > percent[rule.type - 1]))) {
-                            console.log("Rule matched: ", rule)
                             this.busy = true
                             localStorage.setItem(NPC_IN_PROGRESS, JSON.stringify(rule))
                             //City center? click marketplace else go to dorf2
@@ -1252,14 +1215,9 @@ function allInOneOpera() {
                             } else return setTimeout(() => {
                                 location.href = "/dorf2.php"
                             }, delay("NPC: Navigating to city center"))
-                        } else {
-                            console.log("rules checked, no valid rules found")
                         }
                     })
                 }
-                console.log("rules found")
-            } else {
-                console.log("no NPC rules in this city")
             }
         }
 
@@ -1294,8 +1252,6 @@ function allInOneOpera() {
             }
             const p = 100.0 / ratioArr.reduce((a, b) => a + b, 0)
             ratioArr = ratioArr.map(x => Math.round((x * p)))
-            console.log(`Total: ${p} `, ratioArr)
-
             iNPC.ratio = ratioArr
 
             const s = 'You are setting up this NPC rule: \n'
