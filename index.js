@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.9.5rc
+// @version        0.9.6rc
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const VER = "0.9.5rc"
+    const VER = "0.9.6rc"
     const APP_NAME = "PingWin"
 
     let BOT;
@@ -29,11 +29,20 @@ function allInOneOpera() {
 
     const POSITION_UP = "UP";
     const POSITION_DOWN = "DOWN"
-    const TRIBE_ROMAN = 'tribe1'
-    const TRIBE_TEUTON = 'tribe2'
-    const TRIBE_GAUL = 'tribe3'
-    const TRIBE_EGIPT = 'tribe6'
-    const TRIBE_HUN = 'tribe7'
+    const TRIBE_ROMAN = 'tribe1'//
+    const TRIBE_TEUTON = 'tribe2'  //
+    const TRIBE_GAUL = 'tribe3'//
+    const TRIBE_EGIPT = 'tribe6'//
+    const TRIBE_HUN = 'tribe7'//
+
+    const WALLS = {
+        tribe1: 31,
+        tribe2: 32,
+        tribe3: 33,
+        tribe6: 42,
+        tribe7: 43,
+    }
+
     const MIN_WAIT = 3 * 1000 * 60
     const MAX_WAIT = 20 * 1000 * 60
     const NPC_COOLDOWN = 10 * 1000 * 60;
@@ -59,7 +68,6 @@ function allInOneOpera() {
         BOT.setStatus(message, d)
         return d;
     }
-
 
     function shuffleArray(array) {
         var currentIndex = array.length, temporaryValue, randomIndex;
@@ -248,29 +256,60 @@ function allInOneOpera() {
     //DOES NOT PARSE WALL
     function setUpBuildings() {
         const buildings = []
-        const building_nodes = document.querySelectorAll("#village_map > div.buildingSlot > img.building") // does not include wall !!! TODO img.wall for wall selection
+
+        const wall = document.querySelector("#village_map .a40.bottom a[href*='id=40'")
+        let wall_level_node = wall.querySelector("div.labelLayer");
+        let wall_level = 0;
+        if (wall_level_node) {
+            wall_level = Number(wall_level_node.textContent)
+        }
+        console.log(wall)
+        const wall_btn = document.getElementById("village_map").appendChild(document.createElement("div"))
+
+        wall_btn.style.cssText = "cursor:pointer;text-align:center;font-weight:900; border:2px ridge #fdfd75; background-image:none; border-radius:50%; background-color:rgba(41, 61, 113,0.5); color: white; line-height:23px; position:absolute; width:23px; z-index:40; bottom: 43px; left: calc(50% - 20px)"
+        wall_btn.textContent = "+"
+        buildings.push({ node: wall.parentNode, pos: 40, gid: 32, lvl: wall_level, bot: wall_btn })
+
+        const building_nodes = Array.from(document.querySelectorAll("#village_map > div.buildingSlot > img.building"))
+
+
+        //  building_nodes.push(wall)
+
         building_nodes.forEach((a) => {
             let node = a.parentNode;
+            let gid, pos;
 
-            let gid = Number(node.classList.value.split(" g")[1].split(" ")[0])
-            let pos = Number(node.classList.value.split("aid")[1].split(" ")[0])
 
+            // if (node.classList.contains("bottom")) {
+            //     gid = WALLS[this.tribe]
+            //     pos = 40;
+            // }
+            gid = Number(node.classList.value.split(" g")[1].split(" ")[0])
+            pos = Number(node.classList.value.split("aid")[1].split(" ")[0])
 
             let levelNode = node.querySelector("div.labelLayer");
             let lvl = 0;
             if (gid !== 0 && levelNode) {
                 lvl = Number(levelNode.textContent)
             }
+
             let BOT_inc_build = null
+
+            // if (pos === 40) {
+            //     BOT_inc_build = document.querySelector("#village_map").appendChild(document.createElement("div"))
+            //     BOT_inc_build.style.cssText = "text-align:center;position:absolute; left: 50%; bottom:0;font-weight:900; cursor:pointer; border:2px ridge #fdfd75; background-image:none; border-radius:50%; background-color:rgba(41, 61, 113,0.9); color: white; line-height:23px; width: 23px; height:23px"
+            // } 
             BOT_inc_build = node.appendChild(document.createElement("div"))
-            BOT_inc_build.classList.add("level", "buildingSlot", "a" + pos)
+            BOT_inc_build.classList.add("level", "buildingSlot")
             BOT_inc_build.dataset.lvl = lvl;
 
             BOT_inc_build.style.cssText = "text-align:center;font-weight:900; border:2px ridge #fdfd75; margin-left:-28px; margin-top:2px; background-image:none; border-radius:50%; background-color:rgba(41, 61, 113,0.5); color: white; line-height:23px"
             BOT_inc_build.textContent = "+"
             let BOT_inc_buid_spacer = node.appendChild(document.createElement("div"))
-            BOT_inc_buid_spacer.classList.add("level", "buildingSlot", "a" + pos)
+            BOT_inc_buid_spacer.classList.add("level", "buildingSlot")
             BOT_inc_buid_spacer.style.cssText = "border-radius:0;z-index:1;width: 27px;height: 23px;margin-top: 2px;background-color: none;background-image: none;margin-left: -14px; border-top: 2px ridge #fdfd75;border-bottom: 2px ridge #fdfd75;"
+
+
             buildings.push({ node, pos, gid, lvl, bot: BOT_inc_build })
 
             if (gid === 0) {
@@ -279,8 +318,7 @@ function allInOneOpera() {
             }
 
         })
-
-        let wall = document.querySelectorAll("#village_map > div.buildingSlot > img.wall")
+        console.log(buildings)
 
         return buildings
     }
@@ -1025,7 +1063,7 @@ function allInOneOpera() {
 
                         if (inProgress.job.to === 1) {
                             if (inProgress.job.cat) {
-                                let tab = document.querySelector(`#content .contentNavi .content a[href*="category=${inProgress.job.cat}"]`)
+                                let tab = document.querySelector(`#content .contentNavi .scrollingContainer .content a[href*="category=${inProgress.job.cat}"]`)
                                 if (tab && !tab.classList.contains("active")) {
                                     return setTimeout(() => { tab.click() }, delay("Wrong tab detected. switching tab!"), true);
                                 }
@@ -1038,7 +1076,7 @@ function allInOneOpera() {
 
                         } else {
                             //switching tab
-                            let tab = document.querySelector("#content .contentNavi .content a")
+                            let tab = document.querySelector("#content .contentNavi .scrollingContainer .content a")
 
                             if (tab && !tab.classList.contains("active")) {
                                 return setTimeout(() => { tab.click() }, delay("Wrong tab detected. switching tab!", true));
