@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.9.6rc
+// @version        0.9.7rc
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const VER = "0.9.6rc"
+    const VER = "0.9.7rc"
     const APP_NAME = "PingWin"
 
     let BOT;
@@ -17,6 +17,7 @@ function allInOneOpera() {
     const CITIES_STORAGE = "storedCities";
     const PANEL_POSITION = "positionPanel"
     const NPC_RULES = "npcRules"
+    const FARM_RULES = "farmRules"
     const JOBS_STORAGE = "storedJobs";
     const BOT_POWER = 'bot_enabled';
     const BOT_NOTIFICATIONS = 'bot_notifications';
@@ -30,7 +31,7 @@ function allInOneOpera() {
     const POSITION_UP = "UP";
     const POSITION_DOWN = "DOWN"
     const TRIBE_ROMAN = 'tribe1'//
-    const TRIBE_TEUTON = 'tribe2'  //
+    const TRIBE_TEUTON = 'tribe2'//
     const TRIBE_GAUL = 'tribe3'//
     const TRIBE_EGIPT = 'tribe6'//
     const TRIBE_HUN = 'tribe7'//
@@ -63,7 +64,7 @@ function allInOneOpera() {
         }
     }
     function delay(message, fast = false, extraTime = 0) {
-        speed = fast ? DELAY_FAST : DELAY_SLOW
+        let speed = fast ? DELAY_FAST : DELAY_SLOW
         let d = (Math.floor(Math.random() * 4) + speed) * 1000 + extraTime
         BOT.setStatus(message, d)
         return d;
@@ -252,7 +253,6 @@ function allInOneOpera() {
         return ressFields
     }
 
-
     //DOES NOT PARSE WALL
     function setUpBuildings() {
         const buildings = []
@@ -298,7 +298,7 @@ function allInOneOpera() {
             // if (pos === 40) {
             //     BOT_inc_build = document.querySelector("#village_map").appendChild(document.createElement("div"))
             //     BOT_inc_build.style.cssText = "text-align:center;position:absolute; left: 50%; bottom:0;font-weight:900; cursor:pointer; border:2px ridge #fdfd75; background-image:none; border-radius:50%; background-color:rgba(41, 61, 113,0.9); color: white; line-height:23px; width: 23px; height:23px"
-            // } 
+            // }
             BOT_inc_build = node.appendChild(document.createElement("div"))
             BOT_inc_build.classList.add("level", "buildingSlot")
             BOT_inc_build.dataset.lvl = lvl;
@@ -334,7 +334,6 @@ function allInOneOpera() {
     const gi = (x) => (`<i style="background-image: url('https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/hud/topBar/header/stockBar/granary_medium.png');margin-right:4px; width: ${x}px; height: ${x}px; background-size: contain;"></i>`);
 
     const typeNames = [{ name: "Lumber", icon: r1i }, { name: "Clay", icon: r2i }, { name: "Iron", icon: r3i }, { name: 'Crop', icon: r4i }]
-    const building = (id, tribe = "teuton", size = 120, big = true) => (`<span class="buildingsV3"><img src="/img/x.gif" class="building g${id} ${tribe} ${big ? "big" : ""}" style="width: ${size}px; height: ${size}px; background-size:contain;"></span>`)
 
     const getResources = () => {
         let arr = document.querySelector("#contentOuterContainer > script").text.split("=").pop().trim().slice(0, -1).split("},");
@@ -724,10 +723,6 @@ function allInOneOpera() {
             panel.removeChild(panel.firstChild);
         }
 
-        if (jobs.length === 0) {
-            this.jobsSection.innerText = "No jobs planed. Added jobs will show here."
-        }
-
         if (window.location.pathname.includes("dorf1")) {
             this.fieldsCollection.forEach(field => {
                 const buildingNow = cVillage.queue.filter(bn => Number(bn.aid) === field.pos)
@@ -764,6 +759,8 @@ function allInOneOpera() {
                 const pos_jobs = jobs.filter(x => x.pos === building.pos)
                 const count = pos_jobs.length
 
+
+                //if new building display!
                 if (building.gid === 0 && count > 0) {
                     building.bot.style.display = "block";
                     building.gid = pos_jobs[0].gid
@@ -779,9 +776,12 @@ function allInOneOpera() {
                 };
             });
         }
+
+        const summary = this.jobsSection.appendChild(document.createElement("summary"));
+        summary.innerHTML = `<strong>Jobs planed: </strong> ${jobs.length}; <strong>`
+
         if (jobs.length > 0) {
             jobs.forEach((job) => {
-                //if new building display!
                 const node = document.createElement("div");
                 node.style.cssText = "font-size: 10px; line-height:10px; margin-bottom:2px;"
                 const nodeButton = node.appendChild(document.createElement('span'))
@@ -789,7 +789,7 @@ function allInOneOpera() {
                 nodeButton.style.cssText = "cursor: pointer; width:14px; height:14; border-radius:2px; background-color:red;color:white; text-align:center; font-size:12px; padding:2px; display:inline-block; border:1px solid black; margin-right:4px; "
                 nodeButton.textContent = "x";
                 nodeButton.onclick = (e) => {
-                    let i = whichChild(e.target.parentNode)
+                    let i = whichChild(e.target.parentNode) - 1
                     this.removeJob(jobs[i])
                     this.displayJobs()
                 }
@@ -826,9 +826,10 @@ function allInOneOpera() {
 
         const botPanel = createSidePanel().addSection(`${APP_NAME} v${VER}`);
         BOT = getCities();
+        const params = getParams()
 
         if (window.location.pathname.includes("build.php") && !window.location.search.includes("&gid=")) {
-            const params = getParams(window.location.search)
+
             const cat = params.category ? Number(params.category) : 1
 
             const availableBuildings = document.querySelectorAll(".buildingWrapper > .build_desc > img.building");
@@ -870,9 +871,22 @@ function allInOneOpera() {
         const jobQS = botPanel.appendChild(document.createElement("div"))
         jobQS.style.cssText = "padding-bottom: 8px; border-bottom: 1px solid #5e463a;"
         const jobQTitle = jobQS.appendChild(document.createElement("h4"))
-        jobQTitle.innerText = "Buildig queue:"
+        jobQTitle.innerText = "Builder"
         jobQTitle.style.cssText = titleStyle
-        BOT.jobsSection = jobQS.appendChild(document.createElement("div"))
+
+        BOT.jobsSection = jobQS.appendChild(document.createElement("details"))
+
+        const builderSettings = jobQS.appendChild(document.createElement("div"))
+        builderSettings.style.cssText = "padding-top: 6px"
+
+        const autobuilderRow = builderSettings.appendChild(document.createElement("div"))
+        autobuilderRow.innerHTML = '<label for="cbAutoFields" style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoFields" style="margin-right: 2px;">Auto-upgrade resources</label>'
+        // AutobuilderCheckBox = autobuilderRow.getElementById("cbAutoFields")
+
+        const ignoreCropRow = builderSettings.appendChild(document.createElement("div"))
+        ignoreCropRow.innerHTML = '<label for="cbIgnoreCrop"  style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbIgnoreCrop" style="margin-right: 2px;">Auto-upgrade crop<label>'
+        // ignoreCropCheckBox = autobuilderRow.getElementById("cbIgnoreCrop")
+
 
         //NPC SETUP
         const npcS = botPanel.appendChild(document.createElement("div"))
@@ -1018,7 +1032,7 @@ function allInOneOpera() {
 
                 if (filtered.length > 0) {
                     filtered = shuffleArray(filtered)
-                    //switch to some city                    
+                    //switch to some city
                     setTimeout(() => {
                         document.querySelector("#sidebarBoxVillagelist li a[href*='" + filtered[0].did + "']").click()
                     }, delay(`Switching to ${filtered[0].name}`, true, 0));
@@ -1144,9 +1158,7 @@ function allInOneOpera() {
             }
             this.switchCity()
         }
-
-
-        //#region NPC 
+        //#region NPC
 
         function initNPCRules(b) {
             let rules = JSON.parse(localStorage.getItem(NPC_RULES))
@@ -1163,7 +1175,6 @@ function allInOneOpera() {
         }
 
         BOT.checkNPC = function () {
-
             let gold = parseInt(document.querySelector("#header .currency .value").innerText.trim().replace(/\D/g, ''));
             let warehouse_capacity = parseInt(document.querySelector("#stockBar .warehouse .capacity .value").innerText.trim().replace(/\D/g, ''));
             let granary_capacity = parseInt(document.querySelector("#stockBar .granary .capacity .value").innerText.trim().replace(/\D/g, ''));
@@ -1183,7 +1194,6 @@ function allInOneOpera() {
                     localStorage.setItem(NPC_IN_PROGRESS, "")
                     inProgress = null
                 }
-
                 //&& ruleTriggered
                 if (inProgress && gold >= 3 && Date.now() > inProgress.cooldown && ((inProgress.dir === "a" && inProgress.percent < percent[inProgress.type - 1]) || (inProgress.dir === "b" && inProgress.percent > percent[inProgress.type - 1]))) {
                     this.busy = true
@@ -1198,7 +1208,7 @@ function allInOneOpera() {
                             return setTimeout(() => { tab.click() }, delay("NPC: Wrong tab detected. switching tab!"), true);
                         }
 
-                        b = document.querySelector("#build .npcMerchant button")
+                        let b = document.querySelector("#build .npcMerchant button")
                         setTimeout(() => {
                             b.click()
                             setTimeout(() => {
@@ -1230,16 +1240,12 @@ function allInOneOpera() {
 
                             }, 300);
                         }, delay("NPC: Pressing npc button"));
-
-
-
                     } else {
                         return setTimeout(() => {
                             localStorage.setItem(NPC_IN_PROGRESS, "")
                             location.href = "/dorf1.php"
                         }, delay("NPC: Wrong location. Canceling", true));
                     }
-
 
                 } else {
                     rules.forEach((rule) => {
@@ -1250,9 +1256,11 @@ function allInOneOpera() {
                             //City center? click marketplace else go to dorf2
                             if (window.location.pathname.includes("dorf2")) {
                                 return clickGid(17)
-                            } else return setTimeout(() => {
-                                location.href = "/dorf2.php"
-                            }, delay("NPC: Navigating to city center"))
+                            } else {
+                                return setTimeout(() => {
+                                    location.href = "/dorf2.php"
+                                }, delay("NPC: Navigating to city center"))
+                            }
                         }
                     })
                 }
@@ -1338,7 +1346,35 @@ function allInOneOpera() {
             }
         }
 
+        //FARMLIST REGION
+        function initFarmingRules(b) {
+            let rules = JSON.parse(localStorage.getItem(FARM_RULES))
+            if (!rules) {
+                rules = []
+                localStorage.setItem(FARM_RULES, JSON.stringify(rules))
+            }
+            b.npcRules = rules
+            console.log("Rules: ", rules)
+
+            if (window.location.pathname.includes("build.php") && params.gid && params.gid === "16" && params.tt && params.tt === "99") {
+                console.log("farm list open")
+                let villageList = document.querySelectorAll("#raidList .villageWrapper")
+                let farmLists = []
+                villageList.forEach(v => {
+                    let farmList = v.querySelectorAll(".dropContainer .raidList")
+                    farmList.forEach(l => {
+                        let farmListItem = {}
+                        farmListItem.id = l.id
+                        farmLists.push(farmListItem)
+                    })
+                })
+                console.log(farmLists)
+            }
+
+        }
+
         initJobQueue(BOT)
+        initFarmingRules(BOT)
         BOT.displayJobs()
 
         initNPCRules(BOT)
@@ -1351,8 +1387,8 @@ function allInOneOpera() {
         if (ON) {
             console.log("Starting bot")
             BOT.checkNPC()
-            if (!BOT.busy)
-                BOT.setNextJob()
+            if (!BOT.busy) { BOT.setNextJob() }
+
         }
 
         console.log(BOT)
