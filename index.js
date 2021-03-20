@@ -4,12 +4,12 @@
 // @author         S8nLTU
 // @include        *.travian.*/*
 
-// @version        0.9.7rc
+// @version        0.9.8rc
 // ==/UserScript==
 
 function allInOneOpera() {
 
-    const VER = "0.9.7rc"
+    const VER = "0.9.8rc"
     const APP_NAME = "PingWin"
 
     let BOT;
@@ -19,6 +19,7 @@ function allInOneOpera() {
     const NPC_RULES = "npcRules"
     const FARM_RULES = "farmRules"
     const JOBS_STORAGE = "storedJobs";
+    const SETTINGS_STORAGE = "storedSettings";
     const BOT_POWER = 'bot_enabled';
     const BOT_NOTIFICATIONS = 'bot_notifications';
     const BOT_STATS = 'bot_statistics';
@@ -213,10 +214,10 @@ function allInOneOpera() {
     buildings.forEach((b) => { b.getStat = getStat })
 
 
-    function clickSite(id) {
+    function clickSite(id, caller = "") {
         setTimeout(() => {
             document.querySelector(`${id < 19 ? "#resourceFieldContainer" : "#village_map"} a[href*="build.php?id=${id}"]`).click()
-        }, delay("Clicking site " + id));
+        }, delay(`${caller}Clicking site ${id}`));
     }
 
     function clickGid(gid) {
@@ -229,6 +230,9 @@ function allInOneOpera() {
         const ressFields = []
         const res_fields = document.querySelectorAll("#resourceFieldContainer > .level")
         res_fields.forEach((node) => {
+            if (node.classList.contains("maxLevel")) {
+                return
+            }
             let lvl = Number(node.classList.value.split("level").pop())
             let pos = Number(node.classList.value.split("buildingSlot")[1].split(" ")[0])
             let gid = Number(node.classList.value.split("gid")[1].split(" ")[0])
@@ -277,7 +281,7 @@ function allInOneOpera() {
 
         building_nodes.forEach((a) => {
             let node = a.parentNode;
-            if(node.firstChild.classList.contains("maxLevel")){
+            if (node.firstChild.classList.contains("maxLevel")) {
                 return
             }
 
@@ -820,6 +824,40 @@ function allInOneOpera() {
             }
             localStorage.setItem(JOBS_STORAGE, JSON.stringify(jobs))
         }
+
+        let settings = JSON.parse(localStorage.getItem(SETTINGS_STORAGE))
+        if (!settings || !settings[cid]) {
+            settings = settings ? settings : {}
+            if (window.location.pathname.includes("dorf")) {
+                settings[cid] = settings[cid] ? settings[cid] : { upgradeRes: false, upgradeCrop: false }
+            }
+            localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(settings))
+        }
+
+        let cbAutoRes = document.getElementById("cbAutoRes")
+        cbAutoRes.checked = settings[cid].upgradeRes
+        cbAutoRes.addEventListener('change', e => {
+            if (e.target.checked !== c.settings[cid].upgradeRes) {
+                let box = e.target
+                c.settings[cid].upgradeRes = box.checked
+                console.log("auto res changed to ", c.settings[cid].upgradeRes)
+                localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(c.settings))
+            }
+
+        });
+
+        let cbAutoCrop = document.getElementById("cbAutoCrop")
+        cbAutoCrop.checked = settings[cid].upgradeCrop
+        cbAutoCrop.addEventListener('change', e => {
+            if (e.target.checked !== c.settings[cid].upgradeCrop) {
+                let box = e.target
+                c.settings[cid].upgradeCrop = box.checked
+                console.log("auto crop changed to ", c.settings[cid].upgradeCrop)
+                localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(c.settings))
+            }
+        });
+
+        c.settings = settings
         c.jobs = jobs
         c.displayJobs = displayJobs
     }
@@ -884,13 +922,11 @@ function allInOneOpera() {
         builderSettings.style.cssText = "padding-top: 6px"
 
         const autobuilderRow = builderSettings.appendChild(document.createElement("div"))
-        autobuilderRow.innerHTML = '<label for="cbAutoFields" style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoFields" style="margin-right: 2px;">Auto-upgrade resources</label>'
-        // AutobuilderCheckBox = autobuilderRow.getElementById("cbAutoFields")
+        autobuilderRow.innerHTML = '<label for="cbAutoFields" style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoRes" style="margin-right: 2px;">Auto-upgrade resources</label>'
+
 
         const ignoreCropRow = builderSettings.appendChild(document.createElement("div"))
-        ignoreCropRow.innerHTML = '<label for="cbIgnoreCrop"  style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbIgnoreCrop" style="margin-right: 2px;">Auto-upgrade crop<label>'
-        // ignoreCropCheckBox = autobuilderRow.getElementById("cbIgnoreCrop")
-
+        ignoreCropRow.innerHTML = '<label for="cbIgnoreCrop"  style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoCrop" style="margin-right: 2px;">Auto-upgrade crop<label>'
 
         //NPC SETUP
         const npcS = botPanel.appendChild(document.createElement("div"))
@@ -1019,6 +1055,7 @@ function allInOneOpera() {
                 let filtered = this.vil.filter(v => {
                     let shouldCheck = false
                     let jobs = this.jobs["c" + v.did]
+
                     if (jobs && jobs.length > 0) {
                         let q1 = jobs.filter(q => q.gid < 5)
                         let q2 = jobs.filter(q => q.gid > 4)
@@ -1034,8 +1071,25 @@ function allInOneOpera() {
 
                             return shouldCheck
                         }
-                        shouldCheck = v.timestamp + MAX_WAIT < Date.now()
                     }
+
+
+                    if (!shouldCheck) {
+                        let settings = this.settings["c" + v.did]
+                        shouldCheck = (settings.upgradeCrop || settings.upgradeRes) && v.timestamp + MIN_WAIT < Date.now()
+                        if (shouldCheck) {
+                            console.log(`added ${v.name} because of auto rules`)
+                        }
+                    }
+
+                    if (!shouldCheck) {
+                        shouldCheck = v.timestamp + MAX_WAIT < Date.now()
+                        if (shouldCheck) {
+                            console.log(`added ${v.name} because of no update in long time`)
+                        }
+                    }
+
+
                     return shouldCheck
                 })
 
@@ -1161,7 +1215,37 @@ function allInOneOpera() {
                             return clickSite(nextJob.pos)
                         }
                     }
+                }
 
+
+                if (location.pathname.includes("dorf1")) {
+                    let available = this.fieldsCollection.filter(f => f.node.classList.contains("good"))
+                    let upgrade = []
+
+                    //if !upgrade res
+                    if (this.settings["c" + this.cID].upgradeRes) {
+                        upgrade = upgrade.concat(available.filter(f => f.gid < 4))
+
+                    }
+
+                    if (this.settings["c" + this.cID].upgradeCrop) {
+                        upgrade = upgrade.concat(available.filter(f => f.gid === 4))
+                    }
+                    console.log("a", available)
+                    console.log("u", upgrade)
+
+                    upgrade = upgrade.sort((a, b) => a.lvl - b.lvl)
+                    console.log("u s", upgrade)
+
+                    if (upgrade.length > 0) {
+                        let job = upgrade[0]
+                        localStorage.setItem(BOT_IN_PROGRESS, JSON.stringify({
+                            cid: this.cID,
+                            job: { gid: job.gid, pos: job.pos, lvl: job.lvl, to: job.lvl + 1 },
+                            ress: this.current.ress
+                        }));
+                        return clickSite(job.pos, "Auto-Upgrade: ")
+                    }
                 }
 
             }
