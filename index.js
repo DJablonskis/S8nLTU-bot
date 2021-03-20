@@ -277,6 +277,10 @@ function allInOneOpera() {
 
         building_nodes.forEach((a) => {
             let node = a.parentNode;
+            if(node.firstChild.classList.contains("maxLevel")){
+                return
+            }
+
             let gid, pos;
 
 
@@ -960,6 +964,11 @@ function allInOneOpera() {
             } else {
 
                 const b = this.buildingDB[job.gid - 1]
+
+                if (job.to > b.maxLvl) {
+                    alert(`Max level for ${b.name} is ${b.maxLvl}`)
+                    return
+                }
                 //is cap and not alowed in cap:
                 if (this.cap === this.cID && !b.cap) {
                     alert("Cant build this in capitol!")
