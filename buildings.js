@@ -1,3 +1,21 @@
+function RoundMul(v, n) {
+  return Math.round(v / n) * n;
+}
+
+function TimeT3(a, k, b) {
+  this.a = a;
+  if (arguments.length < 3) {
+    this.k = 1.16;
+    if (arguments.length === 1) {
+      k = 1;
+    }
+    this.b = 1875 * k;
+  } else {
+    this.k = k;
+    this.b = b;
+  }
+}
+
 function getStat(lvl) {
   let k = this.k;
   let cost = this.cost.map((v) => RoundMul(v * Math.pow(k, lvl - 1), 5));

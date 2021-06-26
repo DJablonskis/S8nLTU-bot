@@ -3,56 +3,20 @@
 // @description    Travian helper script with build completed notifications and building queue auto building
 // @author         S8nLTU
 // @include        *.travian.*/*
-// @require https://djablonskis.github.io/S8nLTU-bot/buildings.js
+// @require settings.js
+// @require constants.js
+// @require buildings.js
+// @require helpers.js
+// @require jobs.js
+// @require npc.js
 
-// @version        0.9.8rc
+// @version        0.10.01
 // ==/UserScript==
 
 function allInOneOpera() {
-  const VER = "0.9.8rc";
+  const VER = "0.10.01";
   const APP_NAME = "PingWin";
-
   let BOT;
-
-  const CITIES_STORAGE = "storedCities";
-  const PANEL_POSITION = "positionPanel";
-  const NPC_RULES = "npcRules";
-  const FARM_RULES = "farmRules";
-  const JOBS_STORAGE = "storedJobs";
-  const SETTINGS_STORAGE = "storedSettings";
-  const BOT_POWER = "bot_enabled";
-  const BOT_NOTIFICATIONS = "bot_notifications";
-  const BOT_STATS = "bot_statistics";
-  const BOT_ON = "1";
-  const BOT_OFF = "0";
-
-  const BOT_IN_PROGRESS = "bot_progress";
-  const NPC_IN_PROGRESS = "npc_progress";
-
-  const POSITION_UP = "UP";
-  const POSITION_DOWN = "DOWN";
-  const TRIBE_ROMAN = "tribe1"; //
-  const TRIBE_TEUTON = "tribe2"; //
-  const TRIBE_GAUL = "tribe3"; //
-  const TRIBE_EGIPT = "tribe6"; //
-  const TRIBE_HUN = "tribe7"; //
-
-  const WALLS = {
-    tribe1: 31,
-    tribe2: 32,
-    tribe3: 33,
-    tribe6: 42,
-    tribe7: 43,
-  };
-
-  const MIN_WAIT = 3 * 1000 * 60;
-  const MAX_WAIT = 20 * 1000 * 60;
-  const NPC_COOLDOWN = 10 * 1000 * 60;
-  const DELAY_FAST = 1;
-  const DELAY_SLOW = 4;
-
-  const Q1 = "q1";
-  const Q2 = "q2";
 
   function notifyMe(title, action, village) {
     var notification = new Notification(title, {
@@ -70,51 +34,6 @@ function allInOneOpera() {
     let d = (Math.floor(Math.random() * 4) + speed) * 1000 + extraTime;
     BOT.setStatus(message, d);
     return d;
-  }
-
-  function shuffleArray(array) {
-    var currentIndex = array.length,
-      temporaryValue,
-      randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-
-      // And swap it with the current element.
-      temporaryValue = array[currentIndex];
-      array[currentIndex] = array[randomIndex];
-      array[randomIndex] = temporaryValue;
-    }
-
-    return array;
-  }
-
-  const ON = localStorage.getItem(BOT_POWER) === BOT_ON;
-
-  const ON_N = localStorage.getItem(BOT_NOTIFICATIONS) === BOT_ON;
-  const ON_S = localStorage.getItem(BOT_STATS) === BOT_ON;
-  const shouldRun = () => {
-    return (
-      document.querySelectorAll(
-        "div#sidebarBoxVillagelist > div.content > ul > li"
-      ).length > 0
-    );
-  };
-
-  const getParams = (loc = window.location.search) =>
-    loc
-      .slice(1)
-      .split("&")
-      .reduce((acc, s) => {
-        const [k, v] = s.split("=");
-        return Object.assign(acc, { [k]: v });
-      }, {});
-
-  function RoundMul(v, n) {
-    return Math.round(v / n) * n;
   }
 
   function getStorageMax(capacity, storage, production) {
@@ -143,44 +62,6 @@ function allInOneOpera() {
       return Math.ceil(((capacity - storage) / production) * 60 * 60 * 1000);
     }
     return Math.ceil((storage / production) * 60 * 60 * 1000 * -1);
-  }
-
-  function TimeT3(a, k, b) {
-    this.a = a;
-    if (arguments.length < 3) {
-      this.k = 1.16;
-      if (arguments.length === 1) {
-        k = 1;
-      }
-      this.b = 1875 * k;
-    } else {
-      this.k = k;
-      this.b = b;
-    }
-  }
-
-  function clickSite(id, caller = "") {
-    setTimeout(() => {
-      document
-        .querySelector(
-          `${
-            id < 19 ? "#resourceFieldContainer" : "#village_map"
-          } a[href*="build.php?id=${id}"]`
-        )
-        .click();
-    }, delay(`${caller}Clicking site ${id}`));
-  }
-
-  function clickGid(gid) {
-    setTimeout(() => {
-      document
-        .querySelector(
-          `${
-            gid < 5 ? "#resourceFieldContainer" : "#village_map"
-          } a[href*="&gid=${gid}"]`
-        )
-        .click();
-    }, delay("Clicking " + buildings[gid - 1].name));
   }
 
   function setUpResFields() {
@@ -315,43 +196,6 @@ function allInOneOpera() {
 
     return buildings;
   }
-
-  //DETECTS incoming attacks
-  //document.querySelectorAll("table#movements > tbody > tr >td.typ > a > img.att1 ").length>0
-
-  const r1i = (x) =>
-    `<i class="lumber_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:1px;"></i>`;
-  const r2i = (x) =>
-    `<i class="clay_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:1px;"></i>`;
-  const r3i = (x) =>
-    `<i class="iron_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:1px;"></i>`;
-  const r4i = (x) =>
-    `<i class="crop_small" style="width: ${x}px; height: ${x}px; background-size: contain;  margin-right:1px;"></i>`;
-  const wi = (x) =>
-    `<i style="background-image: url('https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/hud/topBar/header/stockBar/warehouse_medium.png'); margin-right:4px; width: ${x}px; height: ${x}px; background-size: contain;"></i>`;
-  const gi = (x) =>
-    `<i style="background-image: url('https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/hud/topBar/header/stockBar/granary_medium.png');margin-right:4px; width: ${x}px; height: ${x}px; background-size: contain;"></i>`;
-
-  const typeNames = [
-    { name: "Lumber", icon: r1i },
-    { name: "Clay", icon: r2i },
-    { name: "Iron", icon: r3i },
-    { name: "Crop", icon: r4i },
-  ];
-
-  const getResources = () => {
-    let arr = document
-      .querySelector("#contentOuterContainer > script")
-      .text.split("=")
-      .pop()
-      .trim()
-      .slice(0, -1)
-      .split("},");
-    let production = JSON.parse("{" + arr[0].split(": {").pop() + "}");
-    let storage = JSON.parse("{" + arr[1].split(": {").pop() + "}");
-    let capacity = JSON.parse("{" + arr[2].split(": {").pop().slice(0, -1));
-    return { production, storage, capacity };
-  };
 
   const getBuildingQueue = () => {
     if (window.location.pathname.includes("dorf")) {
@@ -644,29 +488,6 @@ function allInOneOpera() {
     return { panel, destroy, addSection };
   };
 
-  function checkTime(completion) {
-    function pad(n, z) {
-      z = z || 2;
-      return ("00" + n).slice(-z);
-    }
-
-    let current = Date.now();
-    let s = completion - current;
-
-    if (s > 0) {
-      var ms = s % 1000;
-      s = (s - ms) / 1000;
-      var secs = s % 60;
-      s = (s - secs) / 60;
-      var mins = s % 60;
-      var hrs = (s - mins) / 60;
-
-      let timer = pad(hrs) + ":" + pad(mins) + ":" + pad(secs);
-
-      return { completed: false, timer };
-    } else return { completed: true, timer: "Completed!" };
-  }
-
   function cC(s, p, c) {
     var color = " color:black; ";
     var ratio = (s * 1.0) / c;
@@ -836,178 +657,6 @@ function allInOneOpera() {
     }
   };
 
-  function displayJobs() {
-    let jobs = this.jobs["c" + this.cID];
-    jobs = !jobs ? [] : jobs;
-    const cVillage = this.current;
-    const panel = this.jobsSection;
-    while (panel.firstChild) {
-      panel.removeChild(panel.firstChild);
-    }
-
-    if (window.location.pathname.includes("dorf1")) {
-      this.fieldsCollection.forEach((field) => {
-        const buildingNow = cVillage.queue.filter(
-          (bn) => Number(bn.aid) === field.pos
-        );
-        const min = field.lvl + buildingNow.length + 1;
-        const old_jobs = jobs.filter(
-          (job) => job.pos === field.pos && job.to < min
-        );
-        if (old_jobs.length > 0) {
-          old_jobs.forEach((job) => {
-            jobs = this.completeJob(job);
-          });
-        }
-
-        const count = jobs.filter((x) => x.pos === field.pos).length;
-        field.bot.textContent = count === 0 ? "+" : count;
-        field.bot.dataset.lvl = count;
-        field.bot.onclick = () => {
-          this.addJob({
-            gid: field.gid,
-            pos: field.pos,
-            lvl: field.lvl,
-            to:
-              Number(field.bot.dataset.lvl) +
-              1 +
-              Number(field.lvl) +
-              buildingNow.length,
-          });
-          this.displayJobs();
-        };
-      });
-    }
-    if (window.location.pathname.includes("dorf2")) {
-      this.buildingCollection.forEach((building) => {
-        //Number of currently beign built same type buildings
-        const buildingNow = cVillage.queue.filter(
-          (bn) => Number(bn.aid) === building.pos
-        );
-
-        const min = building.lvl + buildingNow.length + 1;
-        const old_jobs = jobs.filter(
-          (job) => job.pos === building.pos && job.to < min
-        );
-        if (old_jobs.length > 0) {
-          old_jobs.forEach((job) => {
-            jobs = this.completeJob(job);
-          });
-        }
-
-        const pos_jobs = jobs.filter((x) => x.pos === building.pos);
-        const count = pos_jobs.length;
-
-        //if new building display!
-        if (building.gid === 0 && count > 0) {
-          building.bot.style.display = "block";
-          building.gid = pos_jobs[0].gid;
-          let image = building.node.querySelector("img");
-          image.classList.add("g" + pos_jobs[0].gid);
-          image.style.opacity = "0.5";
-        }
-        building.bot.textContent = count === 0 ? "+" : count;
-        building.bot.dataset.lvl = count;
-        building.bot.onclick = () => {
-          this.addJob({
-            gid: building.gid,
-            pos: building.pos,
-            lvl: building.lvl,
-            to:
-              Number(building.bot.dataset.lvl) +
-              1 +
-              Number(building.lvl) +
-              buildingNow.length,
-          });
-          this.displayJobs();
-        };
-      });
-    }
-
-    const summary = this.jobsSection.appendChild(
-      document.createElement("summary")
-    );
-    summary.innerHTML = `<strong>Jobs planed: </strong> ${jobs.length}; <strong>`;
-
-    if (jobs.length > 0) {
-      jobs.forEach((job) => {
-        const node = document.createElement("div");
-        node.style.cssText =
-          "font-size: 10px; line-height:10px; margin-bottom:2px;";
-        const nodeButton = node.appendChild(document.createElement("span"));
-        const nodeText = node.appendChild(document.createElement("span"));
-        nodeButton.style.cssText =
-          "cursor: pointer; width:14px; height:14; border-radius:2px; background-color:red;color:white; text-align:center; font-size:12px; padding:2px; display:inline-block; border:1px solid black; margin-right:4px; ";
-        nodeButton.textContent = "x";
-        nodeButton.onclick = (e) => {
-          let i = whichChild(e.target.parentNode) - 1;
-          this.removeJob(jobs[i]);
-          this.displayJobs();
-        };
-        this.jobsSection.appendChild(node);
-        nodeText.textContent = `[${job.pos}] ${
-          this.buildingDB[job.gid - 1].name
-        } to level ${job.to}`;
-      });
-    }
-  }
-
-  function whichChild(elem) {
-    var i = 0;
-    while ((elem = elem.previousSibling) != null) ++i;
-    return i;
-  }
-
-  function initJobQueue(c) {
-    let cid = "c" + c.cID;
-
-    let jobs = JSON.parse(localStorage.getItem(JOBS_STORAGE));
-    if (!jobs || !jobs[cid]) {
-      jobs = jobs ? jobs : {};
-      if (window.location.pathname.includes("dorf")) {
-        jobs[cid] = jobs[cid] ? jobs[cid] : [];
-      }
-      localStorage.setItem(JOBS_STORAGE, JSON.stringify(jobs));
-    }
-
-    let settings = JSON.parse(localStorage.getItem(SETTINGS_STORAGE));
-    if (!settings || !settings[cid]) {
-      settings = settings ? settings : {};
-      if (window.location.pathname.includes("dorf")) {
-        settings[cid] = settings[cid]
-          ? settings[cid]
-          : { upgradeRes: false, upgradeCrop: false };
-      }
-      localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(settings));
-    }
-
-    let cbAutoRes = document.getElementById("cbAutoRes");
-    cbAutoRes.checked = settings[cid].upgradeRes;
-    cbAutoRes.addEventListener("change", (e) => {
-      if (e.target.checked !== c.settings[cid].upgradeRes) {
-        let box = e.target;
-        c.settings[cid].upgradeRes = box.checked;
-        console.log("auto res changed to ", c.settings[cid].upgradeRes);
-        localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(c.settings));
-      }
-    });
-
-    let cbAutoCrop = document.getElementById("cbAutoCrop");
-    cbAutoCrop.checked = settings[cid].upgradeCrop;
-    cbAutoCrop.addEventListener("change", (e) => {
-      if (e.target.checked !== c.settings[cid].upgradeCrop) {
-        let box = e.target;
-        c.settings[cid].upgradeCrop = box.checked;
-        console.log("auto crop changed to ", c.settings[cid].upgradeCrop);
-        localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(c.settings));
-      }
-    });
-
-    c.settings = settings;
-    c.jobs = jobs;
-    c.displayJobs = displayJobs;
-  }
-
   //UPGRADE WINDOW
   const createUpgradeContext = () => {
     const dialog = document.createElement("div");
@@ -1131,34 +780,7 @@ function allInOneOpera() {
       '<label for="cbIgnoreCrop"  style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoCrop" style="margin-right: 2px;">Auto-upgrade crop<label>';
 
     //NPC SETUP
-    const npcS = botPanel.appendChild(document.createElement("div"));
-    npcS.style.cssText =
-      "padding-bottom: 8px; border-bottom: 1px solid #5e463a;";
-    const npcTitle = npcS.appendChild(document.createElement("h4"));
-    npcTitle.style.cssText = titleStyle;
-    npcTitle.innerText = "Auto NPC";
-
-    BOT.npcPanel = npcS.appendChild(document.createElement("div"));
-
-    const addNpcButton = npcS.appendChild(document.createElement("button"));
-    addNpcButton.className = "textButtonV1 gold productionBoostButton";
-    addNpcButton.style.cssText = "margin-top: 8px;";
-    addNpcButton.innerText = "Add new rule";
-    addNpcButton.onclick = () => BOT.addNPCRule();
-
-    const npcSubtitle = npcS.appendChild(document.createElement("p"));
-    npcSubtitle.innerHTML =
-      "<strong>Warning:</strong> Still experimental. Spends gold and could contain bugs causing high gold usage. Use at your own risks!";
-    npcSubtitle.style.cssText = "margin: 8px 0; color: red;";
-    //status setup
-    const status = botPanel.appendChild(document.createElement("div"));
-    status.style.cssText =
-      "padding-bottom: 8px; border-bottom: 1px solid #5e463a;";
-    const statusTitle = status.appendChild(document.createElement("h4"));
-    statusTitle.style.cssText = titleStyle;
-    statusTitle.innerText = "Status:";
-    let statusMessage = status.appendChild(document.createElement("div"));
-    statusMessage.innerText = "Waiting for instructions";
+    setUpNPC();
 
     const loadingBar = status.appendChild(document.createElement("div"));
     loadingBar.style.cssText =
@@ -1508,278 +1130,6 @@ function allInOneOpera() {
       }
       this.switchCity();
     };
-    //#region NPC
-
-    function initNPCRules(b) {
-      let rules = JSON.parse(localStorage.getItem(NPC_RULES));
-      if (!rules) {
-        rules = [];
-        localStorage.setItem(NPC_RULES, JSON.stringify(rules));
-      }
-      b.npcRules = rules;
-    }
-
-    BOT.setNPCCooldown = function (rule) {
-      this.npcRules.find((x) => x.id === rule.id).cooldown =
-        Date.now() + NPC_COOLDOWN;
-      localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules));
-    };
-
-    BOT.checkNPC = function () {
-      let gold = parseInt(
-        document
-          .querySelector("#header .currency .value")
-          .innerText.trim()
-          .replace(/\D/g, "")
-      );
-      let warehouse_capacity = parseInt(
-        document
-          .querySelector("#stockBar .warehouse .capacity .value")
-          .innerText.trim()
-          .replace(/\D/g, "")
-      );
-      let granary_capacity = parseInt(
-        document
-          .querySelector("#stockBar .granary .capacity .value")
-          .innerText.trim()
-          .replace(/\D/g, "")
-      );
-
-      let percent = [];
-      document
-        .querySelectorAll("#stockBar .barBox .bar")
-        .forEach((b) => percent.push(parseInt(b.style.width.replace("%", ""))));
-
-      let storage = [];
-      document
-        .querySelectorAll("#stockBar .stockBarButton .value")
-        .forEach((b) =>
-          storage.push(parseInt(b.innerText.trim().replace(/\D/g, "")))
-        );
-      const rules = this.npcRules.filter((x) => x.cid === this.cID);
-
-      //TODO && gold >= 3
-      if (rules.length > 0) {
-        let prog = localStorage.getItem(NPC_IN_PROGRESS);
-        const inProgress =
-          prog === "" || prog === null ? null : JSON.parse(prog);
-        if (inProgress && inProgress.cid !== this.cID) {
-          localStorage.setItem(NPC_IN_PROGRESS, "");
-          inProgress = null;
-        }
-        //&& ruleTriggered
-        if (
-          inProgress &&
-          gold >= 3 &&
-          Date.now() > inProgress.cooldown &&
-          ((inProgress.dir === "a" &&
-            inProgress.percent < percent[inProgress.type - 1]) ||
-            (inProgress.dir === "b" &&
-              inProgress.percent > percent[inProgress.type - 1]))
-        ) {
-          this.busy = true;
-          if (window.location.pathname.includes("dorf2")) {
-            return clickGid(17);
-          }
-          //find and open marketplace
-          else if (
-            window.location.pathname.includes("build.php") &&
-            getParams().gid === "17"
-          ) {
-            //switching tab
-            let tab = document.querySelector(
-              "#content .contentNavi .content a"
-            );
-            if (tab && !tab.classList.contains("active")) {
-              return setTimeout(
-                () => {
-                  tab.click();
-                },
-                delay("NPC: Wrong tab detected. switching tab!"),
-                true
-              );
-            }
-
-            let b = document.querySelector("#build .npcMerchant button");
-            setTimeout(() => {
-              b.click();
-              setTimeout(() => {
-                // BOT.distributeNPC(document.getElementById("npc"))
-                const npc = document.getElementById("npc");
-                let distButton = document.querySelector("#submitText button");
-                let submitButton = document.querySelector(
-                  "#submitButton button"
-                );
-                let total = parseInt(document.querySelector("#sum").innerText);
-                let inputs = document.querySelectorAll("td.sel input");
-
-                setTimeout(() => {
-                  inputs[0].value = Math.floor(
-                    (total / 100) * inProgress.ratio[0]
-                  );
-                  inputs[1].value = Math.floor(
-                    (total / 100) * inProgress.ratio[1]
-                  );
-                  inputs[2].value = Math.floor(
-                    (total / 100) * inProgress.ratio[2]
-                  );
-                  inputs[3].value = Math.floor(
-                    (total / 100) * inProgress.ratio[3]
-                  );
-                  inputs[0].dispatchEvent(
-                    new KeyboardEvent("keyup", { key: "0" })
-                  );
-
-                  setTimeout(() => {
-                    distButton.click();
-                    setTimeout(() => {
-                      localStorage.setItem(NPC_IN_PROGRESS, "");
-                      this.setNPCCooldown(inProgress);
-                      submitButton.click();
-                    }, delay("NPC: Pressing confirm.", true));
-                  }, delay("NPC: Pressing distribute.", true));
-                }, delay("NPC: Filling in fields"));
-              }, 300);
-            }, delay("NPC: Pressing npc button"));
-          } else {
-            return setTimeout(() => {
-              localStorage.setItem(NPC_IN_PROGRESS, "");
-              location.href = "/dorf1.php";
-            }, delay("NPC: Wrong location. Canceling", true));
-          }
-        } else {
-          rules.forEach((rule) => {
-            //TODO replace with ruleTriggered() function
-            if (
-              gold >= 3 &&
-              Date.now() > rule.cooldown &&
-              ((rule.dir === "a" && rule.percent < percent[rule.type - 1]) ||
-                (rule.dir === "b" && rule.percent > percent[rule.type - 1]))
-            ) {
-              this.busy = true;
-              localStorage.setItem(NPC_IN_PROGRESS, JSON.stringify(rule));
-              //City center? click marketplace else go to dorf2
-              if (window.location.pathname.includes("dorf2")) {
-                return clickGid(17);
-              } else {
-                return setTimeout(() => {
-                  location.href = "/dorf2.php";
-                }, delay("NPC: Navigating to city center"));
-              }
-            }
-          });
-        }
-      }
-    };
-
-    BOT.addNPCRule = function () {
-      const iNPC = {};
-      const dir = prompt(
-        'Please enter "a" for above limit or "b" for bellow limit:'
-      ).toLowerCase();
-      if (dir != "a" && dir !== "b") {
-        alert("wrong input, canceled!");
-        return false;
-      }
-      iNPC.dir = dir;
-
-      const percent = Number(
-        prompt(
-          "Please enter percentage storage limit at which NPC will be done:\n (between 0 and 100)"
-        ).toLowerCase()
-      );
-      if (percent < 0 && percent > 100) {
-        alert("wrong input, canceled!");
-        return false;
-      }
-      iNPC.percent = percent;
-
-      const type = Number(
-        prompt(
-          "which resource do you want to watch? \n1 - Lumber\n2 - Clay\n3 - Iron\n4 - Crop"
-        )
-      );
-      if (type < 1 || type > 4) {
-        alert("wrong input, canceled!");
-        return false;
-      }
-      iNPC.type = type;
-
-      const ratio = prompt(
-        'Resource percent ratio seperated by comma (must add up to 100):\n i.e.: "30, 30, 30, 10" , will be changed to 30% Lumber, 30% Clay, 30% Iron, 10% Crop after NPC'
-      );
-      let ratioArr = ratio.split(",").map((x) => Number(x));
-      if (
-        ratioArr.length !== 4 &&
-        ratioArr.reduce((a, b) => a + b, 0) !== 100
-      ) {
-        alert("wrong input, total needs to add to 100%. Canceled!");
-        return false;
-      }
-      const p = 100.0 / ratioArr.reduce((a, b) => a + b, 0);
-      ratioArr = ratioArr.map((x) => Math.round(x * p));
-      iNPC.ratio = ratioArr;
-
-      const s =
-        "You are setting up this NPC rule: \n" +
-        `if ${typeNames[type - 1].name} is ${
-          dir === "a" ? "above" : "below"
-        } ${percent}%, then distribute to ratio ${ratioArr[0]}% ${
-          ratioArr[1]
-        }% ${ratioArr[2]}% ${ratioArr[3]}%` +
-        "\n" +
-        "Press OK to confirm!";
-
-      if (confirm(s)) {
-        const cooldown = Date.now();
-        iNPC.id = dir + type + "_" + this.cID + percent + "_" + cooldown;
-        iNPC.cid = this.cID;
-        iNPC.cooldown = cooldown;
-        this.npcRules.push(iNPC);
-        localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules));
-        this.displayNPCRules();
-        ///RERENDER function here later
-        // const newSpan = this.npcPanel.appendChild(document.createElement("span"))
-        //  newSpan.innerText = `${typeNames[type - 1]} ${dir === "a" ? ">" : "<"} ${percent}% : ${ratio}`
-      }
-    };
-
-    BOT.displayNPCRules = function () {
-      let rules = this.npcRules.filter((x) => x.cid === this.cID);
-      this.npcPanel.innerHTML = "";
-      if (rules.length > 0) {
-        rules.forEach((r) => {
-          const node = document.createElement("div");
-          const nodeButton = node.appendChild(document.createElement("span"));
-          const nodeText = node.appendChild(document.createElement("span"));
-          nodeText.style.cssText = "display: inline-flex; align-items: center;";
-          node.style.cssText =
-            "font-size: 10px; line-height:10px; display: flex; align-items: center;";
-          nodeButton.style.cssText =
-            "width:14px; height:14; border-radius:2px; background-color:red;color:white; text-align:center; font-size:12px; padding:2px; display:inline-block; border:1px solid black; margin-right:4px";
-          nodeButton.textContent = "x";
-          nodeButton.onclick = (e) => {
-            this.npcRules = this.npcRules.filter((x) => x.id !== r.id);
-            localStorage.setItem(NPC_RULES, JSON.stringify(this.npcRules));
-            localStorage.setItem(NPC_IN_PROGRESS, "");
-            node.remove();
-            this.displayNPCRules();
-          };
-          nodeText.innerHTML = `${typeNames[r.type - 1].icon(12)} ${
-            r.dir === "a" ? ">" : "<"
-          } ${r.percent}% &nbsp;=&nbsp;${typeNames[0].icon(12)}${
-            r.ratio[0]
-          }%, &nbsp;${typeNames[1].icon(12)}${
-            r.ratio[1]
-          }%, &nbsp;${typeNames[2].icon(12)}${
-            r.ratio[2]
-          }%, &nbsp;${typeNames[3].icon(12)}${r.ratio[3]}%`;
-          this.npcPanel.appendChild(node);
-        });
-      } else {
-        this.npcPanel.innerText = "No rules created yet.";
-      }
-    };
 
     //FARMLIST REGION
     function initFarmingRules(b) {
@@ -1818,9 +1168,7 @@ function allInOneOpera() {
     initJobQueue(BOT);
     initFarmingRules(BOT);
     BOT.displayJobs();
-
-    initNPCRules(BOT);
-    BOT.displayNPCRules();
+    setUpNPC(BOT);
 
     // let prog = localStorage.getItem(BOT_IN_PROGRESS)
     // const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
