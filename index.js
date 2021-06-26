@@ -1168,7 +1168,7 @@ function allInOneOpera() {
     initJobQueue(BOT);
     initFarmingRules(BOT);
     BOT.displayJobs();
-    setUpNPC(BOT);
+    setUpNPC(BOT, botPanel);
 
     // let prog = localStorage.getItem(BOT_IN_PROGRESS)
     // const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)

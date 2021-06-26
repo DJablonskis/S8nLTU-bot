@@ -251,7 +251,7 @@ const displayNPCRules = () => {
   }
 };
 
-const setUpNPC = (BOT) => {
+const setUpNPC = (BOT, botPanel) => {
   const npcS = botPanel.appendChild(document.createElement("div"));
   npcS.style.cssText = "padding-bottom: 8px; border-bottom: 1px solid #5e463a;";
   const npcTitle = npcS.appendChild(document.createElement("h4"));
