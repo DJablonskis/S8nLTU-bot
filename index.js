@@ -10,11 +10,11 @@
 // @require jobs.js
 // @require npc.js
 
-// @version        0.10.01
+// @version        0.10.011
 // ==/UserScript==
 
 function allInOneOpera() {
-  const VER = "0.10.01";
+  const VER = "0.10.011";
   const APP_NAME = "PingWin";
   let BOT;
 
