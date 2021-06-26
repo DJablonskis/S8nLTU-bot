@@ -3,7 +3,6 @@
 // @description    Travian helper script with build completed notifications and building queue auto building
 // @author         S8nLTU
 // @include        *.travian.*/*
-
 // @require constants.js
 // @require settings.js
 // @require notifications.js
@@ -11,12 +10,11 @@
 // @require helpers.js
 // @require jobs.js
 // @require npc1.js
-
-// @version        0.10.02
+// @version        0.10.1
 // ==/UserScript==
 
 function allInOneOpera() {
-  const VER = "0.10.02";
+  const VER = "0.10.1";
   const APP_NAME = "PingWin";
   let BOT;
 
@@ -273,6 +271,25 @@ function allInOneOpera() {
     localStorage.setItem(CITIES_STORAGE, JSON.stringify(cities));
     return cities;
   };
+
+  function cC(s, p, c) {
+    var color = " color:black; ";
+    var ratio = (s * 1.0) / c;
+    if (ratio > 0.2) {
+      if (ratio > 0.5) {
+        color = " color:green; ";
+      }
+      if (ratio > 0.8) {
+        color = " color:#e45f00; ";
+      }
+      if (ratio > 0.9) {
+        color = " color:#e62020d; ";
+      }
+    } else if (p < 0) {
+      color = " color:#e62020; ";
+    }
+    return color;
+  }
 
   // SIDE PANEL
   const createCity = (vil, node) => {
