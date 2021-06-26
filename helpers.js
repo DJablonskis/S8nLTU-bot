@@ -195,36 +195,6 @@ function getStorageMax(capacity, storage, production) {
   return Math.ceil((storage / production) * 60 * 60 * 1000 * -1);
 }
 
-const getBuildingQueue = () => {
-  if (window.location.pathname.includes("dorf")) {
-    let buildingQ = document.querySelectorAll("div.buildingList > ul > li");
-    if (buildingQ && buildingQ.length > 0) {
-      let buildString = document
-        .querySelector("#content > script")
-        .text.includes("var bld")
-        ? document.querySelector("#content > script").text
-        : document.querySelector("#content .village1Content > script").text;
-      let buildingLevels = buildString.split("=").pop();
-      const q = JSON.parse(buildingLevels);
-      buildingQ.forEach((element, index) => {
-        if (q[index]) {
-          let seconds = Number(
-            element
-              .querySelector("div.buildDuration > span")
-              .getAttribute("value")
-          );
-          q[index].name = element
-            .querySelector("div.name")
-            .innerHTML.split("<")[0]
-            .trim();
-          q[index].finish = Date.now() + seconds * 1000;
-        }
-      });
-      return q;
-    } else return [];
-  }
-};
-
 function cC(s, p, c) {
   var color = " color:black; ";
   var ratio = (s * 1.0) / c;
