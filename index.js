@@ -3,7 +3,7 @@
 // @description    Travian helper script with build completed notifications and building queue auto building
 // @author         S8nLTU
 // @include        *.travian.*/*
-// @require https://raw.githubusercontent.com/DJablonskis/S8nLTU-bot/context-ui/buildings.js
+// @require https://djablonskis.github.io/S8nLTU-bot/buildings.js
 
 // @version        0.9.8rc
 // ==/UserScript==
