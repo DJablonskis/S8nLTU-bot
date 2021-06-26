@@ -124,3 +124,122 @@ const shouldRun = () => {
     ).length > 0
   );
 };
+
+function iS(lastTime, ress) {
+  let sec = Date.now() - lastTime;
+  var ms = sec % 1000;
+  sec = (sec - ms) / 1000;
+
+  var style = "display: flex; font-size: 10px; align-items: center;";
+
+  let p_r1 = Math.floor(
+    ((ress.production.l1 * 1.0) / 3600) * sec + ress.storage.l1
+  );
+  p_r1 = p_r1 < ress.capacity.l1 ? p_r1 : ress.capacity.l1;
+  let c_r1 = cC(p_r1, ress.production.l1, ress.capacity.l1);
+
+  let p_r2 = Math.floor(
+    ((ress.production.l2 * 1.0) / 3600) * sec + ress.storage.l2
+  );
+  p_r2 = p_r2 < ress.capacity.l2 ? p_r2 : ress.capacity.l2;
+  let c_r2 = cC(p_r2, ress.production.l12, ress.capacity.l2);
+
+  let p_r3 = Math.floor(
+    ((ress.production.l3 * 1.0) / 3600) * sec + ress.storage.l3
+  );
+  p_r3 = p_r3 < ress.capacity.l3 ? p_r3 : ress.capacity.l3;
+  let c_r3 = cC(p_r3, ress.production.l3, ress.capacity.l3);
+
+  let p_r4 = Math.floor(
+    ((ress.production.l4 * 1.0) / 3600) * sec + ress.storage.l4
+  );
+  p_r4 = p_r4 < ress.capacity.l4 ? p_r4 : ress.capacity.l4;
+  let c_r4 = cC(p_r4, ress.production.l4, ress.capacity.l4);
+
+  return ` <span style="${c_r1 + style}">${r1i(
+    10
+  )}${p_r1}</span>        <span style="${c_r2 + style}">${r2i(
+    10
+  )}${p_r2}</span>        <span style="${c_r3 + style}">${r3i(
+    10
+  )}${p_r3}</span>        <span style="${c_r4 + style}">${r4i(
+    10
+  )}${p_r4}</span>`;
+}
+
+function getStorageMax(capacity, storage, production) {
+  if (capacity === storage && ON_N) {
+    new Notification("Prisipilde resursai!", {
+      body: `Resources are full!`,
+      icon: "https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png",
+      image:
+        "https://cdnb.artstation.com/p/assets/images/images/006/367/267/large/ahmed-hmaim-final-c2.jpg?1498055051",
+    });
+  }
+
+  if (storage === 0 && production < 0 && ON_N) {
+    new Notification("Baigesi grudai!!!!", {
+      body: `Granary is empty!`,
+      icon: "https://gpack.travian.com/20b0b1f1/mainPage/img_ltr/g/upgradeView2019/buildingIllustrations/teuton/g15.png",
+      image:
+        "https://cdnb.artstation.com/p/assets/images/images/006/367/267/large/ahmed-hmaim-final-c2.jpg?1498055051",
+    });
+  }
+
+  if (production == 0) {
+    return MIN_WAIT;
+  }
+  if (production > 0) {
+    return Math.ceil(((capacity - storage) / production) * 60 * 60 * 1000);
+  }
+  return Math.ceil((storage / production) * 60 * 60 * 1000 * -1);
+}
+
+const getBuildingQueue = () => {
+  if (window.location.pathname.includes("dorf")) {
+    let buildingQ = document.querySelectorAll("div.buildingList > ul > li");
+    if (buildingQ && buildingQ.length > 0) {
+      let buildString = document
+        .querySelector("#content > script")
+        .text.includes("var bld")
+        ? document.querySelector("#content > script").text
+        : document.querySelector("#content .village1Content > script").text;
+      let buildingLevels = buildString.split("=").pop();
+      const q = JSON.parse(buildingLevels);
+      buildingQ.forEach((element, index) => {
+        if (q[index]) {
+          let seconds = Number(
+            element
+              .querySelector("div.buildDuration > span")
+              .getAttribute("value")
+          );
+          q[index].name = element
+            .querySelector("div.name")
+            .innerHTML.split("<")[0]
+            .trim();
+          q[index].finish = Date.now() + seconds * 1000;
+        }
+      });
+      return q;
+    } else return [];
+  }
+};
+
+function cC(s, p, c) {
+  var color = " color:black; ";
+  var ratio = (s * 1.0) / c;
+  if (ratio > 0.2) {
+    if (ratio > 0.5) {
+      color = " color:green; ";
+    }
+    if (ratio > 0.8) {
+      color = " color:#e45f00; ";
+    }
+    if (ratio > 0.9) {
+      color = " color:#e62020d; ";
+    }
+  } else if (p < 0) {
+    color = " color:#e62020; ";
+  }
+  return color;
+}
