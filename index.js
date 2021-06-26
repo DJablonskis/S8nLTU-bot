@@ -10,11 +10,11 @@
 // @require jobs.js
 // @require npc.js
 
-// @version        0.10.3
+// @version        0.10.31
 // ==/UserScript==
 
 function allInOneOpera() {
-  const VER = "0.10.3";
+  const VER = "0.10.31";
   const APP_NAME = "PingWin";
   let BOT;
 
@@ -526,6 +526,16 @@ function allInOneOpera() {
     );
     ignoreCropRow.innerHTML =
       '<label for="cbIgnoreCrop"  style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoCrop" style="margin-right: 2px;">Auto-upgrade crop<label>';
+
+    //status setup
+    const status = botPanel.appendChild(document.createElement("div"));
+    status.style.cssText =
+      "padding-bottom: 8px; border-bottom: 1px solid #5e463a;";
+    const statusTitle = status.appendChild(document.createElement("h4"));
+    statusTitle.style.cssText = titleStyle;
+    statusTitle.innerText = "Status:";
+    let statusMessage = status.appendChild(document.createElement("div"));
+    statusMessage.innerText = "Waiting for instructions";
 
     const loadingBar = status.appendChild(document.createElement("div"));
     loadingBar.style.cssText =
