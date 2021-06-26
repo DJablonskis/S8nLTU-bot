@@ -270,15 +270,6 @@ const setUpNPC = (BOT, botPanel) => {
   npcSubtitle.innerHTML =
     "<strong>Warning:</strong> Still experimental. Spends gold and could contain bugs causing high gold usage. Use at your own risks!";
   npcSubtitle.style.cssText = "margin: 8px 0; color: red;";
-  //status setup
-  const status = botPanel.appendChild(document.createElement("div"));
-  status.style.cssText =
-    "padding-bottom: 8px; border-bottom: 1px solid #5e463a;";
-  const statusTitle = status.appendChild(document.createElement("h4"));
-  statusTitle.style.cssText = titleStyle;
-  statusTitle.innerText = "Status:";
-  let statusMessage = status.appendChild(document.createElement("div"));
-  statusMessage.innerText = "Waiting for instructions";
 
   BOT.setNPCCooldown = setNPCCooldown;
   BOT.checkNPC = checkNPC;

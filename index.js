@@ -8,7 +8,7 @@
 // @require buildings.js
 // @require helpers.js
 // @require jobs.js
-// @require npc.js
+// @require npc1.js
 
 // @version        0.10.31
 // ==/UserScript==
