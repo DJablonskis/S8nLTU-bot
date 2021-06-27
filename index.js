@@ -8,22 +8,15 @@
 // @require buildings.js
 // @require helpers.js
 // @require jobs.js
-// @require npc1.js
+// @require npc.js
 
-// @version        0.10.31
+// @version        0.10.32
 // ==/UserScript==
 
 function allInOneOpera() {
-  const VER = "0.10.31";
+  const VER = "0.10.32";
   const APP_NAME = "PingWin";
   let BOT;
-
-  function delay(message, fast = false, extraTime = 0) {
-    let speed = fast ? DELAY_FAST : DELAY_SLOW;
-    let d = (Math.floor(Math.random() * 4) + speed) * 1000 + extraTime;
-    BOT.setStatus(message, d);
-    return d;
-  }
 
   function setUpResFields() {
     const ressFields = [];
@@ -500,9 +493,6 @@ function allInOneOpera() {
       BOT.buildingCollection = setUpBuildings();
     }
 
-    const titleStyle =
-      'letter-spacing: .1em; font-family: "Noto Serif"; font-weight: bold; color: #5e463a; margin-bottom: 5px; margin-top: 5px;';
-
     const jobQS = botPanel.appendChild(document.createElement("div"));
     jobQS.style.cssText =
       "padding-bottom: 8px; border-bottom: 1px solid #5e463a;";
@@ -528,38 +518,6 @@ function allInOneOpera() {
       '<label for="cbIgnoreCrop"  style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoCrop" style="margin-right: 2px;">Auto-upgrade crop<label>';
 
     //status setup
-    const status = botPanel.appendChild(document.createElement("div"));
-    status.style.cssText =
-      "padding-bottom: 8px; border-bottom: 1px solid #5e463a;";
-    const statusTitle = status.appendChild(document.createElement("h4"));
-    statusTitle.style.cssText = titleStyle;
-    statusTitle.innerText = "Status:";
-    let statusMessage = status.appendChild(document.createElement("div"));
-    statusMessage.innerText = "Waiting for instructions";
-
-    const loadingBar = status.appendChild(document.createElement("div"));
-    loadingBar.style.cssText =
-      "margin-top: 4px; position: relative; height:8px; border:1px solid #52372a; overflow: hidden; border-radius:2px; background-color: #52372a";
-    const loadingBarProgress = loadingBar.appendChild(
-      document.createElement("div")
-    );
-    loadingBarProgress.style.cssText =
-      "height:6px; width:0; background-color: #546e39; border: 1px solid transparent; border-color: #699e32 #6db024 #71c117; width: 100%";
-    BOT.setStatus = function (message = "", time = 5000) {
-      let width = 0;
-      let timestamp = Date.now();
-      statusMessage.innerText = message;
-      var id = setInterval(frame, 30);
-      function frame() {
-        width = ((Date.now() - timestamp) / time) * 100.0;
-        if (width >= 100) {
-          clearInterval(id);
-        } else {
-          width++;
-          loadingBarProgress.style.width = width + "%";
-        }
-      }
-    };
 
     BOT.buildingDB = buildings;
     BOT.vil.forEach((t, i) => createCity(t, villageLiArray[i]));
@@ -923,7 +881,12 @@ function allInOneOpera() {
     initJobQueue(BOT);
     initFarmingRules(BOT);
     BOT.displayJobs();
+
     setUpNPC(BOT, botPanel);
+    //should be reacurring event if npc rules enabled
+    BOT.checkNPC();
+
+    setUpStatusBar(BOT, botPanel);
 
     // let prog = localStorage.getItem(BOT_IN_PROGRESS)
     // const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
