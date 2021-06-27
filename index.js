@@ -8,9 +8,10 @@
 // @require buildings.js
 // @require helpers.js
 // @require jobs.js
+// @require status.js
 // @require npc.js
 
-// @version        0.10.4
+// @version        0.10.4.1
 // ==/UserScript==
 
 function allInOneOpera() {

@@ -34,7 +34,7 @@ const setUpNPC = (BOT, botPanel) => {
     const villageRules = NPCRules.filter((x) => x.cid === BOT.cID);
 
     //TODO && gold >= 3
-    if (rules.length > 0 && gold > 2) {
+    if (villageRules.length > 0 && gold > 2) {
       let prog = localStorage.getItem(NPC_IN_PROGRESS);
       const inProgress = prog === "" || prog === null ? null : JSON.parse(prog);
       if (inProgress && inProgress.cid !== BOT.cID) {
@@ -125,7 +125,7 @@ const setUpNPC = (BOT, botPanel) => {
   const displayNPCRules = () => {
     let villageRules = NPCRules.filter((x) => x.cid === BOT.cID);
     NPCPanel.innerHTML = "";
-    if (rules.length > 0) {
+    if (villageRules.length > 0) {
       villageRules.forEach((r) => {
         const node = document.createElement("div");
         const nodeButton = node.appendChild(document.createElement("span"));
