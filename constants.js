@@ -36,3 +36,6 @@ const ON = localStorage.getItem(BOT_POWER) === BOT_ON;
 
 const ON_N = localStorage.getItem(BOT_NOTIFICATIONS) === BOT_ON;
 const ON_S = localStorage.getItem(BOT_STATS) === BOT_ON;
+
+const titleStyle =
+  'letter-spacing: .1em; font-family: "Noto Serif"; font-weight: bold; color: #5e463a; margin-bottom: 5px; margin-top: 5px;';

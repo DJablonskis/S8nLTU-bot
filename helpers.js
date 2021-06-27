@@ -1,8 +1,81 @@
+//Chainable tasks with delay
+// utility function for returning a promise that resolves after a delay
+function doAfter(t) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, t);
+  });
+}
+
+Promise.doAfter = function (fn, t) {
+  // fn is an optional argument
+  if (!t) {
+    t = fn;
+    fn = function () {};
+  }
+  return doAfter(t).then(fn);
+};
+
+Promise.prototype.doAfter = function (fn, t) {
+  // return chained promise
+  return this.then(function () {
+    return Promise.doAfter(fn, t);
+  });
+};
+
+//Returns index of provided child in the parent
 function whichChild(elem) {
   var i = 0;
   while ((elem = elem.previousSibling) != null) ++i;
   return i;
 }
+
+//Reurns int current gold balance
+const getGoldBalance = () =>
+  parseInt(
+    document
+      .querySelector("#header .currency .value")
+      .innerText.trim()
+      .replace(/\D/g, "")
+  );
+
+//Returns int of warehouse capacity
+const getWarehouseCapacity = () =>
+  parseInt(
+    document
+      .querySelector("#stockBar .warehouse .capacity .value")
+      .innerText.trim()
+      .replace(/\D/g, "")
+  );
+
+//Returns int of granary capacity
+const getGranaryCapacity = () =>
+  parseInt(
+    document
+      .querySelector("#stockBar .granary .capacity .value")
+      .innerText.trim()
+      .replace(/\D/g, "")
+  );
+
+//Returns array of storage percentage
+const getRecourcesPercent = () => {
+  let percent = [];
+  document
+    .querySelectorAll("#stockBar .barBox .bar")
+    .forEach((b) => percent.push(parseInt(b.style.width.replace("%", ""))));
+
+  return percent;
+};
+
+//Returns int array of current storage
+const getRecourcesCount = () => {
+  let storage = [];
+  document
+    .querySelectorAll("#stockBar .stockBarButton .value")
+    .forEach((b) =>
+      storage.push(parseInt(b.innerText.trim().replace(/\D/g, "")))
+    );
+  return storage;
+};
 
 function shuffleArray(array) {
   var currentIndex = array.length,
