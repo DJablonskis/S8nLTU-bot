@@ -10,12 +10,10 @@
 // @require jobs.js
 // @require npc.js
 
-// @version        0.10.32
+// @version        0.10.4
 // ==/UserScript==
 
 function allInOneOpera() {
-  const VER = "0.10.32";
-  const APP_NAME = "PingWin";
   let BOT;
 
   function setUpResFields() {

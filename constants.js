@@ -1,3 +1,6 @@
+const VER = "0.10.4";
+const APP_NAME = "S8nLTU BOT";
+
 const CITIES_STORAGE = "storedCities";
 const PANEL_POSITION = "positionPanel";
 const NPC_RULES = "npcRules";
