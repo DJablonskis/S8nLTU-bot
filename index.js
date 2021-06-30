@@ -12,15 +12,11 @@
 // @require productionManager.js
 // @require constructionManager.js
 
-// @require jobs.js
-// @require contectUI.js
-// @require status.js
-
-// @version        0.10.4.3
+// @version        0.10.4.4
 // ==/UserScript==
 
 function allInOneOpera() {
-  let BOT;
+  let BOT = {};
 
   //STARTS HERE IF CAN SEE VILLAGE LIST
 

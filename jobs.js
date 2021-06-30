@@ -1,21 +1,21 @@
 const initJobs = (BOT, botPanel) => {
-  let cid = CurrentVillage.did;
-
   let jobs = JSON.parse(localStorage.getItem(JOBS_STORAGE));
-  if (!jobs || !jobs[cid]) {
+  if (!jobs || !jobs[CurrentVillage.did]) {
     jobs = jobs ? jobs : {};
     if (window.location.pathname.includes("dorf")) {
-      jobs[cid] = jobs[cid] ? jobs[cid] : [];
+      jobs[CurrentVillage.did] = jobs[CurrentVillage.did]
+        ? jobs[CurrentVillage.did]
+        : [];
     }
     localStorage.setItem(JOBS_STORAGE, JSON.stringify(jobs));
   }
 
   let settings = JSON.parse(localStorage.getItem(SETTINGS_STORAGE));
-  if (!settings || !settings[cid]) {
+  if (!settings || !settings[CurrentVillage.did]) {
     settings = settings ? settings : {};
     if (window.location.pathname.includes("dorf")) {
-      settings[cid] = settings[cid]
-        ? settings[cid]
+      settings[CurrentVillage.did] = settings[CurrentVillage.did]
+        ? settings[CurrentVillage.did]
         : { upgradeRes: false, upgradeCrop: false };
     }
     localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(settings));
@@ -50,23 +50,29 @@ const initJobs = (BOT, botPanel) => {
     '<label for="cbIgnoreCrop"  style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoCrop" style="margin-right: 2px;">Auto-upgrade crop<label>';
 
   let cbAutoRes = document.getElementById("cbAutoRes");
-  cbAutoRes.checked = settings[cid].upgradeRes;
+  cbAutoRes.checked = settings[CurrentVillage.did].upgradeRes;
   cbAutoRes.addEventListener("change", (e) => {
-    if (e.target.checked !== settings[cid].upgradeRes) {
+    if (e.target.checked !== settings[CurrentVillage.did].upgradeRes) {
       let box = e.target;
-      settings[cid].upgradeRes = box.checked;
-      console.log("auto res changed to ", settings[cid].upgradeRes);
+      settings[CurrentVillage.did].upgradeRes = box.checked;
+      console.log(
+        "auto res changed to ",
+        settings[CurrentVillage.did].upgradeRes
+      );
       localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(settings));
     }
   });
 
   let cbAutoCrop = document.getElementById("cbAutoCrop");
-  cbAutoCrop.checked = settings[cid].upgradeCrop;
+  cbAutoCrop.checked = settings[CurrentVillage.did].upgradeCrop;
   cbAutoCrop.addEventListener("change", (e) => {
-    if (e.target.checked !== settings[cid].upgradeCrop) {
+    if (e.target.checked !== settings[CurrentVillage.did].upgradeCrop) {
       let box = e.target;
-      settings[cid].upgradeCrop = box.checked;
-      console.log("auto crop changed to ", settings[cid].upgradeCrop);
+      settings[CurrentVillage.did].upgradeCrop = box.checked;
+      console.log(
+        "auto crop changed to ",
+        settings[CurrentVillage.did].upgradeCrop
+      );
       localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(settings));
     }
   });
@@ -75,7 +81,7 @@ const initJobs = (BOT, botPanel) => {
   summary.innerHTML = `<strong>Jobs planed: </strong> ${jobs.length}; <strong>`;
 
   if (jobs.length > 0) {
-    jobs[cid].forEach((job) => {
+    jobs[CurrentVillage.did].forEach((job) => {
       const node = document.createElement("div");
       node.style.cssText =
         "font-size: 10px; line-height:10px; margin-bottom:2px;";
@@ -86,7 +92,7 @@ const initJobs = (BOT, botPanel) => {
       nodeButton.textContent = "x";
       nodeButton.onclick = (e) => {
         let i = whichChild(e.target.parentNode) - 1;
-        removeJob(jobs[cid][i]);
+        removeJob(jobs[CurrentVillage.did][i]);
         refreshJobs();
       };
       jobsSection.appendChild(node);
@@ -97,15 +103,15 @@ const initJobs = (BOT, botPanel) => {
   }
 
   const completeJob = (job) => {
-    jobs[cid] = jobs[cid].filter(
+    jobs[CurrentVillage.did] = jobs[CurrentVillage.did].filter(
       (j) => j.pos !== job.pos || (j.pos === job.pos && j.to !== job.to)
     );
     localStorage.setItem(JOBS_STORAGE, JSON.stringify(jobs));
-    return jobs[cid];
+    return jobs[CurrentVillage.did];
   };
 
   const removeJob = (job) => {
-    jobs[cid] = jobs[cid].filter(
+    jobs[CurrentVillage.did] = jobs[CurrentVillage.did].filter(
       (j) => j.pos !== job.pos || (j.pos === job.pos && j.to < job.to)
     );
     localStorage.setItem(JOBS_STORAGE, JSON.stringify(jobs));
@@ -122,7 +128,7 @@ const initJobs = (BOT, botPanel) => {
     //Check if ress and max level ceiling
     if (job.gid < 5) {
       if (job.to > 10) {
-        if (BOT.cap !== BOT.cID) {
+        if (BOT.cap !== BOT.CurrentVillage.did) {
           alert("Max level is 10 in non Capital villages!");
           return;
         } else if (job.to > 21) {
@@ -247,4 +253,4 @@ const refreshJobs = () => {
   };
 };
 
-const JobsManager = initJobs();
+//const JobsManager = initJobs();

@@ -1,4 +1,14 @@
 const initProductionManager = () => {
+  const updateProduction = () => {
+    let prod = document.querySelector("#contentOuterContainer > script");
+    if (prod) {
+      let arr = prod.text.split("=").pop().trim().slice(0, -1).split("},");
+      let production = JSON.parse("{" + arr[0].split(": {").pop() + "}");
+      let storage = JSON.parse("{" + arr[1].split(": {").pop() + "}");
+      let capacity = JSON.parse("{" + arr[2].split(": {").pop().slice(0, -1));
+      return { production, storage, capacity, timestamp: Date.now() };
+    } else return null;
+  };
   let productionStorage = JSON.parse(localStorage.getItem(PROD_STORAGE));
   if (!productionStorage) {
     productionStorage = {};
@@ -12,17 +22,6 @@ const initProductionManager = () => {
   }
 
   localStorage.setItem(PROD_STORAGE, JSON.stringify(productionStorage));
-
-  const updateProduction = () => {
-    let prod = document.querySelector("#contentOuterContainer > script");
-    if (prod) {
-      arr = prod.text.split("=").pop().trim().slice(0, -1).split("},");
-      let production = JSON.parse("{" + arr[0].split(": {").pop() + "}");
-      let storage = JSON.parse("{" + arr[1].split(": {").pop() + "}");
-      let capacity = JSON.parse("{" + arr[2].split(": {").pop().slice(0, -1));
-      return { production, storage, capacity, timestamp: Date.now() };
-    } else return null;
-  };
 
   function getTimeUntillFull(capacity, storage, production) {
     if (production == 0) {

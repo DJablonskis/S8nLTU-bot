@@ -29,6 +29,15 @@ function whichChild(elem) {
   return i;
 }
 
+const getParams = (loc = window.location.search) =>
+  loc
+    .slice(1)
+    .split("&")
+    .reduce((acc, s) => {
+      const [k, v] = s.split("=");
+      return Object.assign(acc, { [k]: v });
+    }, {});
+
 //Reurns int current gold balance
 const getGoldBalance = () =>
   parseInt(
@@ -134,15 +143,6 @@ function shuffleArray(array) {
   return array;
 }
 
-const getParams = (loc = window.location.search) =>
-  loc
-    .slice(1)
-    .split("&")
-    .reduce((acc, s) => {
-      const [k, v] = s.split("=");
-      return Object.assign(acc, { [k]: v });
-    }, {});
-
 //DETECTS incoming attacks
 //document.querySelectorAll("table#movements > tbody > tr >td.typ > a > img.att1 ").length>0
 
@@ -157,10 +157,10 @@ const icon = (type, x = 20) => {
 };
 
 const typeNames = [
-  { name: "Lumber", icon: r1i },
-  { name: "Clay", icon: r2i },
-  { name: "Iron", icon: r3i },
-  { name: "Crop", icon: r4i },
+  { name: "Lumber", icon: icon(0) },
+  { name: "Clay", icon: icon(1) },
+  { name: "Iron", icon: icon(2) },
+  { name: "Crop", icon: icon(3) },
 ];
 
 function clickSite(id, caller = "") {

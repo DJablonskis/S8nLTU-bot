@@ -1,19 +1,4 @@
 const initConstructionManager = () => {
-  let cmStorage = JSON.parse(localStorage.getItem(CM_STORAGE));
-  if (!cmStorage) {
-    cmStorage = {};
-  }
-  if (window.location.pathname.includes("dorf")) {
-    let updated = updateBuildingQueue();
-    if (updater) {
-      cmStorage[CurrentVillage.did] = updated;
-    } else {
-      console.log("Update Building queue returned falsy value?");
-      cmStorage[CurrentVillage.did] = [];
-    }
-  }
-  localStorage.setItem(CM_STORAGE, JSON.stringify(cmStorage));
-
   const updateBuildingQueue = () => {
     let q = [];
     if (window.location.pathname.includes("dorf")) {
@@ -29,7 +14,7 @@ const initConstructionManager = () => {
         const jsonQ = JSON.parse(buildingLevels);
 
         buildingQ.forEach((element, index) => {
-          b = {};
+          let b = {};
           b.lvl = jsonQ[index].stufe;
           b.gid = jsonQ[index].gid;
           b.finish =
@@ -47,6 +32,21 @@ const initConstructionManager = () => {
     console.log("retrieved q: ", q);
     return q;
   };
+
+  let cmStorage = JSON.parse(localStorage.getItem(CM_STORAGE));
+  if (!cmStorage) {
+    cmStorage = {};
+  }
+  if (window.location.pathname.includes("dorf")) {
+    let updated = updateBuildingQueue();
+    if (updated) {
+      cmStorage[CurrentVillage.did] = updated;
+    } else {
+      console.log("Update Building queue returned falsy value?");
+      cmStorage[CurrentVillage.did] = [];
+    }
+  }
+  localStorage.setItem(CM_STORAGE, JSON.stringify(cmStorage));
 
   const checkTime = (completion) => {
     function pad(n, z) {
@@ -185,3 +185,4 @@ const initConstructionManager = () => {
 };
 
 const ConstructionManager = initConstructionManager();
+console.log(ConstructionManager);
