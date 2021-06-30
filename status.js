@@ -17,13 +17,15 @@ const setUpStatusBar = (BOT, botPanel) => {
   loadingBarProgress.style.cssText =
     "height:6px; width:0; background-color: #546e39; border: 1px solid transparent; border-color: #699e32 #6db024 #71c117; width: 100%";
 
-  const setStatus = (message = "", time = 5000) => {
+  const updateStatus = (message = "", fast = false, extraTime = 0) => {
+    let speed = fast ? DELAY_FAST : DELAY_SLOW;
+    let d = (Math.floor(Math.random() * 4) + speed) * 1000 + extraTime;
     let width = 0;
     let timestamp = Date.now();
     statusMessage.innerText = message;
     var id = setInterval(frame, 30);
     function frame() {
-      width = ((Date.now() - timestamp) / time) * 100.0;
+      width = ((Date.now() - timestamp) / d) * 100.0;
       if (width >= 100) {
         clearInterval(id);
       } else {
@@ -31,14 +33,8 @@ const setUpStatusBar = (BOT, botPanel) => {
         loadingBarProgress.style.width = width + "%";
       }
     }
-  };
-
-  const delay = (message, fast = false, extraTime = 0) => {
-    let speed = fast ? DELAY_FAST : DELAY_SLOW;
-    let d = (Math.floor(Math.random() * 4) + speed) * 1000 + extraTime;
-    setStatus(message, d);
     return d;
   };
 
-  BOT.setStatus = setStatus;
+  BOT.updateStatus = updateStatus;
 };

@@ -64,12 +64,12 @@ const setUpNPC = (BOT, botPanel) => {
           if (tab && !tab.classList.contains("active")) {
             Promise.doAfter(
               () => tab.click(),
-              delay("NPC: Wrong tab detected. switching tab!")
+              BOT.updateStatus("NPC: Wrong tab detected. switching tab!")
             );
           }
           Promise.doAfter(
             document.querySelector("#build .npcMerchant button").click(),
-            delay("NPC: Pressing npc button")
+            BOT.updateStatus("NPC: Pressing npc button")
           )
             .doAfter(() => {
               let total = parseInt(document.querySelector("#sum").innerText);
@@ -81,21 +81,21 @@ const setUpNPC = (BOT, botPanel) => {
               inputs[2].value = Math.floor((total / 100) * inProgress.ratio[2]);
               inputs[3].value = Math.floor((total / 100) * inProgress.ratio[3]);
               inputs[0].dispatchEvent(new KeyboardEvent("keyup", { key: "0" }));
-            }, delay("NPC: Filling inputs"))
+            }, BOT.updateStatus("NPC: Filling inputs"))
             .doAfter(
               () => document.querySelector("#submitText button").click(),
-              delay("NPC: Pressing distribute.", true)
+              BOT.updateStatus("NPC: Pressing distribute.", true)
             )
             .doAfter(() => {
               localStorage.setItem(NPC_IN_PROGRESS, "");
               setNPCCooldown(inProgress);
               document.querySelector("#submitButton button").click();
-            }, delay("NPC: Pressing confirm.", true));
+            }, BOT.updateStatus("NPC: Pressing confirm.", true));
         } else {
           return setTimeout(() => {
             localStorage.setItem(NPC_IN_PROGRESS, "");
             location.href = "/dorf1.php";
-          }, delay("NPC: Wrong location. Canceling", true));
+          }, BOT.updateStatus("NPC: Wrong location. Canceling", true));
         }
       } else {
         villageRules.forEach((rule) => {
@@ -114,7 +114,7 @@ const setUpNPC = (BOT, botPanel) => {
             } else {
               return setTimeout(() => {
                 location.href = "/dorf2.php";
-              }, delay("NPC: Navigating to city center"));
+              }, BOT.updateStatus("NPC: Navigating to city center"));
             }
           }
         });

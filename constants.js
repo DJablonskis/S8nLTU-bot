@@ -1,11 +1,13 @@
-const VER = "0.10.4.1";
+const VER = "0.10.4.2";
 const APP_NAME = "S8nLTU BOT";
 
 const CITIES_STORAGE = "storedCities";
 const PANEL_POSITION = "positionPanel";
 const NPC_RULES = "npcRules";
 const FARM_RULES = "farmRules";
-const JOBS_STORAGE = "storedJobs";
+const JOBS_STORAGE = "jobsManager";
+const CM_STORAGE = "constructionManager";
+const PROD_STORAGE = "productionManager";
 const SETTINGS_STORAGE = "storedSettings";
 const BOT_POWER = "bot_enabled";
 const BOT_NOTIFICATIONS = "bot_notifications";
