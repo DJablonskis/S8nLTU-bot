@@ -16,7 +16,7 @@
 // @require contectUI.js
 // @require status.js
 
-// @version        0.10.4.2
+// @version        0.10.4.3
 // ==/UserScript==
 
 function allInOneOpera() {
