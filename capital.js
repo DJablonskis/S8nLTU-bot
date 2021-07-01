@@ -2,10 +2,10 @@ const Capital = localStorage.getItem(CAPITAL);
 
 if (!Capital) {
   console.log("capital not set");
-  let dialogText = "Please update the ID of the capital city:\n";
-  dialogText = dialogText + "[ ID ]   [VILLAGE NAME]\n";
+  let dialogText =
+    "Confirm ID number of your capital (only needs to be done once):\n";
   Villages.all.forEach((vill) => {
-    dialogText = `[${vill.did}] - "${vill.name}"\n`;
+    dialogText = dialogText + `ID: [${vill.did}] - "${vill.name}"\n`;
   });
 
   let cap = prompt(dialogText, "");
