@@ -3,9 +3,16 @@ const initJobs = () => {
   jobs = jobs ? jobs : {};
   cvJobs = jobs[CurrentVillage.did] ? jobs[CurrentVillage.did] : [];
 
+  const subscribers = [];
+  const subscribe = (funk) => {
+    subscribers.push(funk);
+    funk(cvJobs);
+  };
+
   const save = () => {
     jobs[CurrentVillage.did] = cvJobs;
     localStorage.setItem(JOBS_STORAGE, JSON.stringify(jobs));
+    subscribers.forEach((f) => f(cvJobs));
   };
 
   const complete = (job) => {
@@ -145,6 +152,7 @@ const checkJobs = () => {
     remove,
     add,
     jobs,
+    subscribe,
     get: (did) => jobs[did],
     current: cvJobs,
   };

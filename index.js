@@ -13,9 +13,10 @@
 // @require productionManager.js
 // @require constructionManager.js
 // @require jobsManager.js
-// @require autoUpgrade.js
 
 // @require botPanel.js
+// @require autoUpgrade.js
+// @require jobsList.js
 
 // @version        0.10.4.8
 // ==/UserScript==
@@ -23,10 +24,7 @@
 function allInOneOpera() {
   let BOT = {};
 
-  //STARTS HERE IF CAN SEE VILLAGE LIST
-
   if (shouldRun()) {
-    // BOT = getCities();
     //  const params = getParams();
 
     // if (
@@ -63,7 +61,7 @@ function allInOneOpera() {
     // }
 
     BOT.switchCity = function () {
-      if (location.pathname.includes("dorf1")) {
+      if (Dorf1Slots) {
         let filtered = this.vil.filter((v) => {
           let shouldCheck = false;
           let jobs = this.jobs["c" + v.did];
@@ -89,9 +87,8 @@ function allInOneOpera() {
           }
 
           if (!shouldCheck) {
-            let settings = this.settings["c" + v.did];
             shouldCheck =
-              (settings.upgradeCrop || settings.upgradeRes) &&
+              (AutoUpgrade.get().upgradeCrop || AutoUpgrade.get().upgradeRes) &&
               v.timestamp + MIN_WAIT < Date.now();
             if (shouldCheck) {
               console.log(`added ${v.name} because of auto rules`);
@@ -157,7 +154,7 @@ function allInOneOpera() {
             }, 5000);
           }
           if (
-            inProgress.cid === this.cID &&
+            inProgress.cid === CurrentVillage.did &&
             inProgress.job.pos === Number(params.id)
           ) {
             let b = undefined;
