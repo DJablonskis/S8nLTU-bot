@@ -203,3 +203,4 @@ const initConstructionManager = () => {
 
 const ConstructionManager = initConstructionManager();
 console.log(ConstructionManager);
+ConstructionManager.showDots(ON_S);

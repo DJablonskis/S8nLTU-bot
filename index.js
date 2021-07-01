@@ -9,11 +9,13 @@
 // @require buildings.js
 // @require helpers.js
 
-// @require botPanel.js
 // @require productionManager.js
 // @require constructionManager.js
+// @require jobsManager.js
 
-// @version        0.10.4.5
+// @require botPanel.js
+
+// @version        0.10.4.6
 // ==/UserScript==
 
 function allInOneOpera() {
