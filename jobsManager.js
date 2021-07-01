@@ -34,18 +34,14 @@ const initJobs = () => {
   //   });
 
   const add = (job) => {
-    if (!this.cap) {
-      alert(
-        "Capital not set. Opening '/profile' section for you now. While on '/profile' section, please change your current city to your capital city for bot to update. You only need to do this once."
-      );
-      location.href = "/profile";
-      return;
+    if (!Capital) {
+      return alert("Capital not set.");
     }
 
     //Check if ress and max level ceiling
     if (job.gid < 5) {
       if (job.to > 10) {
-        if (BOT.cap !== BOT.CurrentVillage.did) {
+        if (Capital !== CurrentVillage.did) {
           alert("Max level is 10 in non Capital villages!");
           return;
         } else if (job.to > 21) {
@@ -61,11 +57,11 @@ const initJobs = () => {
         return;
       }
       //is cap and not alowed in cap:
-      if (BOT.cap === CurrentVillage.did && !b.cap) {
+      if (Capital === CurrentVillage.did && !b.cap) {
         alert("Cant build this in capitol!");
         return;
       }
-      if (BOT.cap !== CurrentVillage.did && !b.xcap) {
+      if (Capital !== CurrentVillage.did && !b.xcap) {
         alert("Cant build this in non capitol city!");
         return;
       }

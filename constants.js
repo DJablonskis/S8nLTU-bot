@@ -15,6 +15,8 @@ const BOT_STATS = "bot_statistics";
 const BOT_ON = "1";
 const BOT_OFF = "0";
 
+const CAPITAL = "capital";
+
 const BOT_IN_PROGRESS = "bot_progress";
 const NPC_IN_PROGRESS = "npc_progress";
 

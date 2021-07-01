@@ -8,6 +8,7 @@
 // @require constants.js
 // @require buildings.js
 // @require helpers.js
+// @require capital.js
 
 // @require productionManager.js
 // @require constructionManager.js
@@ -15,7 +16,7 @@
 
 // @require botPanel.js
 
-// @version        0.10.4.6
+// @version        0.10.4.7
 // ==/UserScript==
 
 function allInOneOpera() {
