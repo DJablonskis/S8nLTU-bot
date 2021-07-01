@@ -145,6 +145,6 @@ const botPanelCreator = () => {
 
     return { panel, destroy, addSection };
   };
-
-  const BotPanel = createSidePanel().addSection(`${APP_NAME} v${VER}`);
 };
+
+const BotPanel = createSidePanel();
