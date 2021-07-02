@@ -29,7 +29,6 @@ const initConstructionManager = () => {
         });
       }
     } else return null;
-    console.log("retrieved q: ", q);
     return q;
   };
 
@@ -202,5 +201,4 @@ const initConstructionManager = () => {
 };
 
 const ConstructionManager = initConstructionManager();
-console.log(ConstructionManager);
 ConstructionManager.showDots(ON_S);

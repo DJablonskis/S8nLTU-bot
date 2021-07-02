@@ -1,12 +1,14 @@
 const initJobsList = () => {
-  const { content } = BotPanel.addSection("Planed upgrades");
+  const { content, header } = BotPanel.addSection("Planed upgrades");
+  header.style.paddingTop = "10px";
+  const details = content.appendChild(document.createElement("details"));
+  const summary = details.appendChild(document.createElement("summary"));
+  const detailsInner = details.appendChild(document.createElement("div"));
 
   const updateJobs = (jobs) => {
-    content.innerHTML = "";
-    const details = content.appendChild(document.createElement("details"));
-    const summary = details.appendChild(document.createElement("summary"));
-    summary.innerHTML = `<strong>Jobs upgrades: </strong> ${jobs.length}; <strong>`;
-
+    detailsInner.innerHTML = "";
+    header.innerText = `Planed upgrades (${jobs.length})`;
+    summary.innerHTML = `Click to show/hide`;
     if (jobs.length > 0) {
       jobs.forEach((job) => {
         const node = document.createElement("div");
@@ -18,11 +20,9 @@ const initJobsList = () => {
           "cursor: pointer; width:14px; height:14; border-radius:2px; background-color:red;color:white; text-align:center; font-size:12px; padding:2px; display:inline-block; border:1px solid black; margin-right:4px; ";
         nodeButton.textContent = "x";
         nodeButton.onclick = (e) => {
-          let i = whichChild(e.target.parentNode) - 1;
-          removeJob(jobs[CurrentVillage.did][i]);
-          refreshJobs();
+          JobsManager.remove(job);
         };
-        details.appendChild(node);
+        detailsInner.appendChild(node);
         nodeText.textContent = `[${job.pos}] ${BDB.name(job.gid)} to level ${
           job.to
         }`;

@@ -187,6 +187,9 @@ function clickGid(gid) {
   }, delay("Clicking " + buildings[gid - 1].name));
 }
 
+const navigateTo = (n) =>
+  document.querySelector(`#navigation>a[accessKey="${n}"] `).click();
+
 const shouldRun = () => {
   return (
     document.querySelectorAll(
@@ -287,8 +290,6 @@ const getBuildingSlots = () => {
   building_nodes.pop();
 
   building_nodes.forEach((node) => {
-    console.log("next: ", node);
-
     let pos = Number(node.classList[1].substring(1));
     let gid = Number(node.classList[2].substring(1));
 

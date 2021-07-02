@@ -17,49 +17,15 @@
 // @require botPanel.js
 // @require autoUpgrade.js
 // @require jobsList.js
+// @require newBuildUI.js
 
-// @version        0.10.4.8
+// @version        0.10.5
 // ==/UserScript==
 
 function allInOneOpera() {
   let BOT = {};
 
   if (shouldRun()) {
-    //  const params = getParams();
-
-    // if (
-    //   window.location.pathname.includes("build.php") &&
-    //   !window.location.search.includes("&gid=")
-    // ) {
-    //   const cat = params.category ? Number(params.category) : 1;
-
-    //   const availableBuildings = document.querySelectorAll(
-    //     ".buildingWrapper > .build_desc > img.building"
-    //   );
-    //   availableBuildings.forEach((b) => {
-    //     let cont = b.parentNode.parentNode;
-    //     let gid = Number(
-    //       cont.querySelector(".contract").id.replace("contract_building", "")
-    //     );
-    //     let pos = window.location.search.split("=")[1];
-    //     pos = pos.includes("&") ? Number(pos.split("&")[0]) : Number(pos);
-
-    //     cont.style.position = "relative";
-    //     const button = cont.appendChild(document.createElement("button"));
-    //     button.classList.add("textButtonV1", "green", "new");
-    //     button.style.position = "absolute";
-    //     button.style.right = "0";
-    //     button.style.top = "0";
-    //     button.innerText = `Build later`;
-
-    //     button.onclick = () => {
-    //       BOT.addJob({ gid, pos, lvl: 0, to: 1, cat });
-    //       BOT.displayJobs();
-    //       window.location.href = "/dorf2.php";
-    //     };
-    //   });
-    // }
-
     BOT.switchCity = function () {
       if (Dorf1Slots) {
         let filtered = this.vil.filter((v) => {
@@ -279,11 +245,8 @@ function allInOneOpera() {
           if (this.settings["c" + this.cID].upgradeCrop) {
             upgrade = upgrade.concat(available.filter((f) => f.gid === 4));
           }
-          console.log("a", available);
-          console.log("u", upgrade);
 
           upgrade = upgrade.sort((a, b) => a.lvl - b.lvl);
-          console.log("u s", upgrade);
 
           if (upgrade.length > 0) {
             let job = upgrade[0];
@@ -315,7 +278,6 @@ function allInOneOpera() {
         localStorage.setItem(FARM_RULES, JSON.stringify(rules));
       }
       b.npcRules = rules;
-      console.log("Rules: ", rules);
 
       if (
         window.location.pathname.includes("build.php") &&

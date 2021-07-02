@@ -17,5 +17,5 @@ if (!Capital) {
 }
 
 if (Dorf1Slots) {
-  //check fields for above lvl 10 and maxLevel
+  //TODO: check fields for above lvl 10 and maxLevel
 }

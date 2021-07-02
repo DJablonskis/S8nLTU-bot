@@ -41,6 +41,7 @@ const initJobs = () => {
   //   });
 
   const add = (job) => {
+    //TODO: need to check to identical jobs not to add dublicates
     if (!Capital) {
       return alert("Capital not set.");
     }
@@ -83,75 +84,48 @@ const initJobs = () => {
     cvJobs.push(job);
     save();
   };
-};
+  const checkJobs = () => {
+    if (Dorf1Slots) {
+      Dorf1Slots.forEach((field) => {
+        const buildingNow = ConstructionManager.current.filter(
+          (bn) => Number(bn.aid) === field.pos
+        );
+        const min = field.lvl + buildingNow.length + 1;
+        const old_jobs = cvJobs.filter(
+          (job) => job.pos === field.pos && job.to < min
+        );
+        if (old_jobs.length > 0) {
+          old_jobs.forEach((job) => {
+            complete(job);
+          });
+        }
+      });
+    } else if (Dorf2Slots) {
+      Dorf2Slots.forEach((building) => {
+        //Number of currently beign built same type buildings
+        const buildingNow = ConstructionManager.current.filter(
+          (bn) => Number(bn.aid) === building.pos
+        );
 
-const checkJobs = () => {
-  if (window.location.pathname.includes("dorf1")) {
-    Dord1Slots.forEach((field) => {
-      const buildingNow = ConstructionManager.current.filter(
-        (bn) => Number(bn.aid) === field.pos
-      );
-      const min = field.lvl + buildingNow.length + 1;
-      const old_jobs = jobs.filter(
-        (job) => job.pos === field.pos && job.to < min
-      );
-      if (old_jobs.length > 0) {
-        old_jobs.forEach((job) => {
-          complete(job);
-        });
-      }
-    });
-  } else if (window.location.pathname.includes("dorf2")) {
-    Dorf2Slots.forEach((building) => {
-      //Number of currently beign built same type buildings
-      const buildingNow = ConstructionManager.current.filter(
-        (bn) => Number(bn.aid) === building.pos
-      );
-
-      const min = building.lvl + buildingNow.length + 1;
-      const old_jobs = cvJobs.filter(
-        (job) => job.pos === building.pos && job.to < min
-      );
-      if (old_jobs.length > 0) {
-        old_jobs.forEach((job) => {
-          jobs = complete(job);
-        });
-      }
-
-      //DISPLAYING NEW PLANED BUILDINGS, NEEDS TO BE MOVED
-      // const pos_jobs = jobs.filter((x) => x.pos === building.pos);
-      // const count = pos_jobs.length;
-
-      // //if new building display!
-      // if (building.gid === 0 && count > 0) {
-      //   building.bot.style.display = "block";
-      //   building.gid = pos_jobs[0].gid;
-      //   let image = building.node.querySelector("img");
-      //   image.classList.add("g" + pos_jobs[0].gid);
-      //   image.style.opacity = "0.5";
-      // }
-
-      // building.bot.onclick = () => {
-      //   this.addJob({
-      //     gid: building.gid,
-      //     pos: building.pos,
-      //     lvl: building.lvl,
-      //     to:
-      //       Number(building.bot.dataset.lvl) +
-      //       1 +
-      //       Number(building.lvl) +
-      //       buildingNow.length,
-      //   });
-      //   this.displayJobs();
-      // };
-    });
-  }
+        const min = building.lvl + buildingNow.length + 1;
+        const old_jobs = cvJobs.filter(
+          (job) => job.pos === building.pos && job.to < min
+        );
+        if (old_jobs.length > 0) {
+          old_jobs.forEach((job) => {
+            complete(job);
+          });
+        }
+      });
+    }
+  };
 
   return {
     complete,
     remove,
     add,
     jobs,
+    checkJobs,
     subscribe,
     get: (did) => jobs[did],
     current: cvJobs,
@@ -159,3 +133,4 @@ const checkJobs = () => {
 };
 
 const JobsManager = initJobs();
+JobsManager.checkJobs();
