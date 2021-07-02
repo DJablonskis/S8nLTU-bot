@@ -733,7 +733,7 @@ const initialiseBDB = () => {
   return {
     stats: getStat,
     name: (gid) => buildings[gid - 1].name,
-    data: (gid) => building[gid - 1],
+    data: (gid) => buildings[gid - 1],
   };
 };
 

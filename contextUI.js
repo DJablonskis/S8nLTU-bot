@@ -1,7 +1,18 @@
-const setUpContextUI = (BOT) => {
+const setUpContextUI = () => {
   //UPGRADE WINDOW
   const contextUI = document.createElement("div");
-  contextUI.id = "context_dialog";
+  contextUI.classList.add("sidebar");
+  contextUI.style.cssText = "position: absolute; top:0; left:0";
+
+  const contextUIInner = contextUI.append(document.createElement("div"));
+  contextUIInner.classList.add("sidebarBox");
+  const contextUIBox = contextUIInner.append(document.createElement("div"));
+  contextUIBox.classList.add("content");
+
+  const boxHeader = contextUIBox.append(document.createElement("div"));
+  boxHeader.classList.add("boxHeader");
+  const boxContent = contextUIBox.append(document.createElement("div"));
+  boxContent.classList.add("boxContent");
 
   const closeButton = contextUI.appendChild(document.createElement("button"));
   closeButton.innerText = "x";
@@ -16,21 +27,17 @@ const setUpContextUI = (BOT) => {
   document.body.appendChild(contextUI);
 
   const closeContext = () => {
-    contextUI.style.opacity = 0;
     contextUI.style.display = "none";
     return;
   };
 
-  const openContext = (e, info) => {
+  const openContext = (e, pos) => {
     console.log("event", e);
     console.log("target", e.target);
     console.log("info: ", info);
     contextUI.style.display = "block";
     contextUI.style.top = `${e.clientY - 20}px`;
     contextUI.style.left = `${e.clientX + 10}px`;
-    contextUI.style.opacity = 1;
     return;
   };
-
-  closeButton.onclick = closeContext;
 };

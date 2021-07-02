@@ -101,6 +101,7 @@ const initJobs = () => {
         }
       });
     } else if (Dorf2Slots) {
+      //TODO: check if slots with new buildings are not ocupied
       Dorf2Slots.forEach((building) => {
         //Number of currently beign built same type buildings
         const buildingNow = ConstructionManager.current.filter(

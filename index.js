@@ -18,6 +18,7 @@
 // @require autoUpgrade.js
 // @require jobsList.js
 // @require newBuildUI.js
+// @require contextUI.js
 
 // @version        0.10.5
 // ==/UserScript==
