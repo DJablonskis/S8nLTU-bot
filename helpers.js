@@ -314,3 +314,39 @@ const getBuildingSlots = () => {
 const Dorf2Slots = window.location.pathname.includes("dorf2")
   ? getBuildingSlots()
   : null;
+
+const getTribe = () => {
+  let index;
+  // "tribe" + id
+  const id = ["1", "2", "3", "6", "7"];
+  const name = ["roman", "teuton", "gaul", "egyptian", "egiptian"];
+  const wall = [31, 32, 33, 42, 43];
+
+  const getIndex = (x) => {
+    let i;
+    if (x === "1" || x === "roman") i = 0;
+    else if (x === "2" || x === "teuton") i = 1;
+    else if (x === "3" || x === "gaul") i = 2;
+    else if (x === "6" || x === "egyptian") i = 3;
+    else if (x === "7" || x === "hun") i = 4;
+
+    return i;
+  };
+  if (Dorf1Slots) {
+    index = getIndex(
+      [...document.querySelector("#resourceFieldContainer").classList]
+        .pop()
+        .slice(-1)
+    );
+  } else if (Dorf2Slots) {
+    index = getIndex(
+      [...document.querySelector("#village_map .buildingSlot").classList].pop()
+    );
+  }
+
+  return index
+    ? { id: "tribe" + id[index], name: name[index], wall: wall[index] }
+    : null;
+};
+
+const Tribe = getTribe();

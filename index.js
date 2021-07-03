@@ -9,6 +9,7 @@
 // @require buildings.js
 // @require helpers.js
 // @require capital.js
+// @require notifications.js
 
 // @require productionManager.js
 // @require constructionManager.js
@@ -20,7 +21,7 @@
 // @require newBuildUI.js
 // @require contextUI.js
 
-// @version        0.10.5
+// @version        0.10.6
 // ==/UserScript==
 
 function allInOneOpera() {

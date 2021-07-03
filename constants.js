@@ -1,4 +1,4 @@
-const VER = "0.10.5";
+const VER = "0.10.6";
 const APP_NAME = "S8nLTU BOT";
 
 const CITIES_STORAGE = "storedCities";
@@ -22,11 +22,13 @@ const NPC_IN_PROGRESS = "npc_progress";
 
 const POSITION_UP = "UP";
 const POSITION_DOWN = "DOWN";
-const TRIBE_ROMAN = "tribe1"; //
-const TRIBE_TEUTON = "tribe2"; //
-const TRIBE_GAUL = "tribe3"; //
-const TRIBE_EGIPT = "tribe6"; //
-const TRIBE_HUN = "tribe7"; //
+
+const TRIBE = "tribe";
+const TRIBE_ROMAN = "1"; //
+const TRIBE_TEUTON = "2"; //
+const TRIBE_GAUL = "3"; //
+const TRIBE_EGIPT = "6"; //
+const TRIBE_HUN = "7"; //
 
 const WALLS = {
   tribe1: 31,
