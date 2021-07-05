@@ -1,4 +1,4 @@
-const VER = "0.10.6";
+const VER = "0.10.7";
 const APP_NAME = "S8nLTU BOT";
 
 const CITIES_STORAGE = "storedCities";

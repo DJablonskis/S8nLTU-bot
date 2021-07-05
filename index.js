@@ -16,12 +16,13 @@
 // @require jobsManager.js
 
 // @require botPanel.js
-// @require autoUpgrade.js
+// @require autoUpgradeUI.js
 // @require jobsList.js
 // @require newBuildUI.js
 // @require contextUI.js
+// @require statusUI.js
 
-// @version        0.10.6
+// @version        0.10.7
 // ==/UserScript==
 
 function allInOneOpera() {
@@ -305,9 +306,6 @@ function allInOneOpera() {
       }
     }
 
-    //  setUpStatusBar(BOT, botPanel);
-    // initJobQueue(BOT);
-    // initFarmingRules(BOT);
     // BOT.displayJobs();
 
     //setUpNPC(BOT, botPanel);

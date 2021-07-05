@@ -9,7 +9,7 @@ if (!Capital) {
   });
 
   let cap = prompt(dialogText, "");
-  if (cap == null || cap == "") {
+  if (!cap) {
     return;
   } else if (Villages.get(cap)) {
     localStorage.setItem(CAPITAL, cap);
@@ -17,5 +17,18 @@ if (!Capital) {
 }
 
 if (Dorf1Slots) {
+  const max = Dorf1Slots.find(
+    (slot) => slot.lvl === 10 && slot.status === "maxLevel"
+  );
+
+  if (max) {
+    console.log("not capital");
+  }
+  const above10 = Dorf1Slots.find(
+    (slot) => slot.lvl > 9 && slot.status !== "maxLevel"
+  );
+  if (above10) {
+    console.log("capital");
+  }
   //TODO: check fields for above lvl 10 and maxLevel
 }

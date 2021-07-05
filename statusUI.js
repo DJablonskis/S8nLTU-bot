@@ -1,10 +1,9 @@
-const setUpStatusBar = (BOT, botPanel) => {
-  const status = botPanel.appendChild(document.createElement("div"));
-  status.style.cssText =
-    "padding-bottom: 8px; border-bottom: 1px solid #5e463a;";
-  const statusTitle = status.appendChild(document.createElement("h4"));
-  statusTitle.style.cssText = titleStyle;
-  statusTitle.innerText = "Status:";
+const statusSection = BotPanel.addSection("Bot Status");
+
+const setUpStatusBar = () => {
+  const status = statusSection.appendChild(document.createElement("div"));
+  status.style.cssText = "padding-top: 6px";
+
   let statusMessage = status.appendChild(document.createElement("div"));
   statusMessage.innerText = "Waiting for instructions";
 
@@ -36,5 +35,6 @@ const setUpStatusBar = (BOT, botPanel) => {
     return d;
   };
 
-  BOT.updateStatus = updateStatus;
+  return { updateStatus };
 };
+const StatusBar = setUpStatusBar();

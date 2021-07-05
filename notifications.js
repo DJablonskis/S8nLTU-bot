@@ -1,6 +1,6 @@
 function notifyMe(title, con, village) {
   var notification = new Notification(title, {
-    body: `${DBD.data(con.gid).name} was upgraded to level ${con.lvl} in "${
+    body: `${BDB.data(con.gid).name} was upgraded to level ${con.lvl} in "${
       village.name
     }"`,
     icon: "http://tinygraphs.com/labs/isogrids/hexa16/S8nLtu?theme=heatwave&numcolors=4&size=220&fmt=svg",
