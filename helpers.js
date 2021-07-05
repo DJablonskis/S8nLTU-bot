@@ -344,9 +344,7 @@ const getTribe = () => {
     );
   }
 
-  return index
-    ? { id: "tribe" + id[index], name: name[index], wall: wall[index] }
-    : null;
+  return index ? { id: id[index], name: name[index], wall: wall[index] } : null;
 };
 
 const Tribe = getTribe();

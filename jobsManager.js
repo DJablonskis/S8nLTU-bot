@@ -29,17 +29,6 @@ const initJobs = () => {
     save();
   };
 
-  //   add({
-  //     gid: field.gid,
-  //     pos: field.pos,
-  //     lvl: field.lvl,
-  //     to:
-  //       Number(field.bot.dataset.lvl) +
-  //       1 +
-  //       Number(field.lvl) +
-  //       buildingNow.length,
-  //   });
-
   const add = (job) => {
     //TODO: need to check to identical jobs not to add dublicates
     if (!Capital) {
@@ -84,6 +73,7 @@ const initJobs = () => {
     cvJobs.push(job);
     save();
   };
+
   const checkJobs = () => {
     if (Dorf1Slots) {
       Dorf1Slots.forEach((field) => {
@@ -121,6 +111,22 @@ const initJobs = () => {
     }
   };
 
+  const next = (did = CurrentVillage.did) => {
+    return jobs[did] && jobs[did].length > 0 ? jobs[did][0] : null;
+  };
+
+  const nextDorf1 = (did = CurrentVillage.did) => {
+    if (!jobs[did]) return null;
+    let j = jobs[did].filter((x) => x.gid < 5);
+    return j.length > 0 ? j[0] : null;
+  };
+
+  const nextDorf2 = (did = CurrentVillage.did) => {
+    if (!jobs[did]) return null;
+    let j = jobs[did].filter((x) => x.gid > 4);
+    return j.length > 0 ? j[0] : null;
+  };
+
   return {
     complete,
     remove,
@@ -128,8 +134,10 @@ const initJobs = () => {
     jobs,
     checkJobs,
     subscribe,
-    get: (did) => jobs[did],
-    current: cvJobs,
+    next,
+    nextDorf1,
+    nextDorf2,
+    get: (did = CurrentVillage.did) => jobs[did],
   };
 };
 

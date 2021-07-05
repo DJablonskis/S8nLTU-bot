@@ -1,6 +1,10 @@
 const initConstructionManager = () => {
   const updateBuildingQueue = () => {
-    let q = [];
+    let q = {
+      dorf1: [],
+      dorf2: [],
+      all: [],
+    };
     if (window.location.pathname.includes("dorf")) {
       let buildingQ = document.querySelectorAll("div.buildingList > ul > li");
       if (buildingQ && buildingQ.length > 0) {
@@ -15,6 +19,7 @@ const initConstructionManager = () => {
 
         buildingQ.forEach((element, index) => {
           let b = {};
+
           b.lvl = jsonQ[index].stufe;
           b.gid = jsonQ[index].gid;
           b.finish =
@@ -25,7 +30,9 @@ const initConstructionManager = () => {
                 .getAttribute("value")
             ) *
               1000;
-          q.push(b);
+
+          b.gid < 5 ? q.dorf1.push(b) : q.dorf2.push(b);
+          q.all.push(b);
         });
       }
     } else return null;
@@ -42,7 +49,7 @@ const initConstructionManager = () => {
       cmStorage[CurrentVillage.did] = updated;
     } else {
       console.log("Update Building queue returned falsy value?");
-      cmStorage[CurrentVillage.did] = [];
+      cmStorage[CurrentVillage.did] = {};
     }
   }
   localStorage.setItem(CM_STORAGE, JSON.stringify(cmStorage));
@@ -195,8 +202,15 @@ const initConstructionManager = () => {
   };
   return {
     all: cmStorage,
-    current: cmStorage[CurrentVillage.did],
+    get: (did = CurrentVillage.did) => cmStorage[did],
+    available: (dorf, did = CurrentVillage.did) => {
+      const d = cmStorage[did]["dorf" + dorf];
+      let dorfFinish = d.length > 0 ? d[d.length - 1].finish : 0;
+      let dorfAvailable = dorfFinish < Date.now();
+      return { available: dorfAvailable, finish: dorfFinish };
+    },
     showDots,
+    sorted,
   };
 };
 

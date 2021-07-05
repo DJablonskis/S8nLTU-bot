@@ -1,8 +1,10 @@
-const statusSection = BotPanel.addSection("Bot Status");
+const statusSection = BotPanel.addSection(`Bot v${VER} (${ON ? "On" : "Off"})`);
 
 const setUpStatusBar = () => {
-  const status = statusSection.appendChild(document.createElement("div"));
-  status.style.cssText = "padding-top: 6px";
+  const status = statusSection.content.appendChild(
+    document.createElement("div")
+  );
+  //statusSection.header.style.marginTop = "12px";
 
   let statusMessage = status.appendChild(document.createElement("div"));
   statusMessage.innerText = "Waiting for instructions";
@@ -18,13 +20,13 @@ const setUpStatusBar = () => {
 
   const updateStatus = (message = "", fast = false, extraTime = 0) => {
     let speed = fast ? DELAY_FAST : DELAY_SLOW;
-    let d = (Math.floor(Math.random() * 4) + speed) * 1000 + extraTime;
+    let duration = (Math.floor(Math.random() * 4) + speed) * 1000 + extraTime;
     let width = 0;
     let timestamp = Date.now();
     statusMessage.innerText = message;
     var id = setInterval(frame, 30);
     function frame() {
-      width = ((Date.now() - timestamp) / d) * 100.0;
+      width = ((Date.now() - timestamp) / duration) * 100.0;
       if (width >= 100) {
         clearInterval(id);
       } else {
@@ -32,9 +34,9 @@ const setUpStatusBar = () => {
         loadingBarProgress.style.width = width + "%";
       }
     }
-    return d;
+    return duration;
   };
 
-  return { updateStatus };
+  return { update: updateStatus };
 };
-const StatusBar = setUpStatusBar();
+const Status = setUpStatusBar();

@@ -12,6 +12,8 @@ const initAutoUpgrades = () => {
     localStorage.setItem(SETTINGS_STORAGE, JSON.stringify(settings));
   };
 
+  autoUpgradeSection.header.style.marginTop = "12px";
+
   const builderSettings = autoUpgradeSection.content.appendChild(
     document.createElement("div")
   );
@@ -33,7 +35,7 @@ const initAutoUpgrades = () => {
     }
   });
 
-  const get = () => cvSettings;
+  const get = (did = CurrentVillage.did) => settings[did];
 
   const ignoreCropRow = builderSettings.appendChild(
     document.createElement("div")

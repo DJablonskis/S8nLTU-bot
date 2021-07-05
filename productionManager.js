@@ -61,7 +61,8 @@ const initProductionManager = () => {
 
   return {
     all: productionStorage,
-    get: (id) => (productionStorage[id] ? productionStorage[id] : null),
+    get: (did = CurrentVillage.did) =>
+      productionStorage[did] ? productionStorage[did] : null,
     current: currentStorage,
   };
 };
