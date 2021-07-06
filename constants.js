@@ -1,4 +1,4 @@
-const VER = "0.10.8";
+const VER = "0.10.9";
 const APP_NAME = "S8nLTU BOT";
 
 const CITIES_STORAGE = "storedCities";
@@ -14,8 +14,8 @@ const SETTINGS_STORAGE = "storedSettings";
 const BOT_POWER = "bot_enabled";
 const BOT_NOTIFICATIONS = "bot_notifications";
 const BOT_STATS = "bot_statistics";
-const BOT_ON = "1";
-const BOT_OFF = "0";
+const ON = "1";
+const OFF = "0";
 
 const CAPITAL = "capital";
 
@@ -43,10 +43,9 @@ const WALLS = {
 const Q1 = "q1";
 const Q2 = "q2";
 
-const ON = localStorage.getItem(BOT_POWER) === BOT_ON;
+const BOT_ON = localStorage.getItem(BOT_POWER) === ON;
 
-const ON_N = localStorage.getItem(BOT_NOTIFICATIONS) === BOT_ON;
-const ON_S = localStorage.getItem(BOT_STATS) === BOT_ON;
+const ON_S = localStorage.getItem(BOT_STATS) === ON;
 
 const titleStyle =
   'letter-spacing: .1em; font-family: "Noto Serif"; font-weight: bold; color: #5e463a; margin-bottom: 5px; margin-top: 5px;';

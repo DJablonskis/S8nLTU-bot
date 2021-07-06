@@ -246,7 +246,7 @@ const initBOT = () => {
   };
   return { getNextJob, getAutoUpgradeJob };
 };
-
-const BOT = initBOT();
-
-console.log(BOT.getNextJob());
+if (BOT_ON) {
+  const BOT = initBOT();
+  console.log(BOT.getNextJob());
+}
