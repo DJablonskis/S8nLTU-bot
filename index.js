@@ -24,7 +24,7 @@
 
 // @require BOT.js
 
-// @version        0.10.9
+// @version        0.10.91
 // ==/UserScript==
 
 const start = () => {

@@ -186,7 +186,7 @@ const initConstructionManager = () => {
               } align-items:center;">${timer.timer}</span>`;
 
               if (timer.completed) {
-                notifyMe(x, vil);
+                if (Notifications.on) Notifications.send(x, vil);
                 clearInterval(updater);
               }
             }, 1000);
