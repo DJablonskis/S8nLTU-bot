@@ -44,6 +44,7 @@ const initJobsList = () => {
 
   const updateJobs = (jobs) => {
     detailsInner.innerHTML = "";
+    details.style.display = jobs.length > 0 ? "block" : "none";
     header.innerText = `Planed upgrades (${jobs.length})`;
     summary.innerHTML = `Click to show/hide`;
     if (jobs.length > 0) {
