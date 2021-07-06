@@ -3,6 +3,12 @@ const initJobs = () => {
   jobs = jobs ? jobs : {};
   cvJobs = jobs[CurrentVillage.did] ? jobs[CurrentVillage.did] : [];
 
+  let settings = JSON.parse(localStorage.getItem(JOBS_SETTINGS_STORAGE));
+  settings = settings ? settings : {};
+  let cvSettings = settings[CurrentVillage.did]
+    ? settings[CurrentVillage.did]
+    : { prioritisePlanned: true, watchAds: true };
+
   const subscribers = [];
   const subscribe = (funk) => {
     subscribers.push(funk);
@@ -13,6 +19,11 @@ const initJobs = () => {
     jobs[CurrentVillage.did] = cvJobs;
     localStorage.setItem(JOBS_STORAGE, JSON.stringify(jobs));
     subscribers.forEach((f) => f(cvJobs));
+  };
+
+  const updateSettings = (s) => {
+    settings[CurrentVillage.did] = s;
+    localStorage.setItem(JOBS_SETTINGS_STORAGE, JSON.stringify(settings));
   };
 
   const complete = (job) => {
@@ -30,15 +41,10 @@ const initJobs = () => {
   };
 
   const add = (job) => {
-    //TODO: need to check to identical jobs not to add dublicates
-    if (!Capital) {
-      return alert("Capital not set.");
-    }
-
     //Check if ress and max level ceiling
     if (job.gid < 5) {
       if (job.to > 10) {
-        if (Capital !== CurrentVillage.did) {
+        if (!Capital) {
           alert("Max level is 10 in non Capital villages!");
           return;
         } else if (job.to > 21) {
@@ -54,11 +60,11 @@ const initJobs = () => {
         return;
       }
       //is cap and not alowed in cap:
-      if (Capital === CurrentVillage.did && !b.cap) {
+      if (Capital && !b.cap) {
         alert("Cant build this in capitol!");
         return;
       }
-      if (Capital !== CurrentVillage.did && !b.xcap) {
+      if (!Capital && !b.xcap) {
         alert("Cant build this in non capitol city!");
         return;
       }
@@ -66,6 +72,8 @@ const initJobs = () => {
 
     const w = getWarehouseCapacity();
     const g = getGranaryCapacity();
+
+    //TODO: check for granary and warehouse jobs planed in job queue
     const stats = BDB.stats(job.gid, job.to);
     if (stats.cost[0] > w || stats.cost[1] > w || stats.cost[2] > w)
       return alert("Expand warehouse first!");
@@ -77,7 +85,7 @@ const initJobs = () => {
   const checkJobs = () => {
     if (Dorf1Slots) {
       Dorf1Slots.forEach((field) => {
-        const buildingNow = ConstructionManager.current.filter(
+        const buildingNow = ConstructionManager.get().all.filter(
           (bn) => Number(bn.aid) === field.pos
         );
         const min = field.lvl + buildingNow.length + 1;
@@ -94,7 +102,7 @@ const initJobs = () => {
       //TODO: check if slots with new buildings are not ocupied
       Dorf2Slots.forEach((building) => {
         //Number of currently beign built same type buildings
-        const buildingNow = ConstructionManager.current.filter(
+        const buildingNow = ConstructionManager.get().all.filter(
           (bn) => Number(bn.aid) === building.pos
         );
 
@@ -128,7 +136,9 @@ const initJobs = () => {
   };
 
   return {
+    updateSettings,
     complete,
+    settings: cvSettings,
     remove,
     add,
     jobs,
@@ -137,7 +147,7 @@ const initJobs = () => {
     next,
     nextDorf1,
     nextDorf2,
-    get: (did = CurrentVillage.did) => jobs[did],
+    get: (did = CurrentVillage.did) => (jobs[did] ? jobs[did] : []),
   };
 };
 

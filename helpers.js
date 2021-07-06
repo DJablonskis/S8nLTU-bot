@@ -255,7 +255,7 @@ const getResourceFields = () => {
   res_fields.forEach((link) => {
     let upgrading = link.classList.contains("underConstruction");
 
-    let status = "unknown";
+    let status = "maxLevel";
     if (link.classList.contains("good")) status = "good";
     else if (link.classList.contains("notNow")) status = "notNow";
     else if (link.classList.contains("maxLevel")) status = "maxLevel";
@@ -294,7 +294,7 @@ const getBuildingSlots = () => {
     let gid = Number(node.classList[2].substring(1));
 
     let lvl = 0;
-    let status = "unknown";
+    let status = "maxLevel";
     let upgrading = false;
     let link = node.querySelector("a");
     if (gid !== 0) {

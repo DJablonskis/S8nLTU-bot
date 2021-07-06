@@ -5,7 +5,9 @@ const CITIES_STORAGE = "storedCities";
 const PANEL_POSITION = "positionPanel";
 const NPC_RULES = "npcRules";
 const FARM_RULES = "farmRules";
+
 const JOBS_STORAGE = "jobsManager";
+const JOBS_SETTINGS_STORAGE = "jobsManagerSettings";
 const CM_STORAGE = "constructionManager";
 const PROD_STORAGE = "productionManager";
 const SETTINGS_STORAGE = "storedSettings";

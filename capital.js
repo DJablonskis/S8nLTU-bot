@@ -1,34 +1,47 @@
-const Capital = localStorage.getItem(CAPITAL);
+const getCapital = () => {
+  let C = localStorage.getItem(CAPITAL);
 
-if (!Capital) {
-  console.log("capital not set");
-  let dialogText =
-    "Confirm ID number of your capital (only needs to be done once):\n";
-  Villages.all.forEach((vill) => {
-    dialogText = dialogText + `ID: [${vill.did}] - "${vill.name}"\n`;
-  });
+  const requestCapital = () => {
+    console.log("capital not set");
+    let dialogText =
+      "Confirm ID number of your capital (only needs to be done once):\n";
+    Villages.all.forEach((vill) => {
+      dialogText = dialogText + `ID: [${vill.did}] - "${vill.name}"\n`;
+    });
 
-  let cap = prompt(dialogText, "");
-  if (!cap) {
-    return;
-  } else if (Villages.get(cap)) {
-    localStorage.setItem(CAPITAL, cap);
+    let cap = prompt(dialogText, "");
+    if (!cap || !Villages.get(cap)) {
+      requestCapital();
+    } else localStorage.setItem(CAPITAL, cap);
+  };
+
+  if (Dorf1Slots) {
+    const max = Dorf1Slots.find(
+      (slot) => slot.lvl === 10 && slot.status === "maxLevel"
+    );
+
+    if (max && C === CurrentVillage.did) {
+      alert(
+        "Seems like your capital changed. Please update your capital city."
+      );
+      requestCapital();
+    }
+    const above10 = Dorf1Slots.find(
+      (slot) => slot.lvl > 10 || (slot.lvl > 9 && slot.status !== "maxLevel")
+    );
+    if (above10 && C !== CurrentVillage.did) {
+      console.log("updating capital");
+      C = CurrentVillage.did;
+      localStorage.setItem(CAPITAL, C);
+    }
+    //TODO: check fields for above lvl 10 and maxLevel
   }
-}
 
-if (Dorf1Slots) {
-  const max = Dorf1Slots.find(
-    (slot) => slot.lvl === 10 && slot.status === "maxLevel"
-  );
+  if (!C) requestCapital();
 
-  if (max) {
-    console.log("not capital");
-  }
-  const above10 = Dorf1Slots.find(
-    (slot) => slot.lvl > 9 && slot.status !== "maxLevel"
-  );
-  if (above10) {
-    console.log("capital");
-  }
-  //TODO: check fields for above lvl 10 and maxLevel
-}
+  console.log(C);
+
+  return C === CurrentVillage.did;
+};
+
+const Capital = getCapital();

@@ -105,142 +105,146 @@ const initBOT = () => {
     return null;
   };
 
-  // const buildingProcess = () => {
-  //   if (jobs.length > 0) {
-  //     //ANYTHING BUILDING?
+  const buildingProcess = () => {
+    if (jobs.length > 0) {
+      //ANYTHING BUILDING?
 
-  //     if (nextJob !== null) {
-  //       if (enoughResources(nextJob)) {
-  //         if (
-  //           (nextJob.gid > 4 && Dorf1Slots) ||
-  //           (nextJob.gid < 5 && Dorf2Slots)
-  //         ) {
-  //           return setTimeout(() => {
-  //             window.location.href = `/dorf${nextJob.gid > 4 ? "2" : "1"}.php`;
-  //           }, Status.update("Wrong section. Navigating to correct section"));
-  //         }
+      if (nextJob !== null) {
+        if (enoughResources(nextJob)) {
+          if (
+            (nextJob.gid > 4 && Dorf1Slots) ||
+            (nextJob.gid < 5 && Dorf2Slots)
+          ) {
+            return setTimeout(() => {
+              window.location.href = `/dorf${nextJob.gid > 4 ? "2" : "1"}.php`;
+            }, Status.update("Wrong section. Navigating to correct section"));
+          }
 
-  //         localStorage.setItem(
-  //           BOT_IN_PROGRESS,
-  //           JSON.stringify({
-  //             cid: this.cID,
-  //             job: nextJob,
-  //             ress: this.current.ress,
-  //           })
-  //         );
+          localStorage.setItem(
+            BOT_IN_PROGRESS,
+            JSON.stringify({
+              cid: this.cID,
+              job: nextJob,
+              ress: this.current.ress,
+            })
+          );
 
-  //         return clickSite(nextJob.pos);
-  //       }
-  //     }
-  //   }
+          return clickSite(nextJob.pos);
+        }
+      }
+    }
 
-  //   if (location.pathname.includes("build.php")) {
-  //     if (inProgress !== null) {
-  //       const params = getParams(window.location.search);
-  //       let currentLvl = 0;
-  //       //check if job was done to this leve and if so, complete it
-  //       if (Object.keys(params).includes("gid")) {
-  //         currentLvl = Number(
-  //           document
-  //             .querySelector("div#build")
-  //             .classList[1].replace("level", "")
-  //         );
-  //       }
+    if (location.pathname.includes("build.php")) {
+      if (inProgress !== null) {
+        const params = getParams(window.location.search);
+        let currentLvl = 0;
+        //check if job was done to this leve and if so, complete it
+        if (Object.keys(params).includes("gid")) {
+          currentLvl = Number(
+            document
+              .querySelector("div#build")
+              .classList[1].replace("level", "")
+          );
+        }
 
-  //       if (currentLvl >= inProgress.job.to) {
-  //         return setTimeout(() => {
-  //           localStorage.setItem(BOT_IN_PROGRESS, "");
-  //           this.completeJob(inProgress.job);
-  //           window.location.href = "/dorf1.php";
-  //         }, 5000);
-  //       }
-  //       if (
-  //         inProgress.cid === CurrentVillage.did &&
-  //         inProgress.job.pos === Number(params.id)
-  //       ) {
-  //         let b = undefined;
+        if (currentLvl >= inProgress.job.to) {
+          return setTimeout(() => {
+            localStorage.setItem(BOT_IN_PROGRESS, "");
+            this.completeJob(inProgress.job);
+            window.location.href = "/dorf1.php";
+          }, 5000);
+        }
+        if (
+          inProgress.cid === CurrentVillage.did &&
+          inProgress.job.pos === Number(params.id)
+        ) {
+          let b = undefined;
 
-  //         if (inProgress.job.to === 1) {
-  //           if (inProgress.job.cat) {
-  //             let tab = document.querySelector(
-  //               `#content .contentNavi .scrollingContainer .content a[href*="category=${inProgress.job.cat}"]`
-  //             );
-  //             if (tab && !tab.classList.contains("active")) {
-  //               return setTimeout(
-  //                 () => {
-  //                   tab.click();
-  //                 },
-  //                 Status.update("Wrong tab detected. switching tab!"),
-  //                 true
-  //               );
-  //             }
-  //             b = document
-  //               .querySelector(`img.g${inProgress.job.gid}`)
-  //               .parentNode.parentNode.querySelector(".contractLink button");
-  //           }
-  //           //New res field
-  //           else {
-  //             b = document.querySelector(".section1 button.green.build");
-  //           }
-  //         } else {
-  //           //switching tab
-  //           let tab = document.querySelector(
-  //             "#content .contentNavi .scrollingContainer .content a"
-  //           );
+          if (inProgress.job.to === 1) {
+            if (inProgress.job.cat) {
+              let tab = document.querySelector(
+                `#content .contentNavi .scrollingContainer .content a[href*="category=${inProgress.job.cat}"]`
+              );
+              if (tab && !tab.classList.contains("active")) {
+                return setTimeout(
+                  () => {
+                    tab.click();
+                  },
+                  Status.update("Wrong tab detected. switching tab!"),
+                  true
+                );
+              }
+              b = document
+                .querySelector(`img.g${inProgress.job.gid}`)
+                .parentNode.parentNode.querySelector(".contractLink button");
+            }
+            //New res field
+            else {
+              b = document.querySelector(".section1 button.green.build");
+            }
+          } else {
+            //switching tab
+            let tab = document.querySelector(
+              "#content .contentNavi .scrollingContainer .content a"
+            );
 
-  //           if (tab && !tab.classList.contains("active")) {
-  //             return setTimeout(() => {
-  //               tab.click();
-  //             }, Status.update("Wrong tab detected. switching tab!"));
-  //           }
+            if (tab && !tab.classList.contains("active")) {
+              return setTimeout(() => {
+                tab.click();
+              }, Status.update("Wrong tab detected. switching tab!"));
+            }
 
-  //           b = document.querySelector(".section1 button.green.build");
-  //         }
-  //         return setTimeout(() => {
-  //           if (b) {
-  //             this.completeJob(inProgress.job);
-  //             localStorage.setItem(BOT_IN_PROGRESS, "");
-  //             b.click();
-  //           } else console.log("Error! Button for upgrade not found!");
-  //         }, Status.update("Perssing build Button"));
-  //       }
-  //     }
-  //   }
-  // };
+            b = document.querySelector(".section1 button.green.build");
+          }
+          return setTimeout(() => {
+            if (b) {
+              this.completeJob(inProgress.job);
+              localStorage.setItem(BOT_IN_PROGRESS, "");
+              b.click();
+            } else console.log("Error! Button for upgrade not found!");
+          }, Status.update("Perssing build Button"));
+        }
+      }
+    }
+  };
 
   const getNextJob = (did = CurrentVillage.did) => {
-    let nextJob = null;
-    let d1Info = ConstructionManager.available(1, did);
-    let d2Info = ConstructionManager.available(2, did);
-
+    let nextJob,
+      d1Info,
+      d2Info = null;
     if (JobsManager.next(did)) {
-      //One of the dorfs available to build
+      nextJob = JobsManager.next(did);
+      d1Info = ConstructionManager.available(1, did);
+      d2Info = ConstructionManager.available(2, did);
+
       if (Tribe.id === TRIBE_ROMAN) {
-        if (d1Info.available && d2Info.available) {
-          nextJob = JobsManager.next(did);
-          // if job cant be done because of ress or other reasons check for job in other dorf
-          if (!enoughResources(nextJob)) {
-            let gidD1 = nextJob.gid < 5;
-            if (gidD1)
-              nextJob = JobsManager.nextDorf2(did)
-                ? JobsManager.nextDorf2(did)
-                : null;
-            else
-              nextJob = JobsManager.nextDorf1(did)
-                ? JobsManager.nextDorf1(did)
-                : null;
+        if (nextJob.gid < 5) {
+          if (
+            !d1Info.available ||
+            (!enoughResources(nextJob) && JobsManager.nextDorf2(did))
+          ) {
+            let temp = JobsManager.nextDorf2(did);
+
+            //TODO: check which dorf will be available first?
+            if (enoughResources(temp) && d2Info.available) nextJob = temp;
           }
-        } else if (d1Info.available && JobsManager.nextDorf1(did)) {
-          nextJob = JobsManager.nextDorf1(did);
-        } else if (d2Info.available && JobsManager.nextDorf2(did)) {
-          JobsManager.nextDorf2(did);
+        } else {
+          if (
+            !d2Info.available ||
+            (!enoughResources(nextJob) && JobsManager.nextDorf1(did))
+          ) {
+            let temp = JobsManager.nextDorf1(did);
+            //TODO: check which dorf will be available first?
+            if (enoughResources(temp) && d1Info.available) nextJob = temp;
+          }
         }
-        //Available to build
-      } else if (d1Info.available && d2Info.available)
-        nextJob = JobsManager.next(did);
+      }
+
+      return { nextJob, d1Info, d2Info };
     }
-    return { nextJob, d1Info, d2Info };
+    return null;
   };
+  return { getNextJob, getAutoUpgradeJob };
 };
 
 const BOT = initBOT();

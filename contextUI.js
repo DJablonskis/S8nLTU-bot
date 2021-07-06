@@ -1,4 +1,12 @@
 const setUpContextUI = () => {
+  let upgradeWindow = {
+    coords: {
+      clientX: 0,
+      clientY: 0,
+    },
+    open: false,
+    slot: null,
+  };
   //UPGRADE WINDOW
   const createWindow = () => {
     const contextUI = document.createElement("div");
@@ -32,6 +40,14 @@ const setUpContextUI = () => {
     boxContent.classList.add("boxContent");
 
     const close = () => {
+      upgradeWindow = {
+        coords: {
+          clientX: 0,
+          clientY: 0,
+        },
+        open: false,
+        slot: null,
+      };
       contextUI.style.opacity = 0;
       setTimeout(() => {
         contextUI.style.top = `-1000px`;
@@ -51,14 +67,19 @@ const setUpContextUI = () => {
     confirm.className = "textButtonV1 green";
     confirm.innerText = "confirm";
 
+    const jobsDiv = boxContent.appendChild(document.createElement("div"));
+    jobsDiv.style.display = "block";
+    jobsDiv.style.marginBottom = "6px";
+
     const maxDiv = boxContent.appendChild(document.createElement("div"));
+    maxDiv.innerHTML = "<strong>Maximum level reached</strong>";
+    maxDiv.style.display = "none";
+    maxDiv.style.marginBottom = "6px";
     const inputDiv = boxContent.appendChild(document.createElement("div"));
     const inputDivLabel = inputDiv.appendChild(document.createElement("span"));
-    inputDivLabel.innerText = "Upgrade by: ";
+    inputDivLabel.innerText = "Upgrade to lvl: ";
     const input = inputDiv.appendChild(document.createElement("input"));
     input.type = "number";
-    input.min = 1;
-    input.value = 1;
 
     const planedDiv = boxContent.appendChild(document.createElement("div"));
 
@@ -69,12 +90,50 @@ const setUpContextUI = () => {
       boxHeader.innerText = `[${slot.pos}] ${BDB.name(slot.gid)}`;
       img.className = `buildingIllustration ${Tribe.name} g${slot.gid} big`;
 
-      input.disabled = slot.status === "maxLevel";
+      //TODO: find jobs with matching pos and gid
+      let value = slot.lvl + 1;
+      let max = slot.gid < 5 && Capital ? BDB.data(slot.gid).maxLvl : 10;
+
+      jobs = JobsManager.get().filter((job) => job.pos === slot.pos);
+      let jobTo = 0;
+
+      console.log(jobs);
+      if (jobs.length > 0) {
+        jobTo = jobs[jobs.length - 1].to;
+        jobsDiv.innerHTML = `<strong>Upgrading to lvl${jobTo}</strong>`;
+        value = jobTo + 1;
+      } else jobsDiv.innerHTML = "<strong>No planed upgrades</strong>";
+
+      inputDiv.style.display =
+        slot.status === "maxLevel" || jobTo >= max ? "none" : "block";
+      maxDiv.style.display =
+        slot.status === "maxLevel" || jobTo >= max ? "block" : "none";
+      confirm.disabled = slot.status === "maxLevel" || jobTo >= max;
+
       if (slot.status !== "maxLevel") {
         if (slot.upgrading) {
           //get how many levels upgrading
+          let count = ConstructionManager.get().all.filter((u) => {
+            console.log("u", u);
+            console.log("slot", slot);
+            return u.pos === slot.pos;
+          }).length;
+
+          console.log("count", count);
+          value = value + count;
         }
-        input.max = BDB.data(slot.gid).maxLvl - slot.lvl;
+        input.max = max;
+        input.min = value;
+        input.value = value;
+        confirm.onclick = () => {
+          JobsManager.add({
+            gid: slot.gid,
+            pos: slot.pos,
+            lvl: slot.lvl,
+            to: Number(input.value),
+          });
+          close();
+        };
       }
     };
 
@@ -87,12 +146,26 @@ const setUpContextUI = () => {
     document.body.appendChild(contextUI);
 
     const open = ({ clientY, clientX }, slot) => {
+      upgradeWindow = {
+        coords: {
+          clientX,
+          clientY,
+        },
+        open: true,
+        slot,
+      };
+
       setUp(slot);
       contextUI.style.display = "block";
       contextUI.style.opacity = 1;
       contextUI.style.top = `${clientY - 20}px`;
       contextUI.style.left = `${clientX + 10}px`;
     };
+    JobsManager.subscribe((jobs) => {
+      if (upgradeWindow.open) {
+        open(upgradeWindow.coords, upgradeWindow.slot);
+      }
+    });
 
     return {
       close,
