@@ -23,7 +23,7 @@ const initAutoUpgrades = () => {
     document.createElement("div")
   );
   autobuilderRow.innerHTML =
-    '<label for="cbAutoFields" style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoRes" style="margin-right: 2px;">Auto-upgrade resources</label>';
+    '<label for="cbAutoFields" style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoRes" style="margin-right: 2px;">Upgrade resources</label>';
 
   let cbAutoRes = document.getElementById("cbAutoRes");
   cbAutoRes.checked = cvSettings.upgradeRes;
@@ -41,7 +41,7 @@ const initAutoUpgrades = () => {
     document.createElement("div")
   );
   ignoreCropRow.innerHTML =
-    '<label for="cbIgnoreCrop"  style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoCrop" style="margin-right: 2px;">Auto-upgrade crop<label>';
+    '<label for="cbIgnoreCrop"  style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbAutoCrop" style="margin-right: 2px;">Upgrade crop<label>';
 
   let cbAutoCrop = document.getElementById("cbAutoCrop");
   cbAutoCrop.checked = cvSettings.upgradeCrop;

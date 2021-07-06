@@ -22,6 +22,7 @@ const initConstructionManager = () => {
 
           b.lvl = jsonQ[index].stufe;
           b.gid = jsonQ[index].gid;
+          b.pos = Number(jsonQ[index].aid);
           b.finish =
             Date.now() +
             Number(
@@ -85,11 +86,11 @@ const initConstructionManager = () => {
         "position: absolute;flex-direction: column; display: inline-flex; font-size: 18px; padding-left: 2px; line-height: 0.35;";
       nameRow.appendChild(flexBlock);
 
+      //TODO: might need check for null object
+
       let q1Node = flexBlock.appendChild(document.createElement("div"));
       q1Node.style.height = "8px";
-      let q1 = cmStorage[vil.did]
-        ? cmStorage[vil.did].filter((q) => q.gid < 5)
-        : [];
+      let q1 = cmStorage[vil.did].dorf1 ? cmStorage[vil.did].dorf1 : [];
       q1.forEach((b) => {
         let dot = q1Node.appendChild(document.createElement("span"));
         dot.innerText = "•";
@@ -108,9 +109,7 @@ const initConstructionManager = () => {
 
       let q2Node = flexBlock.appendChild(document.createElement("div"));
       q2Node.style.height = "8px";
-      let q2 = cmStorage[vil.did]
-        ? cmStorage[vil.did].filter((q) => q.gid > 4)
-        : [];
+      let q2 = cmStorage[vil.did].dorf2 ? cmStorage[vil.did].dorf2 : [];
       q2.forEach((b) => {
         let dot = q2Node.appendChild(document.createElement("span"));
         dot.innerText = "•";
@@ -168,7 +167,7 @@ const initConstructionManager = () => {
           prodRow.innerHTML = `<div style="font-size:10px">No info yet.</div>`;
         }
 
-        cmStorage[vil.did].forEach((x) => {
+        cmStorage[vil.did].all.forEach((x) => {
           const task = document.createElement("div");
           queRow.appendChild(task);
           let timer = checkTime(x.finish);
@@ -210,7 +209,6 @@ const initConstructionManager = () => {
       return { available: dorfAvailable, finish: dorfFinish };
     },
     showDots,
-    sorted,
   };
 };
 
