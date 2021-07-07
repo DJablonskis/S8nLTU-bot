@@ -8,11 +8,15 @@ const initConstructionManager = () => {
     if (window.location.pathname.includes("dorf")) {
       let buildingQ = document.querySelectorAll("div.buildingList > ul > li");
       if (buildingQ && buildingQ.length > 0) {
-        let buildString = document
-          .querySelector("#content > script")
-          .text.includes("var bld")
-          ? document.querySelector("#content > script").text
-          : document.querySelector("#content .village1Content > script").text;
+        let scripts = [
+          ...document.querySelectorAll(
+            `#center .village${Dorf1Slots ? "1" : "2"} script`
+          ),
+        ];
+
+        buildString = scripts.find((s) =>
+          s.textContent.startsWith("var bld")
+        ).text;
 
         let buildingLevels = buildString.split("=").pop();
         const jsonQ = JSON.parse(buildingLevels);
@@ -101,6 +105,7 @@ const initConstructionManager = () => {
         if (s > 0) {
           setTimeout(() => {
             dot.style.color = "#4cc500";
+            Notifications.send(b, vil);
           }, s);
         } else {
           dot.style.color = "#4cc500";
@@ -186,7 +191,6 @@ const initConstructionManager = () => {
               } align-items:center;">${timer.timer}</span>`;
 
               if (timer.completed) {
-                if (Notifications.on) Notifications.send(x, vil);
                 clearInterval(updater);
               }
             }, 1000);

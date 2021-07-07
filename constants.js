@@ -26,11 +26,11 @@ const POSITION_UP = "UP";
 const POSITION_DOWN = "DOWN";
 
 const TRIBE = "tribe";
-const TRIBE_ROMAN = "1"; //
-const TRIBE_TEUTON = "2"; //
-const TRIBE_GAUL = "3"; //
-const TRIBE_EGIPT = "6"; //
-const TRIBE_HUN = "7"; //
+const ROMAN = "1"; //
+const TEUTON = "2"; //
+const GAUL = "3"; //
+const EGIPT = "6"; //
+const HUN = "7"; //
 
 const WALLS = {
   tribe1: 31,

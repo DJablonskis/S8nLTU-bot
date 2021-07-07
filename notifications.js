@@ -1,5 +1,5 @@
 const initNotifications = () => {
-  const on = false;
+  let on = false;
   const setting = localStorage.getItem(BOT_NOTIFICATIONS);
   if (setting) on = setting === ON;
 
@@ -45,3 +45,5 @@ const initNotifications = () => {
 };
 
 const Notifications = initNotifications();
+
+//Notifications.send({gid:4, lvl: 12}, {name: "hello world"})
