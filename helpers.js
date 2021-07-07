@@ -284,7 +284,7 @@ const Dorf1Slots = window.location.pathname.includes("dorf1")
 const getBuildingSlots = () => {
   const buildings = [];
   let building_nodes = [
-    ...document.querySelectorAll("#village_map > div.buildingSlot"),
+    ...document.querySelectorAll(".village2 div.buildingSlot"),
   ];
   //REMOVING SECOND WALL
   building_nodes.pop();
@@ -340,7 +340,7 @@ const getTribe = () => {
     );
   } else if (Dorf2Slots) {
     index = getIndex(
-      [...document.querySelector("#village_map .buildingSlot").classList].pop()
+      [...document.querySelector(".village2 .buildingSlot").classList].pop()
     );
   }
 

@@ -1,6 +1,6 @@
 const initProductionManager = () => {
   const updateProduction = () => {
-    let prod = document.querySelector("#contentOuterContainer > script");
+    let prod = document.querySelector("#header script");
     if (prod) {
       let arr = prod.text.split("=").pop().trim().slice(0, -1).split("},");
       let production = JSON.parse("{" + arr[0].split(": {").pop() + "}");
@@ -59,12 +59,41 @@ const initProductionManager = () => {
     }
   };
 
+  const tillEnough = (gid, lvl, did) => {
+    let enough = 0;
+    const { cost } = BDB.stats(gid, lvl);
+    const { storage, production } = productionStorage[did];
+    if (!production) return enough;
+
+    let wait = 0;
+
+    cost.forEach((c, index) => {
+      let i = (index + 1).toString();
+      if (storage["l" + i] < c) {
+        let short = c - storage["l" + i];
+        let p = production["l" + i] / 3600.0 / 1000.0;
+        if (short > 0) {
+          let w = short / p;
+          wait = w > wait ? w : wait;
+        }
+      }
+    });
+    if (wait === 0) {
+      console.log("can be built");
+    } else {
+      enough = Date.now() + Math.ceil(wait);
+    }
+
+    return enough;
+  };
+
   return {
     all: productionStorage,
     get: (did = CurrentVillage.did) =>
       productionStorage[did] ? productionStorage[did] : null,
     current: currentStorage,
+    tillEnough: ({ gid, lvl }, did = CurrentVillage.did) =>
+      tillEnough(gid, lvl, did),
   };
 };
-
 const ProductionManager = initProductionManager();
