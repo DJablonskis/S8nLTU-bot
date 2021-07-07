@@ -167,24 +167,20 @@ function clickSite(id, caller = "") {
   setTimeout(() => {
     document
       .querySelector(
-        `${
-          id < 19 ? "#resourceFieldContainer" : "#village_map"
-        } a[href*="build.php?id=${id}"]`
+        `${id < 19 ? ".village1" : ".village2"} a[href*="build.php?id=${id}"]`
       )
       .click();
-  }, delay(`${caller}Clicking site ${id}`));
+  }, Status.update(`${caller}Clicking site ${id}`));
 }
 
 function clickGid(gid) {
   setTimeout(() => {
     document
       .querySelector(
-        `${
-          gid < 5 ? "#resourceFieldContainer" : "#village_map"
-        } a[href*="&gid=${gid}"]`
+        `${gid < 5 ? ".village1" : ".village2"} a[href*="&gid=${gid}"]`
       )
       .click();
-  }, delay("Clicking " + buildings[gid - 1].name));
+  }, Status.update("Clicking " + buildings[gid - 1].name));
 }
 
 const navigateTo = (n) =>

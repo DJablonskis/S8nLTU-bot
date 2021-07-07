@@ -7,16 +7,17 @@
 // @require settings.js
 // @require constants.js
 // @require buildings.js
-// @require helpers.js
-// @require capital.js
-// @require notifications.js
 
+// @require notifications.js
+// @require botPanel.js
+// @require statusUI.js
+// @require helpers.js
+
+// @require capital.js
 // @require productionManager.js
 // @require constructionManager.js
 // @require jobsManager.js
 
-// @require botPanel.js
-// @require statusUI.js
 // @require autoUpgradeUI.js
 // @require jobsList.js
 // @require newBuildUI.js
@@ -24,7 +25,7 @@
 
 // @require BOT.js
 
-// @version        0.11.0
+// @version        0.11.1
 // ==/UserScript==
 
 const start = () => {

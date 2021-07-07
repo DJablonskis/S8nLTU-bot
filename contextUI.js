@@ -97,7 +97,6 @@ const setUpContextUI = () => {
       jobs = JobsManager.get().filter((job) => job.pos === slot.pos);
       let jobTo = 0;
 
-      console.log(jobs);
       if (jobs.length > 0) {
         jobTo = jobs[jobs.length - 1].to;
         jobsDiv.innerHTML = `<strong>Upgrading to lvl${jobTo}</strong>`;
@@ -114,12 +113,9 @@ const setUpContextUI = () => {
         if (slot.upgrading) {
           //get how many levels upgrading
           let count = ConstructionManager.get().all.filter((u) => {
-            console.log("u", u);
-            console.log("slot", slot);
             return u.pos === slot.pos;
           }).length;
 
-          console.log("count", count);
           value = value + count;
         }
         input.max = max;
