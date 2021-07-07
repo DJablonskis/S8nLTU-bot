@@ -93,38 +93,52 @@ const initBOT = () => {
   };
 
   const startBuildingLoop = () => {
-    //has jobs?
+    //has jobs?getNextJob()
     if (JobsManager.next()) {
-      let next = getNextJob();
-      console.log(next);
-      //has next job
-      if (next) {
-        let gid = next.job.gid;
-        //correct window
+      let { job, queueWait, ressWait } = getNextJob();
+      let { gid, pos } = job;
+      //can job be done?
+      if (queueWait < Date.now() && ressWait < Date.now()) {
+        //correct dorf
         if ((gid > 4 && Dorf2Slots) || (gid < 5 && Dorf1Slots)) {
-          console.log("correct section");
-          //check fields classes if "good"
-          // localStorage.setItem(
-          //   BOT_IN_PROGRESS,
-          //   JSON.stringify({
-          //     cid: this.cID,
-          //     job: nextJob,
-          //     ress: this.current.ress,
-          //   })
-          // );
-          // return clickSite(nextJob.pos);
+          d1 = gid < 5;
+          let i = d1 ? pos - 1 : pos - 19;
+          let slots = d1 ? Dorf1Slots : Dorf2Slots;
+          let slot = slots[i];
+          //possible to upgrade
+          if (slot.status === "good") {
+            //check fields classes if "good"
+            //TODO: Check if levels including current builds are right here too
+            console.log("job to be saved: ", {
+              did: CurrentVillage.did,
+              job,
+              timestamp: Date.now() + lag,
+            });
+            // localStorage.setItem(
+            //   BOT_IN_PROGRESS,
+            //   JSON.stringify({
+            //     did: CurrentVillage.did,
+            //     job,
+            //     timestamp: Date.now() + lag,
+            //   })
+            // );
+            return clickSite(pos);
+          } else {
+            //something not right
+            console.log("job not possible at the moment");
+          }
         }
-        //wrong window switch to correct dorf
+        //wrong dorf switch to correct dorf if job can be done
         else {
-          console.log("incorrect section");
           return setTimeout(
             () => navigateTo(Dorf1Slots ? 2 : 1),
             Status.update("Wrong section. Navigating to correct section")
           );
         }
-      }
+      } // should keep track of these numbers to reduce switchingCities
     } else {
-    } //Check if auto updater is on and available
+      //Check if auto updater is on and available priority
+    }
 
     // if (location.pathname.includes("build.php")) {
     //   if (inProgress !== null) {
@@ -201,16 +215,21 @@ const initBOT = () => {
   };
 
   const getNextJob = (did = CurrentVillage.did) => {
-    let nextJob,
-      dInfo = null;
+    let nextJob = null;
+    let queueWait = 0;
+
     if (JobsManager.next(did)) {
       nextJob = JobsManager.next(did);
       let ressWait = ProductionManager.tillEnough(nextJob);
       let d1 = nextJob.gid < 5;
 
-      dInfo = ConstructionManager.available(d1 ? 1 : 2, did);
+      q1 = ConstructionManager.dorfStatus(1, did);
+      q2 = ConstructionManager.dorfStatus(2, did);
 
-      if (!dInfo.available || ressWait > Date.now()) {
+      if (!q1.empty || !q2.empty || ressWait > Date.now()) {
+        wq1 = q1.empty ? 0 : q1.finish;
+        wq2 = q2.empty ? 0 : q2.finish;
+        queueWait = wq1 > wq2 ? wq1 : wq2;
         if (
           Tribe.id === ROMAN &&
           ((d1 && JobsManager.nextDorf2(did)) ||
@@ -219,20 +238,35 @@ const initBOT = () => {
           let tempNextJob = d1
             ? JobsManager.nextDorf2(did)
             : JobsManager.nextDorf1(did);
-
           let tempRessWait = ProductionManager.tillEnough(tempNextJob);
-          let tempDInfo = ConstructionManager.available(d1 ? 2 : 1, did);
+          let tempDInfo = ConstructionManager.dorfStatus(d1 ? 2 : 1, did);
           if (tempRessWait <= Date.now() && tempDInfo.available) {
             nextJob = tempNextJob;
-            dInfo = tempDInfo;
             ressWait = tempRessWait;
+            queueWait = d1 ? wq2 : wq1;
           } else {
             //TODO: check which dorf will be available first?
+            if (d1) {
+              t1 = wq1 > ressWait ? ressWait : wq1;
+              t2 = wq2 > tempRessWait ? tempRessWait : wq2;
+              if (t1 > t2) {
+                nextJob = tempNextJob;
+                ressWait = tempRessWait;
+                queueWait = wq2;
+              }
+            } else {
+              t1 = wq1 > tempRessWait ? tempRessWait : wq1;
+              t2 = wq2 > ressWait ? ressWait : wq2;
+              if (t1 < t2) {
+                nextJob = tempNextJob;
+                ressWait = tempRessWait;
+                queueWait = wq1;
+              }
+            }
           }
         }
       }
-
-      return { job: nextJob, dInfo, ressWait };
+      return { job: nextJob, queueWait, ressWait };
     }
     return null;
   };
@@ -254,5 +288,4 @@ const initBOT = () => {
 };
 if (BOT_ON) {
   const BOT = initBOT();
-  console.log(BOT.getNextJob());
 }

@@ -204,11 +204,11 @@ const initConstructionManager = () => {
   return {
     all: cmStorage,
     get: (did = CurrentVillage.did) => cmStorage[did],
-    available: (dorf, did = CurrentVillage.did) => {
+    dorfStatus: (dorf, did = CurrentVillage.did) => {
       const d = cmStorage[did]["dorf" + dorf];
       let dorfFinish = d.length > 0 ? d[d.length - 1].finish : 0;
       let dorfAvailable = dorfFinish < Date.now();
-      return { available: dorfAvailable, finish: dorfFinish };
+      return { empty: dorfAvailable, finish: dorfFinish };
     },
     showDots,
   };
