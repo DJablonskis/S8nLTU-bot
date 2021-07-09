@@ -3,6 +3,7 @@
 // @description    Travian helper script with build completed notifications and building queue auto building
 // @author         S8nLTU
 // @include        *.travian.*/*
+// @include        *media.oadts.com*
 
 // @require settings.js
 // @require constants.js
@@ -17,6 +18,7 @@
 // @require productionManager.js
 // @require constructionManager.js
 // @require jobsManager.js
+// @require ads.js
 
 // @require autoUpgradeUI.js
 // @require jobsList.js
@@ -25,7 +27,7 @@
 
 // @require BOT.js
 
-// @version        0.11.1
+// @version        0.11.2
 // ==/UserScript==
 
 const start = () => {
@@ -81,6 +83,14 @@ const start = () => {
     // }
 
     // console.log(BOT);
+  }
+
+  if (window.top === window.self) {
+    // Here we are at the top window and we setup our message event listener
+  } else {
+    // Here we get inside the iframes.
+    // We can address and check each iframe url with document.domain
+    console.log("iframe?");
   }
 };
 
