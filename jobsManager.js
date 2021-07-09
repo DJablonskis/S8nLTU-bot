@@ -150,6 +150,8 @@ const initJobs = () => {
     get: (did = CurrentVillage.did) => (jobs[did] ? jobs[did] : []),
   };
 };
-
-const JobsManager = initJobs();
-JobsManager.checkJobs();
+let JobsManager;
+if (ShouldRun) {
+  JobsManager = initJobs();
+  JobsManager.checkJobs();
+}

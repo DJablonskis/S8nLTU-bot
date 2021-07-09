@@ -1,4 +1,4 @@
-const autoUpgradeSection = BotPanel.addSection("Auto Upgrade");
+let autoUpgradeSection, AutoUpgrade;
 
 const initAutoUpgrades = () => {
   let settings = JSON.parse(localStorage.getItem(SETTINGS_STORAGE));
@@ -58,4 +58,7 @@ const initAutoUpgrades = () => {
   };
 };
 
-const AutoUpgrade = initAutoUpgrades();
+if (ShouldRun) {
+  autoUpgradeSection = BotPanel.addSection("Auto Upgrade");
+  AutoUpgrade = initAutoUpgrades();
+}

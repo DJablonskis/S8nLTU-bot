@@ -43,7 +43,7 @@ const initNotifications = () => {
 
   return { toggle, send, on };
 };
-
-const Notifications = initNotifications();
+let Notifications;
+if (ShouldRun) Notifications = initNotifications();
 
 //Notifications.send({gid:4, lvl: 12}, {name: "hello world"})

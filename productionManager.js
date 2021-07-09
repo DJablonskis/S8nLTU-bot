@@ -96,4 +96,5 @@ const initProductionManager = () => {
       tillEnough(gid, lvl, did),
   };
 };
-const ProductionManager = initProductionManager();
+let ProductionManager;
+if (ShouldRun) ProductionManager = initProductionManager();

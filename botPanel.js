@@ -129,4 +129,6 @@ const createSidePanel = () => {
   return { panel, addSection };
 };
 
-const BotPanel = createSidePanel();
+let BotPanel;
+
+if (ShouldRun) BotPanel = createSidePanel();

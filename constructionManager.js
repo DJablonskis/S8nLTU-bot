@@ -213,6 +213,9 @@ const initConstructionManager = () => {
     showDots,
   };
 };
+let ConstructionManager;
 
-const ConstructionManager = initConstructionManager();
-ConstructionManager.showDots(ON_S);
+if (ShouldRun) {
+  ConstructionManager = initConstructionManager();
+  ConstructionManager.showDots(ON_S);
+}
