@@ -47,7 +47,8 @@ const getGoldBalance = () =>
       .replace(/\D/g, "")
   );
 
-const GoldBalance = getGoldBalance();
+let GoldBalance;
+if (ShouldRun) GoldBalance = getGoldBalance();
 
 const getCurrentVillage = () => {
   const active = document.querySelector(
@@ -81,8 +82,8 @@ const getCurrentVillage = () => {
     coords: { x, y },
   };
 };
-
-const CurrentVillage = getCurrentVillage();
+let CurrentVillage;
+if (ShouldRun) CurrentVillage = getCurrentVillage();
 
 //Returns int of warehouse capacity
 const getWarehouseCapacity = () =>
@@ -186,14 +187,6 @@ function clickGid(gid) {
 const navigateTo = (n) =>
   document.querySelector(`#navigation>a[accessKey="${n}"] `).click();
 
-const shouldRun = () => {
-  return (
-    document.querySelectorAll(
-      "div#sidebarBoxVillagelist > div.content > ul > li"
-    ).length > 0
-  );
-};
-
 const getAllVillages = () => {
   const citiesO = {};
   const citiesA = [];
@@ -239,8 +232,8 @@ const getAllVillages = () => {
     get: (id) => citiesO[id],
   };
 };
-
-const Villages = getAllVillages();
+let Villages;
+if (ShouldRun) Villages = getAllVillages();
 
 const getResourceFields = () => {
   const resourceFields = [];
@@ -342,5 +335,5 @@ const getTribe = () => {
 
   return index ? { id: id[index], name: name[index], wall: wall[index] } : null;
 };
-
-const Tribe = getTribe();
+let Tribe;
+if (ShouldRun) Tribe = getTribe();

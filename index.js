@@ -5,6 +5,10 @@
 // @include        *.travian.*/*
 // @include        *media.oadts.com*
 
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_addValueChangeListener
+
 // @require settings.js
 // @require constants.js
 // @require buildings.js
@@ -31,7 +35,7 @@
 // ==/UserScript==
 
 const start = () => {
-  if (shouldRun()) {
+  if (ShouldRun) {
     //FARMLIST REGION
     function initFarmingRules(b) {
       let rules = JSON.parse(localStorage.getItem(FARM_RULES));
@@ -83,14 +87,6 @@ const start = () => {
     // }
 
     // console.log(BOT);
-  }
-
-  if (window.top === window.self) {
-    // Here we are at the top window and we setup our message event listener
-  } else {
-    // Here we get inside the iframes.
-    // We can address and check each iframe url with document.domain
-    console.log("iframe?");
   }
 };
 

@@ -1,3 +1,5 @@
+let statusSection, Status;
+
 const statusSection = BotPanel.addSection(`v${VER} (${BOT_ON ? "On" : "Off"})`);
 
 const setUpStatusBar = () => {
@@ -39,4 +41,7 @@ const setUpStatusBar = () => {
 
   return { update: updateStatus };
 };
-const Status = setUpStatusBar();
+if (ShouldRun) {
+  statusSection = BotPanel.addSection(`v${VER} (${BOT_ON ? "On" : "Off"})`);
+  Status = setUpStatusBar();
+}

@@ -5,6 +5,8 @@ const initBOT = () => {
   const { upgradeCrop, upgradeRes } = AutoUpgrade.get();
   const { watchAds, prioritisePlanned } = JobsManager.settings;
 
+  const label = "trav";
+
   const switchCity = () => {
     console.log("switch city");
     // if (Dorf1Slots) {
@@ -164,11 +166,13 @@ const initBOT = () => {
 
             if (b2 && watchAds) {
               b2.click();
+              //sending message to other script to start video in 5 seconds
               setTimeout(() => {
-                let playButton = document.querySelector(".video-js button");
-                if (playButton) playButton.click();
-                else console.log("could not find play button");
+                console.log("sent");
+                GM_setValue(label, Math.random().toString());
               }, 5000);
+            } else {
+              b ? b.click() : console.log("could not find build button");
             }
             //TODO: Job should be auto cleared after reload if level exists already?? check if working
             // JobsManager.complete(inProgress.job);
@@ -326,7 +330,7 @@ const initBOT = () => {
   else startBuildingLoop();
 };
 
-if (BOT_ON) {
+if (BOT_ON && ShouldRun) {
   console.log("bot on");
   initBOT();
 }

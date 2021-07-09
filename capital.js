@@ -43,5 +43,5 @@ const getCapital = () => {
 
   return C === CurrentVillage.did;
 };
-
-const Capital = getCapital();
+let Capital;
+if (ShouldRun) Capital = getCapital();

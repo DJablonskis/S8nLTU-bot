@@ -69,5 +69,4 @@ const initJobsList = () => {
   };
   JobsManager.subscribe(updateJobs);
 };
-
-initJobsList();
+if (ShouldRun) initJobsList();
