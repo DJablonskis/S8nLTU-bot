@@ -10,6 +10,7 @@
 // @grant        GM_addValueChangeListener
 
 // @require settings.js
+// @require login.js
 // @require constants.js
 // @require buildings.js
 
@@ -31,7 +32,7 @@
 
 // @require BOT.js
 
-// @version        0.11.3
+// @version        0.11.4
 // ==/UserScript==
 
 const start = () => {

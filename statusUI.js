@@ -1,7 +1,5 @@
 let statusSection, Status;
 
-const statusSection = BotPanel.addSection(`v${VER} (${BOT_ON ? "On" : "Off"})`);
-
 const setUpStatusBar = () => {
   const status = statusSection.content.appendChild(
     document.createElement("div")

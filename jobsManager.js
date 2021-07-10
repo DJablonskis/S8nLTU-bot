@@ -138,7 +138,7 @@ const initJobs = () => {
   return {
     updateSettings,
     complete,
-    settings: cvSettings,
+    settings: (did = CurrentVillage.did) => settings[did],
     remove,
     add,
     jobs,

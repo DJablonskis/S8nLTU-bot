@@ -78,12 +78,7 @@ const initProductionManager = () => {
         }
       }
     });
-    if (wait === 0) {
-      console.log("can be built");
-    } else {
-      enough = Date.now() + Math.ceil(wait);
-    }
-
+    if (!wait === 0) enough = Date.now() + Math.ceil(wait);
     return enough;
   };
 
