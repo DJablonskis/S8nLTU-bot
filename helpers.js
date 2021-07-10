@@ -164,14 +164,14 @@ const typeNames = [
   { name: "Crop", icon: icon(3) },
 ];
 
-function clickSite(id, caller = "") {
+function clickSite(id, message) {
   setTimeout(() => {
     document
       .querySelector(
         `${id < 19 ? ".village1" : ".village2"} a[href*="build.php?id=${id}"]`
       )
       .click();
-  }, Status.update(`${caller}Clicking site ${id}`));
+  }, Status.update(message));
 }
 
 function clickGid(gid) {

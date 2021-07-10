@@ -12,11 +12,11 @@ const initJobsList = () => {
     '<label for="cbWatchAds" style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbWatchAds" style="margin-right: 2px;">Watch ads</label>';
 
   let cbAds = document.getElementById("cbWatchAds");
-  cbAds.checked = JobsManager.settings.watchAds;
+  cbAds.checked = JobsManager.settings().watchAds;
   cbAds.addEventListener("change", (e) => {
-    if (e.target.checked !== JobsManager.settings.watchAds) {
+    if (e.target.checked !== JobsManager.settings().watchAds) {
       JobsManager.updateSettings({
-        ...JobsManager.settings,
+        ...JobsManager.settings(),
         watchAds: e.target.checked,
       });
     }
@@ -28,11 +28,11 @@ const initJobsList = () => {
     '<label for="cbPrioritise" style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbPrioritise" style="margin-right: 2px;">Prioritise planned</label>';
 
   let cbPrioritise = document.getElementById("cbPrioritise");
-  cbPrioritise.checked = JobsManager.settings.prioritisePlanned;
+  cbPrioritise.checked = JobsManager.settings().prioritisePlanned;
   cbPrioritise.addEventListener("change", (e) => {
-    if (e.target.checked !== JobsManager.settings.prioritisePlanned) {
+    if (e.target.checked !== JobsManager.settings().prioritisePlanned) {
       JobsManager.updateSettings({
-        ...JobsManager.settings,
+        ...JobsManager.settings(),
         prioritisePlanned: e.target.checked,
       });
     }

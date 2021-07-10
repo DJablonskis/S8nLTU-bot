@@ -3,12 +3,22 @@ const initBOT = () => {
   let prog = localStorage.getItem(BOT_IN_PROGRESS);
   const inProgress = !prog ? null : JSON.parse(prog);
   const { upgradeCrop, upgradeRes } = AutoUpgrade.get();
-  const { watchAds, prioritisePlanned } = JobsManager.settings;
+  const { watchAds, prioritisePlanned } = JobsManager.settings();
 
   const label = "trav";
 
   const switchCity = () => {
     console.log("switch city");
+    let planned = [];
+    console.log("checking for jobs");
+    Villages.all.forEach((vil) => {
+      p = getNextJob(vil.did);
+      p = p ? p : { job: null, ressWait: 0, queueWait: 0 };
+      p.autoUp = AutoUpgrade.get(vil.did);
+      p.prioritise = JobsManager.settings(vil.did);
+      planned.push(p);
+      console.log(p);
+    });
     // if (Dorf1Slots) {
     //   let filtered = Villages.all.filter((v) => {
     //     let shouldCheck = false;
@@ -161,16 +171,15 @@ const initBOT = () => {
         }
         if (b || b2) {
           return setTimeout(() => {
-            console.log("to :", inProgress.job.to);
-            console.log("current: ", currentLvl);
-
             if (b2 && watchAds) {
               b2.click();
               //sending message to other script to start video in 5 seconds
               setTimeout(() => {
-                console.log("sent");
-                GM_setValue(label, Math.random().toString());
-              }, 5000);
+                GM_setValue(
+                  "trav_ads_main",
+                  " pressed on build with add " + Math.random
+                );
+              }, 3000);
             } else {
               b ? b.click() : console.log("could not find build button");
             }
@@ -199,9 +208,12 @@ const initBOT = () => {
               timestamp: Date.now() + lag,
             })
           );
-          setTimeout(() => {
-            clickSite(job.pos);
-          }, Status.update(`Auto upgrade: upgrading ${BDB.data(job.gid).name} to level ${job.to}`));
+          clickSite(
+            job.pos,
+            `Auto upgrade: upgrading ${BDB.data(job.gid).name} to level ${
+              job.to
+            }`
+          );
         } else switchCity();
       } else {
         setTimeout(() => {
@@ -245,7 +257,9 @@ const initBOT = () => {
                   timestamp: Date.now() + lag,
                 })
               );
-              return clickSite(pos);
+              return clickSite(
+                `Navigating: Upgrading ${BDB.data(gid).name} to level ${job.to}`
+              );
             } else {
               //something not right
               console.log("job not possible at the moment");
@@ -264,7 +278,7 @@ const initBOT = () => {
           // TODO: Not enough resources for job keep track of times here for switchingCities
           switchCity();
         }
-      } // TODO: Queue busy keep track of times here for switchingCities
+      } else switchCity(); // TODO: Queue busy keep track of times here for switchingCities
     } else startAutoUpgradeJob();
   };
 
