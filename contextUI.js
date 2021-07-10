@@ -92,7 +92,7 @@ const setUpContextUI = () => {
 
       //TODO: find jobs with matching pos and gid
       let value = slot.lvl + 1;
-      let max = slot.gid < 5 && Capital ? BDB.data(slot.gid).maxLvl : 10;
+      let max = slot.gid < 5 && !Capital ? 10 : BDB.data(slot.gid).maxLvl;
 
       jobs = JobsManager.get().filter((job) => job.pos === slot.pos);
       let jobTo = 0;

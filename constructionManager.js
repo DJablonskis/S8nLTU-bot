@@ -4,6 +4,7 @@ const initConstructionManager = () => {
       dorf1: [],
       dorf2: [],
       all: [],
+      timestamp: Date.now(),
     };
     if (window.location.pathname.includes("dorf")) {
       let buildingQ = document.querySelectorAll("div.buildingList > ul > li");
@@ -48,6 +49,17 @@ const initConstructionManager = () => {
   if (!cmStorage) {
     cmStorage = {};
   }
+
+  const get = (did = CurrentVillage.did) => {
+    return cmStorage[did]
+      ? cmStorage[did]
+      : {
+          dorf1: [],
+          dorf2: [],
+          all: [],
+          timestamp: 0,
+        };
+  };
   if (window.location.pathname.includes("dorf")) {
     let updated = updateBuildingQueue();
     if (updated) {
@@ -90,12 +102,9 @@ const initConstructionManager = () => {
         "position: absolute;flex-direction: column; display: inline-flex; font-size: 18px; padding-left: 2px; line-height: 0.35;";
       nameRow.appendChild(flexBlock);
 
-      //TODO: might need check for null object
-
       let q1Node = flexBlock.appendChild(document.createElement("div"));
       q1Node.style.height = "8px";
-      let q1 = cmStorage[vil.did].dorf1 ? cmStorage[vil.did].dorf1 : [];
-      q1.forEach((b) => {
+      get(vil.did).dorf1.forEach((b) => {
         let dot = q1Node.appendChild(document.createElement("span"));
         dot.innerText = "•";
         dot.style.cssText =
@@ -114,8 +123,7 @@ const initConstructionManager = () => {
 
       let q2Node = flexBlock.appendChild(document.createElement("div"));
       q2Node.style.height = "8px";
-      let q2 = cmStorage[vil.did].dorf2 ? cmStorage[vil.did].dorf2 : [];
-      q2.forEach((b) => {
+      get(vil.did).dorf2.forEach((b) => {
         let dot = q2Node.appendChild(document.createElement("span"));
         dot.innerText = "•";
         dot.style.cssText =
@@ -172,7 +180,7 @@ const initConstructionManager = () => {
           prodRow.innerHTML = `<div style="font-size:10px">No info yet.</div>`;
         }
 
-        cmStorage[vil.did].all.forEach((x) => {
+        get(vil.did).all.forEach((x) => {
           const task = document.createElement("div");
           queRow.appendChild(task);
           let timer = checkTime(x.finish);
@@ -203,9 +211,9 @@ const initConstructionManager = () => {
   };
   return {
     all: cmStorage,
-    get: (did = CurrentVillage.did) => cmStorage[did],
+    get,
     dorfStatus: (dorf, did = CurrentVillage.did) => {
-      const d = cmStorage[did]["dorf" + dorf];
+      const d = get(did)["dorf" + dorf];
       let dorfFinish = d.length > 0 ? d[d.length - 1].finish : 0;
       let dorfAvailable = dorfFinish < Date.now();
       return { empty: dorfAvailable, finish: dorfFinish };

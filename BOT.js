@@ -8,81 +8,90 @@ const initBOT = () => {
   const label = "trav";
 
   const switchCity = () => {
-    console.log("switch city");
+    console.log("switching city");
     let planned = [];
-    console.log("checking for jobs");
     Villages.all.forEach((vil) => {
-      p = getNextJob(vil.did);
-      p = p ? p : { job: null, ressWait: 0, queueWait: 0 };
-      p.autoUp = AutoUpgrade.get(vil.did);
-      p.prioritise = JobsManager.settings(vil.did);
+      console.log(`[######   ${vil.name}    #####]`);
+      let time = Date.now();
+
+      let { job, queueWait, ressWait, wq1 } = getNextJob(vil.did);
+      let { upgradeCrop, upgradeRes } = AutoUpgrade.get(vil.did);
+      let { prioritisePlanned } = JobsManager.settings(vil.did);
+      let lastCheck = ConstructionManager.get(vil.did).timestamp;
+
+      p = {
+        did: vil.did,
+        nextCheck: lastCheck + MAX_WAIT,
+      };
+
+      let nextCheckMin = lastCheck + MIN_WAIT;
+      let nextCheckMax = lastCheck + MAX_WAIT;
+      let wmax = queueWait > ressWait ? queueWait : ressWait;
+      let auto = upgradeCrop || upgradeRes;
+      let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
+
+      const getNextAutoTime = () => {
+        if (wq1 > time) {
+          console.log(
+            `village ${vil.name} has busy queue and auto build enabled.`
+          );
+          return wq1 > nextCheckMax ? nextCheckMax : wq1;
+        } else {
+          console.log(
+            `village ${vil.name} has empty queue and auto build enabled.`
+          );
+          return nextCheckMin < time ? time : nextCheckMin;
+        }
+      };
+
+      if (job) {
+        //can be built?
+        if (wmax < time) {
+          console.log(`village ${vil.name} has planed job can be built now`);
+          p.nextCheck = time;
+        } else if (prioritisePlanned) {
+          console.log(
+            `village ${vil.name} has planed priority job that cant be built now`
+          );
+          p.nextCheck = nextMax;
+        } else if (auto) {
+          //TODO: need to store field values for villages for more acurate calculations
+          p.nextCheck = getNextAutoTime();
+        }
+      } else if (nextCheckMax < time) {
+        // Maximum time of not checking passed. needs to be checked!
+        console.log(`village ${vil.name} was not checked for too long`);
+        p.nextCheck = time;
+      } else if (auto) {
+        // Maximum time of not checking passed. needs to be checked!
+        p.nextCheck = getNextAutoTime();
+      }
       planned.push(p);
-      console.log(p);
+      console.log(
+        "minutes till next check: ",
+        (p.nextCheck - Date.now()) / 1000 / 60
+      );
+      console.log("======================");
     });
-    // if (Dorf1Slots) {
-    //   let filtered = Villages.all.filter((v) => {
-    //     let shouldCheck = false;
-    //     let jobs = JobsManager.get(v.did);
+    console.log("scan finished", planned);
+    planned.sort((a, b) => a.nextCheck - b.nextCheck);
+    console.log("vill sorted", planned);
 
-    //     if (jobs && jobs.length > 0) {
-    //       let q1 = jobs.filter((q) => q.gid < 5);
-    //       let q2 = jobs.filter((q) => q.gid > 4);
-
-    //       const p = v.queue.filter((b) => b.finish > Date.now());
-    //       const p1 = p.filter((_p) => _p.gid < 5);
-    //       const p2 = p.filter((_p) => _p.gid > 4);
-    //       if (v.timestamp + MIN_WAIT < Date.now()) {
-    //         if (Tribe.id === TRIBE_ROMAN) {
-    //           shouldCheck =
-    //             (q1.length > 0 && p1.length === 0) ||
-    //             (q2.length > 0 && p2.length === 0);
-    //         } else {
-    //           shouldCheck = p.length === 0;
-    //         }
-
-    //         return shouldCheck;
-    //       }
-    //     }
-
-    //     if (!shouldCheck) {
-    //       shouldCheck =
-    //         (AutoUpgrade.get().upgradeCrop || AutoUpgrade.get().upgradeRes) &&
-    //         v.timestamp + MIN_WAIT < Date.now();
-    //       if (shouldCheck) {
-    //         console.log(`added ${v.name} because of auto rules`);
-    //       }
-    //     }
-
-    //     if (!shouldCheck) {
-    //       shouldCheck = v.timestamp + MAX_WAIT < Date.now();
-    //       if (shouldCheck) {
-    //         console.log(`added ${v.name} because of no update in long time`);
-    //       }
-    //     }
-
-    //     return shouldCheck;
-    //   });
-
-    //   if (filtered.length > 0) {
-    //     filtered = shuffleArray(filtered);
-    //     //switch to some city
-    //     setTimeout(() => {
-    //       document
-    //         .querySelector(
-    //           "#sidebarBoxVillagelist li a[href*='" + filtered[0].did + "']"
-    //         )
-    //         .click();
-    //     }, Status.update(`Switching to ${filtered[0].name}`, true, 0));
-    //   } else {
-    //     setTimeout(() => {
-    //       navigateTo(1);
-    //     }, Status.update("Cooldown, waiting minimal time.", false, MIN_WAIT));
-    //   }
-    // } else {
-    //   setTimeout(() => {
-    //     navigateTo(1);
-    //   }, Status.update("Switching to resources view"));
-    // }
+    if (planned[0].did === CurrentVillage.did) {
+      setTimeout(
+        startBuildingLoop,
+        Status.update("waiting for next job", true, planned[0].nextCheck - time)
+      );
+    } else {
+      let delay = Status.update(
+        `Switching to ${Villages.get(planned[0].did).name}`,
+        true,
+        planned[0].nextCheck - time
+      );
+      setTimeout(() => {
+        Villages.get(planned[0].did).node.click();
+      }, delay);
+    }
   };
 
   const getAutoUpgradeJob = () => {
@@ -93,7 +102,6 @@ const initBOT = () => {
     if (upgradable.length > 0) {
       upgradable = upgradable.sort((a, b) => a.lvl - b.lvl);
       let job = upgradable[0];
-      console.log("auto upgrade job found");
       return {
         gid: job.gid,
         pos: job.pos,
@@ -101,7 +109,6 @@ const initBOT = () => {
         to: job.lvl + 1,
       };
     }
-    console.log(" no auto upgrade job found");
     return null;
   };
 
@@ -194,7 +201,6 @@ const initBOT = () => {
   };
 
   const startAutoUpgradeJob = () => {
-    console.log("start auto upgrade");
     if (upgradeCrop || upgradeRes) {
       //Check if auto updater is on and available priority
       if (Dorf1Slots) {
@@ -220,7 +226,7 @@ const initBOT = () => {
           navigateTo(1);
         }, Status.update("Auto upgrades: switching to resources view"));
       }
-    }
+    } else switchCity();
   };
 
   const startBuildingLoop = () => {
@@ -244,11 +250,6 @@ const initBOT = () => {
             if (slot.status === "good") {
               //check fields classes if "good"
               //TODO: Check if levels including current builds are right here too
-              console.log("job to be saved: ", {
-                did: CurrentVillage.did,
-                job,
-                timestamp: Date.now() + lag,
-              });
               localStorage.setItem(
                 BOT_IN_PROGRESS,
                 JSON.stringify({
@@ -258,11 +259,13 @@ const initBOT = () => {
                 })
               );
               return clickSite(
+                job.pos,
                 `Navigating: Upgrading ${BDB.data(gid).name} to level ${job.to}`
               );
             } else {
               //something not right
               console.log("job not possible at the moment");
+              switchCity();
             }
           } else {
             //wrong dorf switch to correct dorf if job can be done
@@ -286,18 +289,19 @@ const initBOT = () => {
     let nextJob = null;
     let queueWait = 0;
 
+    q1 = ConstructionManager.dorfStatus(1, did);
+    q2 = ConstructionManager.dorfStatus(2, did);
+
+    wq1 = q1.empty ? 0 : q1.finish;
+    wq2 = q2.empty ? 0 : q2.finish;
+    queueWait = wq1 > wq2 ? wq1 : wq2;
+
     if (JobsManager.next(did)) {
       nextJob = JobsManager.next(did);
       let ressWait = ProductionManager.tillEnough(nextJob);
+
       let d1 = nextJob.gid < 5;
-
-      q1 = ConstructionManager.dorfStatus(1, did);
-      q2 = ConstructionManager.dorfStatus(2, did);
-
       if (!q1.empty || !q2.empty || ressWait > Date.now()) {
-        wq1 = q1.empty ? 0 : q1.finish;
-        wq2 = q2.empty ? 0 : q2.finish;
-        queueWait = wq1 > wq2 ? wq1 : wq2;
         if (
           Tribe.id === ROMAN &&
           ((d1 && JobsManager.nextDorf2(did)) ||
@@ -334,9 +338,9 @@ const initBOT = () => {
           }
         }
       }
-      return { job: nextJob, queueWait, ressWait };
+      return { job: nextJob, queueWait, wq1, wq2, ressWait };
     }
-    return null;
+    return { job: nextJob, queueWait, ressWait: 0, wq1, wq2 };
   };
 
   //Check if anything is in progres... if so, continue building or start new loop

@@ -32,7 +32,7 @@
 
 // @require BOT.js
 
-// @version        0.11.4
+// @version        0.12.0
 // ==/UserScript==
 
 const start = () => {
@@ -69,25 +69,6 @@ const start = () => {
         console.log(farmLists);
       }
     }
-
-    // BOT.displayJobs();
-
-    //setUpNPC(BOT, botPanel);
-    //should be reacurring event if npc rules enabled
-    // BOT.checkNPC();
-
-    // let prog = localStorage.getItem(BOT_IN_PROGRESS)
-    // const inProgress = prog === "" || prog === null ? null : JSON.parse(prog)
-
-    // if (ON) {
-    //   console.log("Starting bot");
-    //   BOT.checkNPC();
-    //   if (!BOT.busy) {
-    //     BOT.setNextJob();
-    //   }
-    // }
-
-    // console.log(BOT);
   }
 };
 
