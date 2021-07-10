@@ -7,7 +7,7 @@ const initJobs = () => {
   settings = settings ? settings : {};
   let cvSettings = settings[CurrentVillage.did]
     ? settings[CurrentVillage.did]
-    : { prioritisePlanned: true, watchAds: true };
+    : { prioritisePlanned: false, watchAds: false };
 
   const subscribers = [];
   const subscribe = (funk) => {
@@ -138,7 +138,10 @@ const initJobs = () => {
   return {
     updateSettings,
     complete,
-    settings: (did = CurrentVillage.did) => settings[did],
+    settings: (did = CurrentVillage.did) =>
+      settings[did]
+        ? settings[did]
+        : { prioritisePlanned: false, watchAds: false },
     remove,
     add,
     jobs,

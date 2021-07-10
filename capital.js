@@ -2,7 +2,6 @@ const getCapital = () => {
   let C = localStorage.getItem(CAPITAL);
 
   const requestCapital = () => {
-    console.log("capital not set");
     let dialogText =
       "Confirm ID number of your capital (only needs to be done once):\n";
     Villages.all.forEach((vill) => {
@@ -30,7 +29,6 @@ const getCapital = () => {
       (slot) => slot.lvl > 10 || (slot.lvl > 9 && slot.status !== "maxLevel")
     );
     if (above10 && C !== CurrentVillage.did) {
-      console.log("updating capital");
       C = CurrentVillage.did;
       localStorage.setItem(CAPITAL, C);
     }
@@ -38,8 +36,6 @@ const getCapital = () => {
   }
 
   if (!C) requestCapital();
-
-  console.log(C);
 
   return C === CurrentVillage.did;
 };

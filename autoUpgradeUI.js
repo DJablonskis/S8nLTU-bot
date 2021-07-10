@@ -3,9 +3,11 @@ let autoUpgradeSection, AutoUpgrade;
 const initAutoUpgrades = () => {
   let settings = JSON.parse(localStorage.getItem(SETTINGS_STORAGE));
   settings = settings ? settings : {};
-  let cvSettings = settings[CurrentVillage.did]
-    ? settings[CurrentVillage.did]
-    : { upgradeRes: false, upgradeCrop: false };
+
+  const get = (did = CurrentVillage.did) =>
+    settings[did] ? settings[did] : { upgradeRes: false, upgradeCrop: false };
+
+  let cvSettings = get();
 
   const save = () => {
     settings[CurrentVillage.did] = cvSettings;
@@ -34,8 +36,6 @@ const initAutoUpgrades = () => {
       save();
     }
   });
-
-  const get = (did = CurrentVillage.did) => settings[did];
 
   const ignoreCropRow = builderSettings.appendChild(
     document.createElement("div")
