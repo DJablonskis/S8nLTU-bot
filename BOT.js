@@ -76,20 +76,22 @@ const initBOT = () => {
     console.log("scan finished", planned);
     planned.sort((a, b) => a.nextCheck - b.nextCheck);
     console.log("vill sorted", planned);
+    console.log("nxt ", planned[0]);
 
     if (planned[0].did === CurrentVillage.did) {
-      setTimeout(
-        startBuildingLoop,
-        Status.update("waiting for next job", true, planned[0].nextCheck - time)
-      );
+      setTimeout(() => {
+        console.log(Villages.get(planned[0].did).node);
+        startBuildingLoop();
+      }, Status.update("waiting for next job", false, planned[0].nextCheck - Date.now().valueOf()));
     } else {
       let delay = Status.update(
         `Switching to ${Villages.get(planned[0].did).name}`,
-        true,
-        planned[0].nextCheck - time
+        false,
+        planned[0].nextCheck - Date.now().valueOf()
       );
       setTimeout(() => {
-        Villages.get(planned[0].did).node.click();
+        console.log(Villages.get(planned[0].did).node);
+        Villages.get(planned[0].did).node.querySelector("a").click();
       }, delay);
     }
   };
