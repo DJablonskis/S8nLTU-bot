@@ -39,7 +39,14 @@ const initJobsList = () => {
   });
 
   const details = content.appendChild(document.createElement("details"));
+  details.open = JobsManager.settings().expanded;
   const summary = details.appendChild(document.createElement("summary"));
+  summary.onclick = () => {
+    JobsManager.updateSettings({
+      ...JobsManager.settings(),
+      expanded: !details.open,
+    });
+  };
   const detailsInner = details.appendChild(document.createElement("div"));
 
   const updateJobs = (jobs) => {
@@ -66,6 +73,7 @@ const initJobsList = () => {
         }`;
       });
     }
+    summary.onclick;
   };
   JobsManager.subscribe(updateJobs);
 };

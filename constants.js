@@ -1,4 +1,4 @@
-const VER = "0.12.1";
+const VER = "0.12.2";
 const APP_NAME = "S8nLTU BOT";
 
 const CITIES_STORAGE = "storedCities";
@@ -46,6 +46,5 @@ const Q2 = "q2";
 const BOT_ON = localStorage.getItem(BOT_POWER) === ON;
 
 const ON_S = localStorage.getItem(BOT_STATS) === ON;
-
 const titleStyle =
   'letter-spacing: .1em; font-family: "Noto Serif"; font-weight: bold; color: #5e463a; margin-bottom: 5px; margin-top: 5px;';
