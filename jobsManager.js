@@ -3,11 +3,17 @@ const initJobs = () => {
   jobs = jobs ? jobs : {};
   cvJobs = jobs[CurrentVillage.did] ? jobs[CurrentVillage.did] : [];
 
+  let defaultSettings = {
+    prioritisePlanned: false,
+    watchAds: false,
+    expanded: true,
+  };
+
   let settings = JSON.parse(localStorage.getItem(JOBS_SETTINGS_STORAGE));
   settings = settings ? settings : {};
   let cvSettings = settings[CurrentVillage.did]
     ? settings[CurrentVillage.did]
-    : { prioritisePlanned: false, watchAds: false };
+    : defaultSettings;
 
   const subscribers = [];
   const subscribe = (funk) => {
@@ -139,9 +145,7 @@ const initJobs = () => {
     updateSettings,
     complete,
     settings: (did = CurrentVillage.did) =>
-      settings[did]
-        ? settings[did]
-        : { prioritisePlanned: false, watchAds: false },
+      settings[did] ? settings[did] : defaultSettings,
     remove,
     add,
     jobs,

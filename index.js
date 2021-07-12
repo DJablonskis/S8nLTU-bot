@@ -10,7 +10,9 @@
 // @grant        GM_addValueChangeListener
 
 // @require https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js
+// @require https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js
 // @require firebase.js
+
 // @require settings.js
 // @require login.js
 // @require constants.js
@@ -34,7 +36,7 @@
 
 // @require BOT.js
 
-// @version        0.12.1
+// @version        0.12.2
 // ==/UserScript==
 
 const start = () => {
