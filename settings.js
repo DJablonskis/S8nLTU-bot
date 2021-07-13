@@ -28,7 +28,7 @@ const initBotPower = () => {
     subscribers.forEach((f) => f(BOT_ON));
     return BOT_ON;
   };
-  return { on: BOT_ON, toggle, subscribers };
+  return { on: BOT_ON, toggle, subscribe };
 };
 
 const BotPower = initBotPower();
