@@ -40,6 +40,8 @@ const setUpStatusBar = () => {
   return { update: updateStatus };
 };
 if (ShouldRun) {
-  statusSection = BotPanel.addSection(`v${VER} (${BOT_ON ? "On" : "Off"})`);
+  statusSection = BotPanel.addSection(
+    `v${GM_info.script.version} (${BotPower.on ? "On" : "Off"})`
+  );
   Status = setUpStatusBar();
 }

@@ -371,7 +371,7 @@ firebase.auth().onAuthStateChanged((user) => {
   }
 });
 
-if (BOT_ON && ShouldRun && AuthManager.user) {
+if (BotPower.on && ShouldRun && AuthManager.user) {
   console.log("# BOT");
   initBOT();
 }

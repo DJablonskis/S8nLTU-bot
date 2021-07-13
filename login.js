@@ -19,10 +19,6 @@ firebase.auth().onAuthStateChanged((user) => {
     // https://firebase.google.com/docs/reference/js/firebase.User
     var uid = user.uid;
     console.log("signed in", user);
-    setTimeout(() => {
-      navigateTo(1);
-    }, Status.update("Logged in. Refreshing..."));
-
     // ...
   } else {
     // User is signed out
@@ -52,4 +48,6 @@ const signInPrompt = () => {
     });
 };
 
-const AuthManager = { signInPrompt, user: firebase.auth().currentUser };
+let user = firebase.auth().currentUser;
+
+const AuthManager = { signInPrompt, user };
