@@ -14,7 +14,6 @@
 // @require firebase.js
 
 // @require settings.js
-// @require login.js
 // @require constants.js
 // @require buildings.js
 
@@ -22,6 +21,8 @@
 // @require botPanel.js
 // @require statusUI.js
 // @require helpers.js
+
+// @require login.js
 
 // @require capital.js
 // @require productionManager.js
@@ -36,7 +37,7 @@
 
 // @require BOT.js
 
-// @version        0.12.2
+// @version        0.12.3
 // ==/UserScript==
 
 const start = () => {

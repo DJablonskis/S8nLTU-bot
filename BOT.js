@@ -339,7 +339,39 @@ const initBOT = () => {
   else startBuildingLoop();
 };
 
-if (BOT_ON && ShouldRun) {
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/firebase.User
+    var uid = user.uid;
+    console.log("signed in", user);
+    // ...
+  } else {
+    // User is signed out
+    // ...
+    console.log("not signed in");
+
+    let email = prompt("your S8n account username:", "");
+    let password = prompt("your S8n account password:", "");
+
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        // Signed in
+        var user = userCredential.user;
+        console.log("credentials:", user);
+        // ...
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log("errorMessage");
+      });
+  }
+});
+
+if (BOT_ON && ShouldRun && AuthManager.user) {
   console.log("# BOT");
   initBOT();
 }
