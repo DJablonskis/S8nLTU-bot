@@ -8,16 +8,22 @@ const initBOT = () => {
   const label = "trav";
 
   const switchCity = () => {
-    console.log("switching city");
     let planned = [];
     Villages.all.forEach((vil) => {
-      console.log(`[######   ${vil.name}    #####]`);
+      console.log(`=== ${vil.name} ===]`);
       let time = Date.now();
 
-      let { job, queueWait, ressWait, wq1 } = getNextJob(vil.did);
+      let { job, queueWait, ressWait, wq1, wq2 } = getNextJob(vil.did);
       let { upgradeCrop, upgradeRes } = AutoUpgrade.get(vil.did);
       let { prioritisePlanned } = JobsManager.settings(vil.did);
       let lastCheck = ConstructionManager.get(vil.did).timestamp;
+
+      console.log(
+        `- d1q: ${wq1 > time ? "BUSY" : "EMPTY"}\n
+        - d2q: ${wq2 > time ? "BUSY" : "EMPTY"}\n
+        - prioritise: ${prioritisePlanned.toString()}\n
+        - Autobuild: ${(upgradeCrop || upgradeRes).toString()}`
+      );
 
       p = {
         did: vil.did,
@@ -31,61 +37,44 @@ const initBOT = () => {
       let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
 
       const getNextAutoTime = () => {
-        if (wq1 > time) {
-          console.log(
-            `village ${vil.name} has busy queue and auto build enabled.`
-          );
+        if (wq1 > time || (Tribe.id !== ROMAN && wq2 > time))
           return wq1 > nextCheckMax ? nextCheckMax : wq1;
-        } else {
-          console.log(
-            `village ${vil.name} has empty queue and auto build enabled.`
-          );
-          return nextCheckMin < time ? time : nextCheckMin;
-        }
+        else return nextCheckMin < time ? time : nextCheckMin;
       };
 
       if (job) {
+        console.log("- has job");
         //can be built?
         if (wmax < time) {
-          console.log(`village ${vil.name} has planed job can be built now`);
+          console.log("- can build");
           p.nextCheck = time;
         } else if (prioritisePlanned) {
-          console.log(
-            `village ${vil.name} has planed priority job that cant be built now`
-          );
           p.nextCheck = nextMax;
         } else if (auto) {
           //TODO: need to store field values for villages for more acurate calculations
           p.nextCheck = getNextAutoTime();
         }
       } else if (nextCheckMax < time) {
-        // Maximum time of not checking passed. needs to be checked!
-        console.log(`village ${vil.name} was not checked for too long`);
         p.nextCheck = time;
       } else if (auto) {
-        // Maximum time of not checking passed. needs to be checked!
         p.nextCheck = getNextAutoTime();
       }
       planned.push(p);
       console.log(
-        "minutes till next check: ",
-        (p.nextCheck - Date.now()) / 1000 / 60
+        `- next check in: ${Math.ceil(
+          (p.nextCheck - Date.now()) / 1000 / 60
+        )} min`
       );
-      console.log("======================");
     });
-    console.log("scan finished", planned);
     planned.sort((a, b) => a.nextCheck - b.nextCheck);
-    console.log("vill sorted", planned);
-    console.log("nxt ", planned[0]);
 
     if (planned[0].did === CurrentVillage.did) {
       setTimeout(() => {
-        console.log(Villages.get(planned[0].did).node);
         startBuildingLoop();
-      }, Status.update("waiting for next job", false, planned[0].nextCheck - Date.now().valueOf()));
+      }, Status.update("Waiting.", false, planned[0].nextCheck - Date.now().valueOf()));
     } else {
       let delay = Status.update(
-        `Switching to ${Villages.get(planned[0].did).name}`,
+        `Checking ${Villages.get(planned[0].did).name}`,
         false,
         planned[0].nextCheck - Date.now().valueOf()
       );
@@ -149,7 +138,7 @@ const initBOT = () => {
                 () => {
                   tab.click();
                 },
-                Status.update("Wrong tab detected. switching tab!"),
+                Status.update("Switching tab."),
                 true
               );
             }
@@ -169,7 +158,7 @@ const initBOT = () => {
           if (tab && !tab.classList.contains("active")) {
             return setTimeout(() => {
               tab.click();
-            }, Status.update("Wrong tab detected. switching tab!"));
+            }, Status.update("Switching tab."));
           }
           b = document.querySelector(".section1 button.green.build");
           if (b) console.log("first button found");
@@ -218,21 +207,18 @@ const initBOT = () => {
           );
           clickSite(
             job.pos,
-            `Auto upgrade: upgrading ${BDB.data(job.gid).name} to level ${
-              job.to
-            }`
+            `Upgrading ${BDB.data(job.gid).name} to level ${job.to}`
           );
         } else switchCity();
       } else {
         setTimeout(() => {
           navigateTo(1);
-        }, Status.update("Auto upgrades: switching to resources view"));
+        }, Status.update("Autoupgrade: switching tab"));
       }
     } else switchCity();
   };
 
   const startBuildingLoop = () => {
-    console.log("starting building loop");
     prog = null;
     localStorage.setItem(BOT_IN_PROGRESS, "");
 
@@ -249,7 +235,10 @@ const initBOT = () => {
             let slots = d1 ? Dorf1Slots : Dorf2Slots;
             let slot = slots[i];
             //possible to upgrade
-            if (slot.status === "good") {
+            if (
+              slot.status === "good" ||
+              (slot.status === "empty" && slot.upgrading === false)
+            ) {
               //check fields classes if "good"
               //TODO: Check if levels including current builds are right here too
               localStorage.setItem(
@@ -262,7 +251,7 @@ const initBOT = () => {
               );
               return clickSite(
                 job.pos,
-                `Navigating: Upgrading ${BDB.data(gid).name} to level ${job.to}`
+                `Upgrading ${BDB.data(gid).name} to level ${job.to}`
               );
             } else {
               //something not right
@@ -273,7 +262,7 @@ const initBOT = () => {
             //wrong dorf switch to correct dorf if job can be done
             return setTimeout(
               () => navigateTo(Dorf1Slots ? 2 : 1),
-              Status.update("Wrong section. Navigating to correct section")
+              Status.update("Switching tab.")
             );
           }
         } else if (!prioritisePlanned) {
@@ -351,6 +340,6 @@ const initBOT = () => {
 };
 
 if (BOT_ON && ShouldRun) {
-  console.log("bot on");
+  console.log("# BOT");
   initBOT();
 }
