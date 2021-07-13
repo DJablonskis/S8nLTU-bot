@@ -1,4 +1,3 @@
-const VER = "0.12.3";
 const APP_NAME = "S8nLTU BOT";
 
 const CITIES_STORAGE = "storedCities";
@@ -42,8 +41,6 @@ const WALLS = {
 
 const Q1 = "q1";
 const Q2 = "q2";
-
-const BOT_ON = localStorage.getItem(BOT_POWER) === ON;
 
 const ON_S = localStorage.getItem(BOT_STATS) === ON;
 const titleStyle =

@@ -9,13 +9,13 @@
 // @grant        GM_getValue
 // @grant        GM_addValueChangeListener
 
+// @require constants.js
+// @require settings.js
+// @require buildings.js
+
 // @require https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js
 // @require https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js
 // @require firebase.js
-
-// @require settings.js
-// @require constants.js
-// @require buildings.js
 
 // @require notifications.js
 // @require botPanel.js
