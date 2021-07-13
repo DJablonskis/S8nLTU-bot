@@ -1,6 +1,7 @@
 let statusSection, Status;
 
 const setUpStatusBar = () => {
+  let interval = null;
   const status = statusSection.content.appendChild(
     document.createElement("div")
   );
@@ -18,21 +19,27 @@ const setUpStatusBar = () => {
   loadingBarProgress.style.cssText =
     "height:6px; width:0; background-color: #546e39; border: 1px solid transparent; border-color: #699e32 #6db024 #71c117; width: 100%";
 
-  const updateStatus = (message = "", fast = false, extraTime = 0) => {
-    let speed = fast ? DELAY_FAST : DELAY_SLOW;
-    let duration = (Math.floor(Math.random() * 4) + speed) * 1000 + extraTime;
-    let width = 0;
+  const updateStatus = (message = "", instant = false, extraTime = 0) => {
+    let duration = instant
+      ? 0
+      : (Math.floor(Math.random() * 4) + DELAY_SLOW) * 1000 + extraTime;
+    let width = instant ? 100 : 0;
     let timestamp = Date.now();
+    if (interval) clearInterval(interval);
     statusMessage.innerText = message;
-    var id = setInterval(frame, 30);
-    function frame() {
-      width = ((Date.now() - timestamp) / duration) * 100.0;
-      if (width >= 100) {
-        clearInterval(id);
-      } else {
-        width++;
-        loadingBarProgress.style.width = width + "%";
+    if (!instant) {
+      interval = setInterval(frame, 30);
+      function frame() {
+        width = ((Date.now() - timestamp) / duration) * 100.0;
+        if (width >= 100) {
+          clearInterval(interval);
+        } else {
+          width++;
+          loadingBarProgress.style.width = width + "%";
+        }
       }
+    } else {
+      loadingBarProgress.style.width = width + "%";
     }
     return duration;
   };

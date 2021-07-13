@@ -5,6 +5,8 @@ const initBOT = () => {
   const { upgradeCrop, upgradeRes } = AutoUpgrade.get();
   const { watchAds, prioritisePlanned } = JobsManager.settings();
 
+  let timeout = null;
+
   const label = "trav";
 
   const switchCity = () => {
@@ -69,7 +71,7 @@ const initBOT = () => {
     planned.sort((a, b) => a.nextCheck - b.nextCheck);
 
     if (planned[0].did === CurrentVillage.did) {
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         startBuildingLoop();
       }, Status.update("Waiting.", false, planned[0].nextCheck - Date.now().valueOf()));
     } else {
@@ -78,7 +80,7 @@ const initBOT = () => {
         false,
         planned[0].nextCheck - Date.now().valueOf()
       );
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         console.log(Villages.get(planned[0].did).node);
         Villages.get(planned[0].did).node.querySelector("a").click();
       }, delay);
@@ -134,13 +136,14 @@ const initBOT = () => {
               `#content .contentNavi .scrollingContainer .content a[href*="category=${inProgress.job.cat}"]`
             );
             if (tab && !tab.classList.contains("active")) {
-              return setTimeout(
+              timeout = setTimeout(
                 () => {
                   tab.click();
                 },
                 Status.update("Switching tab."),
                 true
               );
+              return timeout;
             }
             b = document
               .querySelector(`img.g${inProgress.job.gid}`)
@@ -156,9 +159,10 @@ const initBOT = () => {
             "#content .contentNavi .scrollingContainer .content a"
           );
           if (tab && !tab.classList.contains("active")) {
-            return setTimeout(() => {
+            timeout = setTimeout(() => {
               tab.click();
             }, Status.update("Switching tab."));
+            return timeout;
           }
           b = document.querySelector(".section1 button.green.build");
           if (b) console.log("first button found");
@@ -168,11 +172,11 @@ const initBOT = () => {
           }
         }
         if (b || b2) {
-          return setTimeout(() => {
+          timeout = setTimeout(() => {
             if (b2 && watchAds) {
               b2.click();
               //sending message to other script to start video in 5 seconds
-              setTimeout(() => {
+              timeout = setTimeout(() => {
                 GM_setValue(
                   "trav_ads_main",
                   " pressed on build with add " + Math.random
@@ -186,6 +190,7 @@ const initBOT = () => {
             localStorage.setItem(BOT_IN_PROGRESS, "");
             //   b.click();
           }, Status.update("Perssing build Button"));
+          return timeout;
         } else console.log("Error! Button for upgrade not found!");
       }
     }
@@ -211,7 +216,7 @@ const initBOT = () => {
           );
         } else switchCity();
       } else {
-        setTimeout(() => {
+        timeout = setTimeout(() => {
           navigateTo(1);
         }, Status.update("Autoupgrade: switching tab"));
       }
@@ -260,10 +265,11 @@ const initBOT = () => {
             }
           } else {
             //wrong dorf switch to correct dorf if job can be done
-            return setTimeout(
+            timeout = setTimeout(
               () => navigateTo(Dorf1Slots ? 2 : 1),
               Status.update("Switching tab.")
             );
+            return timeout;
           }
         } else if (!prioritisePlanned) {
           // TODO: Not enough resources for job keep track of times here for switchingCities
@@ -334,44 +340,24 @@ const initBOT = () => {
     return { job: nextJob, queueWait, ressWait: 0, wq1, wq2 };
   };
 
-  //Check if anything is in progres... if so, continue building or start new loop
-  if (inProgress && inProgress.timestamp > Date.now()) continueUpgrade();
-  else startBuildingLoop();
+  const start = () => {
+    if (inProgress && inProgress.timestamp > Date.now()) continueUpgrade();
+    else startBuildingLoop();
+  };
+
+  const stop = () => {
+    if (timeout) clearTimeout(timeout);
+    Status.update("Bot off", true, 0);
+  };
+
+  return { start, stop };
 };
 
-firebase.auth().onAuthStateChanged((user) => {
-  if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/firebase.User
-    var uid = user.uid;
-    console.log("signed in", user);
-    // ...
-  } else {
-    // User is signed out
-    // ...
-    console.log("not signed in");
+const BOT = initBOT();
 
-    let email = prompt("your S8n account username:", "");
-    let password = prompt("your S8n account password:", "");
-
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        // Signed in
-        var user = userCredential.user;
-        console.log("credentials:", user);
-        // ...
-      })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log("errorMessage");
-      });
-  }
+BotPower.subscribe((power) => {
+  console.log("subscribed to bot power");
+  console.log(power);
+  if (power) BOT.start();
+  else BOT.stop();
 });
-
-if (BotPower.on && ShouldRun && AuthManager.user) {
-  console.log("# BOT");
-  initBOT();
-}
