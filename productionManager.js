@@ -36,13 +36,12 @@ const initProductionManager = () => {
   };
 
   const tillEnough = (gid, lvl, did) => {
+    //TODO: check if levels are correct when checking building which is in progress
     let enough = 0;
     const { cost } = BDB.stats(gid, lvl);
     const { storage, production } = productionStorage[did];
     if (!production) return enough;
-
     let wait = 0;
-
     cost.forEach((c, index) => {
       let i = (index + 1).toString();
       if (storage["l" + i] < c) {
@@ -54,17 +53,16 @@ const initProductionManager = () => {
         }
       }
     });
-    if (!wait === 0) enough = Date.now() + Math.ceil(wait);
+    if (wait !== 0) enough = Date.now() + Math.ceil(wait);
     return enough;
   };
-
   return {
     all: productionStorage,
     get: (did = CurrentVillage.did) =>
       productionStorage[did] ? productionStorage[did] : null,
     current: currentStorage,
     tillEnough: ({ gid, lvl }, did = CurrentVillage.did) =>
-      tillEnough(gid, lvl, did),
+      tillEnough(gid, lvl + 1, did),
   };
 };
 let ProductionManager;
