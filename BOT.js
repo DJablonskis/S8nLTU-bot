@@ -12,20 +12,17 @@ const initBOT = () => {
   const switchCity = () => {
     let planned = [];
     Villages.all.forEach((vil) => {
-      console.log(`=== ${vil.name} ===]`);
+      console.log(`# ${vil.name} `);
       let time = Date.now();
 
       let { job, queueWait, ressWait, wq1, wq2 } = getNextJob(vil.did);
       let { upgradeCrop, upgradeRes } = AutoUpgrade.get(vil.did);
       let { prioritisePlanned } = JobsManager.settings(vil.did);
       let lastCheck = ConstructionManager.get(vil.did).timestamp;
-
-      console.log(
-        `- d1q: ${wq1 > time ? "BUSY" : "EMPTY"}\n
-        - d2q: ${wq2 > time ? "BUSY" : "EMPTY"}\n
-        - prioritise: ${prioritisePlanned.toString()}\n
-        - Autobuild: ${(upgradeCrop || upgradeRes).toString()}`
-      );
+      console.log(`- d1q: ${wq1 > time ? "BUSY" : "EMPTY"}`);
+      console.log(`- d2q: ${wq2 > time ? "BUSY" : "EMPTY"}`);
+      console.log(`- prioritise: ${prioritisePlanned.toString()}`);
+      console.log(`- Autobuild: ${(upgradeCrop || upgradeRes).toString()}`);
 
       p = {
         did: vil.did,
@@ -39,8 +36,11 @@ const initBOT = () => {
       let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
 
       const getNextAutoTime = () => {
-        if (wq1 > time || (Tribe.id !== ROMAN && wq2 > time))
-          return wq1 > nextCheckMax ? nextCheckMax : wq1;
+        if (Tribe.id === ROMAN)
+          if (wq1 < time) return nextCheckMin < time ? time : nextCheckMin;
+          else return wq1 > nextCheckMax ? nextCheckMax : wq1;
+        else if (queueWait > time)
+          return queueWait > nextCheckMax ? nextCheckMax : queueWait;
         else return nextCheckMin < time ? time : nextCheckMin;
       };
 
@@ -67,6 +67,7 @@ const initBOT = () => {
           (p.nextCheck - Date.now()) / 1000 / 60
         )} min`
       );
+      console.log(" ");
     });
     planned.sort((a, b) => a.nextCheck - b.nextCheck);
 
@@ -105,8 +106,9 @@ const initBOT = () => {
     return null;
   };
 
-  const continueUpgrade = () => {
+  const continueUpgrade = ({ did, job }) => {
     console.log("continuing old upgrade");
+    console.log("progress job:", job);
     if (location.pathname.includes("build.php")) {
       const params = getParams();
       let currentLvl = 0;
@@ -124,10 +126,7 @@ const initBOT = () => {
         //   window.location.href = "/dorf1.php";
         // }, 5000);
       }
-      if (
-        inProgress.did === CurrentVillage.did &&
-        inProgress.job.pos === Number(params.id)
-      ) {
+      if (did === CurrentVillage.did && job.pos === params.id) {
         let b,
           b2 = undefined;
         if (inProgress.job.to === 1) {
@@ -148,6 +147,7 @@ const initBOT = () => {
             b = document
               .querySelector(`img.g${inProgress.job.gid}`)
               .parentNode.parentNode.querySelector(".contractLink button");
+            console.log("button found: ", b);
           }
           //New res field
           else {
@@ -341,7 +341,8 @@ const initBOT = () => {
   };
 
   const start = () => {
-    if (inProgress && inProgress.timestamp > Date.now()) continueUpgrade();
+    if (inProgress && inProgress.timestamp > Date.now())
+      continueUpgrade(inProgress);
     else startBuildingLoop();
   };
 
@@ -355,9 +356,6 @@ const initBOT = () => {
 
 const BOT = initBOT();
 
-BotPower.subscribe((power) => {
-  console.log("subscribed to bot power");
-  console.log(power);
-  if (power) BOT.start();
-  else BOT.stop();
-});
+BotPower.subscribe((power) =>
+  power && firebase.auth().currentUser ? BOT.start() : BOT.stop()
+);
