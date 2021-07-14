@@ -28,13 +28,14 @@ if (window.location.pathname.includes("build.php")) {
   }
 } else if (Dorf2Slots) {
   const buildings = [];
-
   const display = (job) => {
     let building = Dorf2Slots[job.pos - 19];
-    building.link.parentNode.style.display = "block";
-    let image = building.link.parentNode.querySelector("img");
-    image.classList.add("g" + job.gid);
-    image.style.opacity = "0.5";
+    if (building.status === "empty") {
+      building.link.parentNode.style.display = "block";
+      let image = building.link.parentNode.querySelector("img");
+      image.classList.add("g" + job.gid);
+      image.style.opacity = "0.5";
+    } else JobsManager.remove(job);
 
     // building.bot.onclick = () => {
     //   this.addJob({
@@ -65,7 +66,7 @@ if (window.location.pathname.includes("build.php")) {
   const displayNewBuildings = (jobs) => {
     clear();
     jobs
-      .filter((x) => x.gid > 4 && x.lvl === 0)
+      .filter((x) => x.gid > 4 && x.to === 1)
       .forEach((job) => {
         display(job);
         buildings.push(job);

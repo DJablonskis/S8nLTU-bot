@@ -24,6 +24,8 @@ const setUpStatusBar = () => {
       ? 0
       : (Math.floor(Math.random() * 4) + DELAY_SLOW) * 1000 + extraTime;
     let width = instant ? 100 : 0;
+
+    if (!instant && duration < 3000) duration = 3600;
     let timestamp = Date.now();
     if (interval) clearInterval(interval);
     statusMessage.innerText = message;
