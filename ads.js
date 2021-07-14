@@ -4,7 +4,7 @@ if (location.hostname.includes("media.oadts.com")) {
     if (button) {
       GM_setValue("trav_add", Math.random().toString());
       console.log("button found. starting to play");
-      //button.click();
+      button.click();
     }
   }, 3000);
 }

@@ -52,5 +52,11 @@ if (ShouldRun) {
   statusSection = BotPanel.addSection(
     `v${GM_info.script.version} (${BotPower.on ? "On" : "Off"})`
   );
+  BotPower.subscribe((power) => {
+    statusSection.header.innerText = `v${GM_info.script.version} (${
+      power ? "On" : "Off"
+    })`;
+  });
+
   Status = setUpStatusBar();
 }

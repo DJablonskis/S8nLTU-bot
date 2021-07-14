@@ -21,7 +21,7 @@ if (window.location.pathname.includes("build.php")) {
       button.style.top = "0";
       button.innerText = `Build later`;
       button.onclick = () => {
-        JobsManager.add({ gid, pos: params.id, lvl: 0, to: 1, cat });
+        JobsManager.add({ gid, pos: Number(params.id), lvl: 0, to: 1, cat });
         navigateTo(2);
       };
     });
