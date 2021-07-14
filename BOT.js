@@ -10,6 +10,11 @@ const initBOT = () => {
   const label = "trav";
 
   const switchCity = () => {
+    if (!Dorf1Slots && !Dorf2Slots)
+      return setTimeout(
+        () => navigateTo(1),
+        Status.update("Lost, navigating home")
+      );
     let planned = [];
     Villages.all.forEach((vil) => {
       console.log(`# ${vil.name} `);
@@ -45,10 +50,12 @@ const initBOT = () => {
       };
 
       if (job) {
-        console.log("- has job");
+        console.log("- has job", job);
         //can be built?
         if (wmax < time) {
+          console.log("- resswait: ", ressWait);
           console.log("- can build");
+
           p.nextCheck = time;
         } else if (prioritisePlanned) {
           p.nextCheck = nextMax;
@@ -118,7 +125,7 @@ const initBOT = () => {
           document.querySelector("div#build").classList[1].slice(-1)
         );
       }
-      if (currentLvl >= inProgress.job.to) {
+      if (currentLvl >= job.to) {
         console.log("something wrong with levels");
         // return setTimeout(() => {
         //   localStorage.setItem(BOT_IN_PROGRESS, "");
@@ -126,11 +133,13 @@ const initBOT = () => {
         //   window.location.href = "/dorf1.php";
         // }, 5000);
       }
-      if (did === CurrentVillage.did && job.pos === params.id) {
+      console.log(params);
+      if (did === CurrentVillage.did && Number(job.pos) === Number(params.id)) {
+        console.log("correct vil:");
         let b,
           b2 = undefined;
-        if (inProgress.job.to === 1) {
-          if (inProgress.job.cat) {
+        if (job.to === 1) {
+          if (job.cat) {
             let tab = document.querySelector(
               `#content .contentNavi .scrollingContainer .content a[href*="category=${inProgress.job.cat}"]`
             );
@@ -343,6 +352,11 @@ const initBOT = () => {
   const start = () => {
     if (inProgress && inProgress.timestamp > Date.now())
       continueUpgrade(inProgress);
+    else if (!Dorf1Slots && !Dorf2Slots)
+      return setTimeout(
+        () => navigateTo(1),
+        Status.update("Lost, navigating home")
+      );
     else startBuildingLoop();
   };
 

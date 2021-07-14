@@ -89,40 +89,45 @@ const initJobs = () => {
   };
 
   const checkJobs = () => {
-    if (Dorf1Slots) {
-      Dorf1Slots.forEach((field) => {
-        const buildingNow = ConstructionManager.get().all.filter(
-          (bn) => Number(bn.aid) === field.pos
-        );
-        const min = field.lvl + buildingNow.length + 1;
-        const old_jobs = cvJobs.filter(
-          (job) => job.pos === field.pos && job.to < min
-        );
-        if (old_jobs.length > 0) {
-          old_jobs.forEach((job) => {
-            complete(job);
-          });
-        }
-      });
-    } else if (Dorf2Slots) {
-      //TODO: check if slots with new buildings are not ocupied
-      Dorf2Slots.forEach((building) => {
-        //Number of currently beign built same type buildings
-        const buildingNow = ConstructionManager.get().all.filter(
-          (bn) => Number(bn.aid) === building.pos
-        );
+    slots = Dorf1Slots ? Dorf1Slots : Dorf2Slots;
 
-        const min = building.lvl + buildingNow.length + 1;
-        const old_jobs = cvJobs.filter(
-          (job) => job.pos === building.pos && job.to < min
-        );
-        if (old_jobs.length > 0) {
-          old_jobs.forEach((job) => {
-            complete(job);
-          });
-        }
-      });
-    }
+    slots.forEach((slot) => {
+      const buildingNow = ConstructionManager.get().all.filter(
+        (bn) => Number(bn.aid) === slot.pos
+      );
+      const min = slot.lvl + buildingNow.length + 1;
+      const outdatedJobs = cvJobs.filter(
+        (job) => job.pos === slot.pos && (job.to < min || job.lvl !== min)
+      );
+      if (outdatedJobs.length > 0) {
+        console.log("outdated jobs found: ", outdatedJobs);
+        outdatedJobs.forEach((job) => {
+          if (job.lvl !== min) job.lvl = min;
+          if (job.to < min) complete(job);
+        });
+        console.log("outdated jobs after check: ", outdatedJobs);
+        save();
+      }
+    });
+    //  else if (Dorf2Slots) {
+    //   //TODO: check if slots with new buildings are not ocupied
+    //   Dorf2Slots.forEach((building) => {
+    //     //Number of currently beign built same type buildings
+    //     const buildingNow = ConstructionManager.get().all.filter(
+    //       (bn) => Number(bn.aid) === building.pos
+    //     );
+
+    //     const min = building.lvl + buildingNow.length + 1;
+    //     const outdatedJobs = cvJobs.filter(
+    //       (job) => job.pos === building.pos && (job.to < min || job.lvl != min)
+    //     );
+    //     if (outdatedJobs.length > 0) {
+    //       outdatedJobs.forEach((job) => {
+    //         complete(job);
+    //       });
+    //     }
+    //   });
+    // }
   };
 
   const next = (did = CurrentVillage.did) => {
