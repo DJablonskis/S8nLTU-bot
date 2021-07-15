@@ -17,12 +17,12 @@ const setUpStatusBar = () => {
     document.createElement("div")
   );
   loadingBarProgress.style.cssText =
-    "height:6px; width:0; background-color: #546e39; border: 1px solid transparent; border-color: #699e32 #6db024 #71c117; width: 100%";
+    "transition:width 0.5s ease; height:6px; background-color: #546e39; border: 1px solid transparent; border-color: #699e32 #6db024 #71c117; width: 100%;";
 
   const updateStatus = (message = "", instant = false, extraTime = 0) => {
     let duration = instant
       ? 0
-      : (Math.floor(Math.random() * 4) + DELAY_SLOW) * 1000 + extraTime;
+      : (Math.floor(Math.random() * 3) + DELAY_SLOW) * 1000 + extraTime;
     let width = instant ? 100 : 0;
 
     if (!instant && duration < 3000) duration = 3600;
@@ -30,14 +30,18 @@ const setUpStatusBar = () => {
     if (interval) clearInterval(interval);
     statusMessage.innerText = message;
     if (!instant) {
-      interval = setInterval(frame, 30);
+      interval = setInterval(frame, 1000);
       function frame() {
-        width = ((Date.now() - timestamp) / duration) * 100.0;
+        let passed = Date.now() - timestamp;
+        width = (passed / duration) * 100.0;
         if (width >= 100) {
+          loadingBarProgress.style.width = "100%";
           clearInterval(interval);
         } else {
           width++;
           loadingBarProgress.style.width = width + "%";
+          statusMessage.innerText =
+            message + ` [${msToTimeString(duration - passed, false)}]`;
         }
       }
     } else {

@@ -10,11 +10,14 @@ const initBOT = () => {
   const label = "trav";
 
   const switchCity = () => {
-    if (!Dorf1Slots && !Dorf2Slots)
-      return setTimeout(
+    if (!Dorf1Slots && !Dorf2Slots) {
+      timeout = setTimeout(
         () => navigateTo(1),
         Status.update("Lost, navigating home")
       );
+      return timeout;
+    }
+
     let planned = [];
     Villages.all.forEach((vil) => {
       console.log(`# ${vil.name} `);
@@ -352,12 +355,13 @@ const initBOT = () => {
   const start = () => {
     if (inProgress && inProgress.timestamp > Date.now())
       continueUpgrade(inProgress);
-    else if (!Dorf1Slots && !Dorf2Slots)
-      return setTimeout(
+    else if (!Dorf1Slots && !Dorf2Slots) {
+      timeout = setTimeout(
         () => navigateTo(1),
         Status.update("Lost, navigating home")
       );
-    else startBuildingLoop();
+      return timeout;
+    } else startBuildingLoop();
   };
 
   const stop = () => {
