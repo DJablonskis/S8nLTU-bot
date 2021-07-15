@@ -29,6 +29,28 @@ function whichChild(elem) {
   return i;
 }
 
+const msToTimeString = (t, hours = true) => {
+  function pad(n, z) {
+    z = z || 2;
+    return ("00" + n).slice(-z);
+  }
+  let string = "";
+
+  if (t > 0) {
+    var ms = t % 1000;
+    t = (t - ms) / 1000;
+    var s = t % 60;
+    t = (t - s) / 60;
+    var min = t % 60;
+    var h = (t - min) / 60;
+
+    if (hours) string += pad(h) + ":";
+    string += pad(min) + ":" + pad(s);
+  }
+
+  return string;
+};
+
 const getParams = (loc = window.location.search) =>
   loc
     .slice(1)

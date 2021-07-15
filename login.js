@@ -34,17 +34,6 @@ const createLoginWindow = () => {
 
   const controls = document.createElement("div");
 
-  const loginButton = controls.appendChild(document.createElement("button"));
-  loginButton.className = "textButtonV1 green";
-  loginButton.innerText = "Login";
-  loginButton.style.marginRight = "8px";
-  loginButton.onclick = () => {};
-
-  const registerButton = controls.appendChild(document.createElement("button"));
-  registerButton.className = "textButtonV1 green";
-  registerButton.innerText = "Register";
-  registerButton.onclick = () => {};
-
   const usernameGroup = boxContent.appendChild(document.createElement("div"));
   const usernameLabel = usernameGroup.appendChild(
     document.createElement("span")
@@ -60,6 +49,44 @@ const createLoginWindow = () => {
   passLabel.innerText = "License password:";
   const passInput = passGroup.appendChild(document.createElement("input"));
   passInput.type = "password";
+
+  const loginButton = controls.appendChild(document.createElement("button"));
+  loginButton.className = "textButtonV1 green";
+  loginButton.innerText = "Login";
+  loginButton.style.marginRight = "8px";
+  loginButton.onclick = () => {
+    firebase
+      .auth()
+      .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .then(() => {
+        let email = usernameInput.value;
+        let password = passInput.value;
+        return firebase
+          .auth()
+          .signInWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            // Signed in
+            var user = userCredential.user;
+            console.log("credentials:", user);
+            close();
+          })
+          .catch((error) => {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            console.log("errorMessage", errorMessage);
+          });
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+      });
+  };
+
+  const registerButton = controls.appendChild(document.createElement("button"));
+  registerButton.className = "textButtonV1 green";
+  registerButton.innerText = "Register";
+  registerButton.onclick = () => {};
 
   const close = () => {
     panel.style.opacity = 0;

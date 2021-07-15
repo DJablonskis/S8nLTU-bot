@@ -32,9 +32,31 @@ if (window.location.pathname.includes("build.php")) {
     let building = Dorf2Slots[job.pos - 19];
     if (building.status === "empty") {
       building.link.parentNode.style.display = "block";
-      let image = building.link.parentNode.querySelector("img");
-      image.classList.add("g" + job.gid);
-      image.style.opacity = "0.5";
+      console.log("building", building);
+      if (building.pos !== 40) {
+        let image = building.link.parentNode.querySelector("img");
+        image.oncontextmenu = (e) => {
+          console.log("e", e.target);
+          e.preventDefault();
+        };
+        image.classList.add("g" + job.gid);
+        image.style.opacity = "0.6";
+        image.style.filter = "grayscale(100%)";
+      } else {
+        classBottom = `wall g${Tribe.wall}Bottom ${Tribe}`;
+        classTop = `wall g${Tribe.wall}Top ${Tribe}`;
+        let imgBottom = document.createElement("img");
+        imgBottom.style.filter = "grayscale(100%)";
+        imgBottom.src = "/img/x.gif";
+        imgBottom.style.opacity = "0.6";
+
+        let imgTop = imgBottom.cloneNode(true);
+        imgTop.className = classTop;
+        imgBottom.className = classBottom;
+        console.log(Tribe);
+        building.link.parentNode.appendChild(imgBottom);
+        building.link.parentNode.nextSibling.appendChild(imgTop);
+      }
     } else JobsManager.remove(job);
 
     // building.bot.onclick = () => {
@@ -53,12 +75,21 @@ if (window.location.pathname.includes("build.php")) {
   };
 
   const clear = () => {
+    //TODO: walls behave differently remove images!
     buildings.forEach((job) => {
       let building = Dorf2Slots[job.pos - 19];
-      building.link.parentNode.style.display = "block";
-      let image = building.link.parentNode.querySelector("img");
-      image.classList.remove("g" + job.gid);
-      image.style.opacity = "1";
+
+      if (building.pos === 40) {
+        let wallBottom = document.querySelector("img.wall");
+        if (wallBottom) wallBottom.remove();
+        let wallTop = document.querySelector("img.wall");
+        if (wallTop) wallTop.remove();
+      } else {
+        building.link.parentNode.style.display = "block";
+        let image = building.link.parentNode.querySelector("img");
+        image.classList.remove("g" + job.gid);
+        image.style.opacity = "1";
+      }
     });
     //goes through buildings array and reverts changes
   };

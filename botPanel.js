@@ -31,25 +31,7 @@ const createSidePanel = () => {
 
   btnPower.onclick = (e) => {
     if (!firebase.auth().currentUser) {
-      let email = prompt("your S8n account username:", "");
-      let password = prompt("your S8n account password:", "");
-
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          // Signed in
-          var user = userCredential.user;
-          console.log("credentials:", user);
-          let on = BotPower.toggle();
-          btnPower.querySelector("svg").style.fill = on ? "red" : "white";
-          // ...
-        })
-        .catch((error) => {
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          console.log("errorMessage");
-        });
+      LoginUI.open();
     } else {
       let on = BotPower.toggle();
       btnPower.querySelector("svg").style.fill = on ? "red" : "white";
