@@ -355,7 +355,7 @@ const getTribe = () => {
     );
   }
 
-  return index ? { id: id[index], name: name[index], wall: wall[index] } : null;
+  return index ? { id: id[index], name: name[index], wall: WALL[index] } : null;
 };
 let Tribe;
 if (ShouldRun) Tribe = getTribe();

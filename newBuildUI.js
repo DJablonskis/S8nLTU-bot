@@ -1,30 +1,42 @@
 if (window.location.pathname.includes("build.php")) {
-  let params = getParams();
-  if (!params.gid) {
-    const cat = params.category ? Number(params.category) : 1;
-    const availableBuildings = [
-      ...document.querySelectorAll(
-        ".buildingWrapper > .build_desc > img.building"
-      ),
-    ];
-    availableBuildings.forEach((b) => {
-      let cont = b.parentNode.parentNode;
-      let gid = Number(
-        cont.querySelector(".contract").id.replace("contract_building", "")
-      );
+  const createButton = () => {
+    const button = document.createElement("button");
+    button.classList.add("textButtonV1", "green", "new");
+    button.style.marginTop = "4px";
+    button.innerText = `Add to planed upgrades`;
+    return button;
+  };
 
-      cont.style.position = "relative";
-      const button = cont.appendChild(document.createElement("button"));
-      button.classList.add("textButtonV1", "green", "new");
-      button.style.position = "absolute";
-      button.style.right = "0";
-      button.style.top = "0";
-      button.innerText = `Build later`;
-      button.onclick = () => {
-        JobsManager.add({ gid, pos: Number(params.id), lvl: 0, to: 1, cat });
-        navigateTo(2);
-      };
-    });
+  let params = getParams();
+  let query = "#build div[id*=contract_building]";
+
+  if (!params.gid) {
+    let containers = document.querySelectorAll(query);
+    if (containers) {
+      containers.forEach((container) => {
+        let job = {
+          gid: Number(container.id.replace("contract_building", "")),
+          pos: 0,
+          lvl: 0,
+          to: 1,
+          cat: params.category ? Number(params.category) : 1,
+        };
+        //WALL pos 40!
+        if (WALL.includes(job.gid)) {
+          job.pos = 40;
+        } else if (job.gid === 16) {
+          job.pos = 39;
+        } else {
+          job.pos = Number(params.id);
+        }
+        let button = createButton();
+        container.appendChild(button);
+        button.onclick = () => {
+          JobsManager.add(job);
+          navigateTo(2);
+        };
+      });
+    }
   }
 } else if (Dorf2Slots) {
   const buildings = [];
@@ -58,20 +70,6 @@ if (window.location.pathname.includes("build.php")) {
         building.link.parentNode.nextSibling.appendChild(imgTop);
       }
     } else JobsManager.remove(job);
-
-    // building.bot.onclick = () => {
-    //   this.addJob({
-    //     gid: building.gid,
-    //     pos: building.pos,
-    //     lvl: building.lvl,
-    //     to:
-    //       Number(building.bot.dataset.lvl) +
-    //       1 +
-    //       Number(building.lvl) +
-    //       buildingNow.length,
-    //   });
-    //   this.displayJobs();
-    // };
   };
 
   const clear = () => {

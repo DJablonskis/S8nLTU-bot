@@ -94,7 +94,9 @@ const initConstructionManager = () => {
     } else return { completed: true, timer: "Completed!" };
   };
 
-  const showDots = (detailed = false) => {
+  const showDots = () => {
+    const detailsBlocks = [];
+
     Villages.all.forEach((vil) => {
       const nameRow = vil.node.querySelector("span.name");
       let flexBlock = document.createElement("div");
@@ -139,25 +141,35 @@ const initConstructionManager = () => {
         }
       });
 
-      if (detailed) {
-        const block = document.createElement("div");
-        block.style.padding = "0 4px";
-        block.style.gridColumnStart = "1";
-        block.style.gridColumnEnd = "3";
-        block.style.fontWeight = 400;
+      const block = document.createElement("div");
+      block.style.padding = "0 4px";
+      block.style.gridColumnStart = "1";
+      block.style.gridColumnEnd = "3";
+      block.style.fontWeight = 400;
 
-        const prodRow = document.createElement("div");
-        prodRow.style.padding = "0 12px";
-        prodRow.style.fontSize = "10px";
-        prodRow.style.display = "flex";
-        prodRow.style.justifyContent = "space-between";
+      detailsBlocks.push(block);
 
-        block.appendChild(prodRow);
+      const prodRow = document.createElement("div");
+      prodRow.style.padding = "0 12px";
+      prodRow.style.fontSize = "10px";
+      prodRow.style.display = "flex";
+      prodRow.style.justifyContent = "space-between";
 
-        const queRow = document.createElement("div");
-        block.appendChild(queRow);
+      block.appendChild(prodRow);
 
-        if (ProductionManager.current(vil.did)) {
+      const queRow = document.createElement("div");
+      block.appendChild(queRow);
+
+      if (ProductionManager.current(vil.did)) {
+        let { l1, l2, l3, l4 } = ProductionManager.current(vil.did);
+        prodRow.innerHTML = `<span>${icon(0, 12)} ${l1} </span> <span>${icon(
+          1,
+          12
+        )}${l2} </span> <span>${icon(2, 12)}${l3} </span> <span>${icon(
+          3,
+          12
+        )}${l4} </span>`;
+        setInterval(() => {
           let { l1, l2, l3, l4 } = ProductionManager.current(vil.did);
           prodRow.innerHTML = `<span>${icon(0, 12)} ${l1} </span> <span>${icon(
             1,
@@ -166,49 +178,44 @@ const initConstructionManager = () => {
             3,
             12
           )}${l4} </span>`;
-          setInterval(() => {
-            let { l1, l2, l3, l4 } = ProductionManager.current(vil.did);
-            prodRow.innerHTML = `<span>${icon(
-              0,
-              12
-            )} ${l1} </span> <span>${icon(1, 12)}${l2} </span> <span>${icon(
-              2,
-              12
-            )}${l3} </span> <span>${icon(3, 12)}${l4} </span>`;
-          }, 2000);
-        } else {
-          prodRow.innerHTML = `<div style="font-size:10px">No info yet.</div>`;
-        }
-
-        get(vil.did).all.forEach((x) => {
-          const task = document.createElement("div");
-          queRow.appendChild(task);
-          let timer = checkTime(x.finish);
-          task.innerHTML = `<span style="font-size:11px; padding-left: 15px; padding-right:8px">${BDB.name(
-            x.gid
-          )} level ${x.lvl}</span><span style="font-size:11px;  ${
-            timer.completed ? "color:green;" : ""
-          } align-items:center;">${timer.timer}</span>`;
-          if (!timer.completed) {
-            let updater = setInterval(() => {
-              timer = checkTime(x.finish);
-              task.innerHTML = `<span style="font-size:11px; padding-left: 15px; padding-right:8px">${BDB.name(
-                x.gid
-              )} level ${x.lvl}</span><span style="font-size:11px; ${
-                timer.completed ? "color:green;" : ""
-              } align-items:center;">${timer.timer}</span>`;
-
-              if (timer.completed) {
-                clearInterval(updater);
-              }
-            }, 1000);
-          }
-        });
-
-        vil.node.appendChild(block);
+        }, 2000);
+      } else {
+        prodRow.innerHTML = `<div style="font-size:10px">No info yet.</div>`;
       }
+
+      get(vil.did).all.forEach((x) => {
+        const task = document.createElement("div");
+        queRow.appendChild(task);
+        let timer = checkTime(x.finish);
+        task.innerHTML = `<span style="font-size:11px; padding-left: 15px; padding-right:8px">${BDB.name(
+          x.gid
+        )} level ${x.lvl}</span><span style="font-size:11px;  ${
+          timer.completed ? "color:green;" : ""
+        } align-items:center;">${timer.timer}</span>`;
+        if (!timer.completed) {
+          let updater = setInterval(() => {
+            timer = checkTime(x.finish);
+            task.innerHTML = `<span style="font-size:11px; padding-left: 15px; padding-right:8px">${BDB.name(
+              x.gid
+            )} level ${x.lvl}</span><span style="font-size:11px; ${
+              timer.completed ? "color:green;" : ""
+            } align-items:center;">${timer.timer}</span>`;
+
+            if (timer.completed) {
+              clearInterval(updater);
+            }
+          }, 1000);
+        }
+      });
+
+      DetailedStats.subscribe((d) => {
+        detailsBlocks.forEach((b) => (b.style.display = d ? "block" : "none"));
+      });
+
+      vil.node.appendChild(block);
     });
   };
+  showDots();
   return {
     all: cmStorage,
     get,
@@ -218,12 +225,10 @@ const initConstructionManager = () => {
       let dorfAvailable = dorfFinish < Date.now();
       return { empty: dorfAvailable, finish: dorfFinish };
     },
-    showDots,
   };
 };
 let ConstructionManager;
 
 if (ShouldRun) {
   ConstructionManager = initConstructionManager();
-  ConstructionManager.showDots(ON_S);
 }
