@@ -12,11 +12,33 @@ const NPC_COOLDOWN = 10 * 1000 * 60;
 const DELAY_FAST = 1;
 const DELAY_SLOW = 3;
 
-const initBotPower = () => {
-  let BOT_ON = localStorage.getItem(BOT_POWER) === ON;
+initDetailedStats = () => {
+  let ON_S = localStorage.getItem(BOT_STATS) === ON;
   const subscribers = [];
 
-  //const user = ;
+  const subscribe = (f) => {
+    subscribers.push(f);
+    f(ON_S);
+  };
+
+  const notify = () => {
+    subscribers.forEach((f) => f(ON_S));
+  };
+
+  const toggle = () => {
+    ON_S = !ON_S;
+    localStorage.setItem(BOT_STATS, ON_S ? ON : OFF);
+    notify();
+  };
+  return { on: ON_S, toggle, subscribe };
+};
+
+const DetailedStats = initDetailedStats();
+
+const initBotPower = () => {
+  let initialised = false;
+  let BOT_ON = localStorage.getItem(BOT_POWER) === ON;
+  const subscribers = [];
 
   const subscribe = (f) => {
     subscribers.push(f);
@@ -25,7 +47,7 @@ const initBotPower = () => {
 
   const notify = () => {
     console.log("auth state changed");
-    subscribers.forEach((f) => f(BOT_ON));
+    if (initialised) subscribers.forEach((f) => f(BOT_ON));
   };
 
   const toggle = () => {
@@ -35,27 +57,13 @@ const initBotPower = () => {
     notify();
     return BOT_ON;
   };
-  return { on: BOT_ON, toggle, subscribe, notify };
+
+  firebase.auth().onAuthStateChanged((user) => {
+    initialised = true;
+    notify();
+  });
+
+  return { on: BOT_ON, toggle, subscribe };
 };
 
 const BotPower = initBotPower();
-
-firebase.auth().onAuthStateChanged((user) => {
-  BotPower.notify();
-  // if (user) {
-  //   // User is signed in, see docs for a list of available properties
-  //   // https://firebase.google.com/docs/reference/js/firebase.User
-  //   var uid = user.uid;
-  //   console.log("signed in");
-  //   // ...
-  // } else {
-  //   // User is signed out
-  //   // ...
-  //   console.log("not signed in");
-  //   if (BotPower.on) {
-  //     console.log("switching bot off");
-  //     BotPower.toggle();
-  //   }
-  //   //  signInPrompt();
-  // }
-});

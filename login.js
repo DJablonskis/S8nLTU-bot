@@ -13,106 +13,138 @@ if (!ShouldRun && location.hostname.includes("travian")) {
   }
 }
 
-const createLoginWindow = () => {
-  const panel = document.createElement("div");
-  panel.classList.add("sidebar");
-  panel.style.cssText =
-    "position: absolute; top:-1000px; left:-1000px; z-index:11000; opacity:0; display:block;transition: opacity 0.4s ease; background-color: #00000040; box-shadow: 0 0 10px 8px #00000040";
+const createAuthPanel = () => {
+  let { header, content } = BotPanel.addSection("Authentication");
+  header.remove();
 
-  const loginBox = panel.appendChild(document.createElement("div"));
-  loginBox.classList.add("sidebarBox");
+  const populateLoginPanel = () => {
+    const panel = document.createElement("div");
+    panel.style.cssText =
+      "display:none;flex-direction:column; justify-content:center";
+    content.appendChild(panel);
+    const usernameLabel = panel.appendChild(document.createElement("span"));
+    usernameLabel.innerText = "License email:";
 
-  const innerBox = loginBox.appendChild(document.createElement("div"));
-  innerBox.classList.add("content");
+    const usernameInput = panel.appendChild(document.createElement("input"));
+    usernameInput.type = "email";
 
-  const boxHeader = innerBox.appendChild(document.createElement("div"));
-  boxHeader.classList.add("boxTitle");
-  boxHeader.innerText = `Login or Register`;
+    const passLabel = panel.appendChild(document.createElement("span"));
+    passLabel.innerText = "License password:";
 
-  const boxContent = innerBox.appendChild(document.createElement("div"));
-  boxContent.classList.add("boxContent");
+    const passInput = panel.appendChild(document.createElement("input"));
+    passInput.type = "password";
 
-  const controls = document.createElement("div");
+    const clear = () => {
+      usernameInput.value = "";
+      passInput.value = "";
+    };
 
-  const usernameGroup = boxContent.appendChild(document.createElement("div"));
-  const usernameLabel = usernameGroup.appendChild(
-    document.createElement("span")
-  );
-  usernameLabel.innerText = "License email:";
-  const usernameInput = usernameGroup.appendChild(
-    document.createElement("input")
-  );
-  usernameInput.type = "email";
+    const controls = panel.appendChild(document.createElement("div"));
 
-  const passGroup = boxContent.appendChild(document.createElement("div"));
-  const passLabel = passGroup.appendChild(document.createElement("span"));
-  passLabel.innerText = "License password:";
-  const passInput = passGroup.appendChild(document.createElement("input"));
-  passInput.type = "password";
+    const loginButton = controls.appendChild(document.createElement("button"));
+    loginButton.className = "textButtonV1 green";
+    loginButton.innerText = "Login";
+    loginButton.style.marginRight = "8px";
+    loginButton.onclick = () => {
+      firebase
+        .auth()
+        .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+          let email = usernameInput.value;
+          let password = passInput.value;
+          return firebase
+            .auth()
+            .signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+              // Signed in
+              var user = userCredential.user;
+              console.log("credentials:", user);
+              close();
+            })
+            .catch((error) => {
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              console.log("errorMessage", errorMessage);
+            });
+        })
+        .catch((error) => {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+        });
+    };
 
-  const loginButton = controls.appendChild(document.createElement("button"));
-  loginButton.className = "textButtonV1 green";
-  loginButton.innerText = "Login";
-  loginButton.style.marginRight = "8px";
-  loginButton.onclick = () => {
-    firebase
-      .auth()
-      .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => {
-        let email = usernameInput.value;
-        let password = passInput.value;
-        return firebase
-          .auth()
-          .signInWithEmailAndPassword(email, password)
-          .then((userCredential) => {
-            // Signed in
-            var user = userCredential.user;
-            console.log("credentials:", user);
-            close();
-          })
-          .catch((error) => {
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            console.log("errorMessage", errorMessage);
-          });
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-      });
+    const registerButton = controls.appendChild(
+      document.createElement("button")
+    );
+
+    registerButton.className = "textButtonV1 green";
+    registerButton.innerText = "Register";
+    registerButton.onclick = () => {};
+
+    const open = () => {
+      clear();
+      panel.style.display = "flex";
+    };
+
+    const close = () => {
+      panel.style.display = "none";
+    };
+
+    return { open, close };
   };
 
-  const registerButton = controls.appendChild(document.createElement("button"));
-  registerButton.className = "textButtonV1 green";
-  registerButton.innerText = "Register";
-  registerButton.onclick = () => {};
+  const populateAccountPanel = () => {
+    const panel = document.createElement("div");
+    panel.style.display = "none";
+    content.appendChild(panel);
+    const usernameSpan = panel.appendChild(document.createElement("span"));
 
-  const close = () => {
-    panel.style.opacity = 0;
-    setTimeout(() => {
-      panel.style.top = `-1000px`;
-      panel.style.left = `-1000px`;
-    }, 400);
+    const controls = panel.appendChild(document.createElement("div"));
+    controls.style.cssText = "display:flex;justify-content:center;";
+
+    const logoutBTN = controls.appendChild(document.createElement("button"));
+    logoutBTN.className = "textButtonV1 green";
+    logoutBTN.innerText = "Logout";
+    logoutBTN.onclick = () =>
+      firebase
+        .auth()
+        .signOut()
+        .then(() => {
+          // Sign-out successful.
+        })
+        .catch((error) => {
+          // An error happened.
+        });
+
+    const open = (user) => {
+      usernameSpan.innerText = user;
+      panel.style.display = "block";
+    };
+
+    const close = () => {
+      usernameSpan.innerText = "";
+      panel.style.display = "none";
+    };
+
+    return { open, close };
   };
 
-  boxContent.appendChild(controls);
+  const loginPanel = populateLoginPanel();
+  const accountPanel = populateAccountPanel();
 
-  const closeButton = panel.appendChild(document.createElement("button"));
-  closeButton.innerText = "x";
-  closeButton.style.cssText =
-    "position: absolute; top:16px; right:12px; z-index: 20";
-  closeButton.onclick = close;
-
-  document.body.appendChild(panel);
-
-  const open = () => {
-    panel.style.display = "block";
-    panel.style.opacity = 1;
-    panel.style.top = `20%`;
-    panel.style.left = `50%`;
-    panel.style.marginLeft = "-50%";
-  };
+  firebase.auth().onAuthStateChanged((user) => {
+    console.log("state in login: ", user);
+    if (user) {
+      var uid = user.uid;
+      accountPanel.open(uid);
+      loginPanel.close();
+      // ...
+    } else {
+      accountPanel.close;
+      loginPanel.open();
+    }
+  });
 
   return {
     close,
@@ -120,5 +152,6 @@ const createLoginWindow = () => {
   };
 };
 
-const LoginUI = createLoginWindow();
+const LoginUI = createAuthPanel();
+
 //LoginUI.open();

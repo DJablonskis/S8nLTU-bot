@@ -9,13 +9,13 @@
 // @grant        GM_getValue
 // @grant        GM_addValueChangeListener
 
-// @require constants.js
-// @require settings.js
-// @require buildings.js
-
 // @require https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js
 // @require https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js
 // @require firebase.js
+
+// @require constants.js
+// @require settings.js
+// @require buildings.js
 
 // @require notifications.js
 // @require botPanel.js
@@ -37,7 +37,7 @@
 
 // @require BOT.js
 
-// @version        0.12.5
+// @version        0.12.6
 // ==/UserScript==
 
 const start = () => {

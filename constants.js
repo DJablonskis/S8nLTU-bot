@@ -21,9 +21,6 @@ const CAPITAL = "capital";
 const BOT_IN_PROGRESS = "bot_progress";
 const NPC_IN_PROGRESS = "npc_progress";
 
-const POSITION_UP = "UP";
-const POSITION_DOWN = "DOWN";
-
 const TRIBE = "tribe";
 const ROMAN = "1"; //
 const TEUTON = "2"; //
@@ -31,17 +28,10 @@ const GAUL = "3"; //
 const EGIPT = "6"; //
 const HUN = "7"; //
 
-const WALLS = {
-  tribe1: 31,
-  tribe2: 32,
-  tribe3: 33,
-  tribe6: 42,
-  tribe7: 43,
-};
+const WALL = [31, 32, 33, 42, 43];
 
 const Q1 = "q1";
 const Q2 = "q2";
 
-const ON_S = localStorage.getItem(BOT_STATS) === ON;
 const titleStyle =
   'letter-spacing: .1em; font-family: "Noto Serif"; font-weight: bold; color: #5e463a; margin-bottom: 5px; margin-top: 5px;';
