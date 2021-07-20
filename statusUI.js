@@ -17,7 +17,7 @@ const setUpStatusBar = () => {
     document.createElement("div")
   );
   loadingBarProgress.style.cssText =
-    "transition:width 0.5s ease; height:6px; background-color: #546e39; border: 1px solid transparent; border-color: #699e32 #6db024 #71c117; width: 100%;";
+    "transition:width 0.5s ease; height:6px; background-color: #546e39; border: 1px solid transparent; border-color: #699e32 #6db024 #71c117; width: 0%;";
 
   const updateStatus = (message = "", instant = false, extraTime = 0) => {
     let duration = instant

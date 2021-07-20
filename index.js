@@ -19,10 +19,9 @@
 
 // @require notifications.js
 // @require botPanel.js
+// @require login.js
 // @require statusUI.js
 // @require helpers.js
-
-// @require login.js
 
 // @require capital.js
 // @require productionManager.js
@@ -37,7 +36,7 @@
 
 // @require BOT.js
 
-// @version        0.12.7
+// @version        0.12.71
 // ==/UserScript==
 
 const start = () => {
