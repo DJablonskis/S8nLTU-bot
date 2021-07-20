@@ -88,16 +88,24 @@ const setUpContextUI = () => {
     const setUp = (slot) => {
       // fill in fields, slider, header, jobs....};
       console.log("right click on: ", slot);
+
       if (slot.pos === 40) slot.gid = Tribe.wall;
 
-      boxHeader.innerText = `[${slot.pos}] ${BDB.name(slot.gid)}`;
-      img.className = `buildingIllustration ${Tribe.name} g${slot.gid} big`;
+      let newBuildJob = JobsManager.get().filter(
+        (job) => job.pos === slot.pos && job.to === 1
+      );
+
+      let gid = newBuildJob.length > 0 ? newBuildJob[0].gid : slot.gid;
+
+      boxHeader.innerText = `[${slot.pos}] ${BDB.name(gid)}`;
+      img.className = `buildingIllustration ${Tribe.name} g${gid} big`;
 
       //TODO: find jobs with matching pos and gid
       let value = slot.lvl + 1;
-      let max = slot.gid < 5 && !Capital ? 10 : BDB.data(slot.gid).maxLvl;
+      let max = gid < 5 && !Capital ? 10 : BDB.data(gid).maxLvl;
 
       jobs = JobsManager.get().filter((job) => job.pos === slot.pos);
+
       let jobTo = 0;
 
       if (jobs.length > 0) {
@@ -126,7 +134,7 @@ const setUpContextUI = () => {
         input.value = value;
         confirm.onclick = () => {
           JobsManager.add({
-            gid: slot.gid,
+            gid,
             pos: slot.pos,
             lvl: slot.lvl,
             to: Number(input.value),
@@ -174,11 +182,29 @@ const setUpContextUI = () => {
 
   let slots = Dorf1Slots ? Dorf1Slots : Dorf2Slots;
   const w = createWindow();
+  console.log("JM", JobsManager.get());
+
   slots.forEach((slot) => {
-    let link = slot.link;
+    let jobs = JobsManager.get().filter(
+      (job) => job.pos === slot.pos && job.to === 1
+    );
+
+    let link = null;
+
     if (slot.pos === 40) {
-      link = link.parentNode.querySelector("svg");
+      link =
+        jobs.length > 0
+          ? slot.link.parentElement.querySelector("path")
+          : slot.link.parentNode.querySelector("svg");
+    } else {
+      link =
+        jobs.length > 0
+          ? slot.link.parentElement.querySelector("path")
+          : slot.link;
     }
+
+    let gid = jobs.length > 0 ? jobs[0].gid : slot.gid;
+
     link.oncontextmenu = (e) => {
       e.preventDefault();
       w.open(e, slot);

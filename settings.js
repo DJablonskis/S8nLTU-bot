@@ -21,6 +21,10 @@ initDetailedStats = () => {
     f(ON_S);
   };
 
+  const get = () => {
+    return ON_S;
+  };
+
   const notify = () => {
     subscribers.forEach((f) => f(ON_S));
   };
@@ -30,7 +34,7 @@ initDetailedStats = () => {
     localStorage.setItem(BOT_STATS, ON_S ? ON : OFF);
     notify();
   };
-  return { on: ON_S, toggle, subscribe };
+  return { get, toggle, subscribe };
 };
 
 const DetailedStats = initDetailedStats();
@@ -43,6 +47,10 @@ const initBotPower = () => {
   const subscribe = (f) => {
     subscribers.push(f);
     f(BOT_ON);
+  };
+
+  const get = () => {
+    return BOT_ON;
   };
 
   const notify = () => {
@@ -63,7 +71,7 @@ const initBotPower = () => {
     notify();
   });
 
-  return { on: BOT_ON, toggle, subscribe };
+  return { get, toggle, subscribe };
 };
 
 const BotPower = initBotPower();

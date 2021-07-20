@@ -298,7 +298,7 @@ const getBuildingSlots = () => {
     ...document.querySelectorAll(".village2 div.buildingSlot"),
   ];
   //REMOVING SECOND WALL
-  building_nodes.pop();
+  if (building_nodes.length > 21) building_nodes.pop();
 
   building_nodes.forEach((node) => {
     let pos = Number(node.classList[1].substring(1));
