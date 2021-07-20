@@ -32,6 +32,8 @@ const initBOT = () => {
       console.log(`- prioritise: ${prioritisePlanned.toString()}`);
       console.log(`- Autobuild: ${(upgradeCrop || upgradeRes).toString()}`);
 
+      console.log("last check", new Date(lastCheck).toLocaleTimeString());
+
       p = {
         did: vil.did,
         nextCheck: lastCheck + MAX_WAIT,
@@ -42,6 +44,8 @@ const initBOT = () => {
       let wmax = queueWait > ressWait ? queueWait : ressWait;
       let auto = upgradeCrop || upgradeRes;
       let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
+
+      console.log(`- nextMax: ${nextMax}`);
 
       const getNextAutoTime = () => {
         if (Tribe.id === ROMAN)
