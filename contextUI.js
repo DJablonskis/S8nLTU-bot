@@ -57,15 +57,11 @@ const setUpContextUI = () => {
 
     const controls = document.createElement("div");
 
-    const cancel = controls.appendChild(document.createElement("button"));
-    cancel.className = "textButtonV1 green";
-    cancel.innerText = "cancel";
+    const cancel = controls.appendChild(blueButton("cancel"));
     cancel.style.marginRight = "8px";
 
     cancel.onclick = close;
-    const confirm = controls.appendChild(document.createElement("button"));
-    confirm.className = "textButtonV1 green";
-    confirm.innerText = "confirm";
+    const confirm = controls.appendChild(blueButton("confirm"));
 
     const jobsDiv = boxContent.appendChild(document.createElement("div"));
     jobsDiv.style.display = "block";

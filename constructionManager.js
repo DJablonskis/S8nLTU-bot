@@ -104,40 +104,42 @@ const initConstructionManager = () => {
         "position: absolute;flex-direction: column; display: inline-flex; font-size: 18px; padding-left: 2px; line-height: 0.35;";
       nameRow.appendChild(flexBlock);
 
+      let getDot = () => {
+        let dot = document.createElement("span");
+        dot.innerText = "•";
+        dot.style.cssText =
+          "font-weight: bold; text-stroke: 1px #759eb8; color:#23b5d3 ;padding-right:2px;";
+        return dot;
+      };
+
       let q1Node = flexBlock.appendChild(document.createElement("div"));
       q1Node.style.height = "8px";
       get(vil.did).dorf1.forEach((b) => {
-        let dot = q1Node.appendChild(document.createElement("span"));
-        dot.innerText = "•";
-        dot.style.cssText =
-          "font-weight: bold; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; color: orange;padding-right:2px;";
+        let dot = q1Node.appendChild(getDot());
         let current = Date.now();
         let s = b.finish - current;
         if (s > 0) {
           setTimeout(() => {
-            dot.style.color = "#4cc500";
+            dot.style.color = "#578b11";
             Notifications.send(b, vil);
           }, s);
         } else {
-          dot.style.color = "#4cc500";
+          dot.style.color = "#578b11";
         }
       });
 
       let q2Node = flexBlock.appendChild(document.createElement("div"));
       q2Node.style.height = "8px";
       get(vil.did).dorf2.forEach((b) => {
-        let dot = q2Node.appendChild(document.createElement("span"));
-        dot.innerText = "•";
-        dot.style.cssText =
-          "font-weight: bold; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; color: orange; padding-right:2px;";
+        let dot = q2Node.appendChild(getDot());
         let current = Date.now();
         let s = b.finish - current;
         if (s > 0) {
           setTimeout(() => {
-            dot.style.color = "#4cc500";
+            dot.style.color = "#578b11";
           }, s);
         } else {
-          dot.style.color = "#4cc500";
+          dot.style.color = "#578b11";
         }
       });
 

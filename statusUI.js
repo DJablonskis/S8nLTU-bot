@@ -12,12 +12,12 @@ const setUpStatusBar = () => {
 
   const loadingBar = status.appendChild(document.createElement("div"));
   loadingBar.style.cssText =
-    "margin-top: 4px; position: relative; height:8px; border:1px solid #52372a; overflow: hidden; border-radius:2px; background-color: #52372a";
+    "margin-top: 4px; position: relative; height:8px; border:1px solid #759eb8; overflow: hidden; border-radius:2px; background-color: #759eb8";
   const loadingBarProgress = loadingBar.appendChild(
     document.createElement("div")
   );
   loadingBarProgress.style.cssText =
-    "transition:width 0.5s ease; height:6px; background-color: #546e39; border: 1px solid transparent; border-color: #699e32 #6db024 #71c117; width: 0%;";
+    "transition:width 0.5s ease; height:6px; background-color: #23B5D3; border: 1px solid transparent; border-color: #28c3D3 #23B5f3 #24B7D3; width: 0%;";
 
   const updateStatus = (message = "", instant = false, extraTime = 0) => {
     let duration = instant

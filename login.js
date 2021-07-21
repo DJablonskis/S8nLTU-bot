@@ -41,9 +41,7 @@ const createAuthPanel = () => {
 
     const controls = panel.appendChild(document.createElement("div"));
 
-    const loginButton = controls.appendChild(document.createElement("button"));
-    loginButton.className = "textButtonV1 green";
-    loginButton.innerText = "Login";
+    const loginButton = controls.appendChild(blueButton("Login"));
     loginButton.style.marginRight = "8px";
     loginButton.onclick = () => {
       firebase
@@ -74,12 +72,7 @@ const createAuthPanel = () => {
         });
     };
 
-    const registerButton = controls.appendChild(
-      document.createElement("button")
-    );
-
-    registerButton.className = "textButtonV1 green";
-    registerButton.innerText = "Register";
+    const registerButton = controls.appendChild(blueButton("Register"));
     registerButton.onclick = () => {};
 
     const open = () => {
@@ -103,9 +96,7 @@ const createAuthPanel = () => {
     const controls = panel.appendChild(document.createElement("div"));
     controls.style.cssText = "display:flex;justify-content:center;";
 
-    const logoutBTN = controls.appendChild(document.createElement("button"));
-    logoutBTN.className = "textButtonV1 green";
-    logoutBTN.innerText = "Logout";
+    const logoutBTN = controls.appendChild(blueButton("Logout"));
     logoutBTN.onclick = () =>
       firebase
         .auth()

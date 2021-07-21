@@ -1,12 +1,4 @@
 if (window.location.pathname.includes("build.php")) {
-  const createButton = () => {
-    const button = document.createElement("button");
-    button.classList.add("textButtonV1", "green", "new");
-    button.style.marginTop = "4px";
-    button.innerText = `Add to planed upgrades`;
-    return button;
-  };
-
   let params = getParams();
   let query = "#build div[id*=contract_building]";
 
@@ -29,7 +21,8 @@ if (window.location.pathname.includes("build.php")) {
         } else {
           job.pos = Number(params.id);
         }
-        let button = createButton();
+        let button = blueButton("Add to planed upgrades");
+        button.style.marginTop = "4px";
         container.appendChild(button);
         button.onclick = () => {
           JobsManager.add(job);
@@ -46,7 +39,7 @@ if (window.location.pathname.includes("build.php")) {
       building.link.parentNode.style.display = "block";
       console.log(building.link);
       if (building.pos !== 40) {
-        let image = building.link.nextSibling();
+        let image = building.link.nextSibling;
         image.classList.add("g" + job.gid);
         image.style.opacity = "0.6";
         image.style.filter = "grayscale(100%)";
