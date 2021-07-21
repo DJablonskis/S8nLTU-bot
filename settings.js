@@ -54,7 +54,6 @@ const initBotPower = () => {
   };
 
   const notify = () => {
-    console.log("auth state changed");
     if (initialised) subscribers.forEach((f) => f(BOT_ON));
   };
 

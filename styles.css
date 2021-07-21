@@ -1,3 +1,34 @@
-body {
-  background-color: transparent !important;
+button.green.blue {
+  margin: 8px 4px;
+  background-image: none;
+  background-color: #759eb8;
+  box-shadow: inset 2px 0 1px -1px #23b5d3, inset -2px 0 1px -1px #23b5d3,
+    inset 0 3px 1px -1px hsl(203deg 91% 76%), inset 0 -3px 1px -1px #23b5d399;
+}
+
+.buttonFramed.green.blue.round:before {
+  box-shadow: inset 0 -2px 1px 1px #23b5d3, inset 2px -1px 1px 0 #204760,
+    inset -2px -1px 1px 0 #204760, inset 0 2px 1px 1px #c8ddea;
+}
+
+.buttonFramed.green.blue.round:hover:before {
+  box-shadow: inset 0 -2px 1px 1px #23b5d3, inset 2px -1px 1px 0 #204760,
+    inset -2px -1px 1px 0 #204760, inset 0 2px 1px 1px #c8ddea;
+}
+.buttonFramed.green.blue.round > svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
+  stroke-width: 3px;
+}
+.buttonFramed.green.blue.round.bigger > svg {
+  width: 28px;
+  height: 28px;
+}
+
+.buttonFramed.green.blue:before {
+  background-color: #759eb8;
+}
+.buttonFramed.green.blue:hover:before {
+  background-color: #23b5d3;
 }

@@ -178,7 +178,6 @@ const setUpContextUI = () => {
 
   let slots = Dorf1Slots ? Dorf1Slots : Dorf2Slots;
   const w = createWindow();
-  console.log("JM", JobsManager.get());
 
   slots.forEach((slot) => {
     let jobs = JobsManager.get().filter(
