@@ -14,6 +14,20 @@ if (!ShouldRun && location.hostname.includes("travian")) {
 }
 
 const createAuthPanel = () => {
+  const { version, speed, country, worldId } = unsafeWindow.Travian.Game;
+
+  const Server = {
+    version,
+    speed,
+    country,
+    worldId,
+    username: document.querySelector("div.playerName").innerText,
+    host: window.location.hostname,
+    path: window.location.pathname,
+  };
+
+  console.log("Server", Server);
+
   let { header, content } = BotPanel.addSection("Authentication");
   header.remove();
 
@@ -56,13 +70,11 @@ const createAuthPanel = () => {
             .then((userCredential) => {
               // Signed in
               var user = userCredential.user;
-              console.log("credentials:", user);
               close();
             })
             .catch((error) => {
               var errorCode = error.code;
               var errorMessage = error.message;
-              console.log("errorMessage", errorMessage);
             });
         })
         .catch((error) => {
@@ -91,7 +103,16 @@ const createAuthPanel = () => {
     const panel = document.createElement("div");
     panel.style.display = "none";
     content.appendChild(panel);
-    const usernameSpan = panel.appendChild(document.createElement("span"));
+    const usernameSpan = panel.appendChild(document.createElement("p"));
+    panel.appendChild(
+      document.createElement("div")
+    ).innerText = `Server: ${Server.host}`;
+    panel.appendChild(
+      document.createElement("div")
+    ).innerText = `World ID: ${Server.worldId}, Speed: ${Server.speed}`;
+    panel.appendChild(
+      document.createElement("div")
+    ).innerText = `Account: ${Server.username}`;
 
     const controls = panel.appendChild(document.createElement("div"));
     controls.style.cssText = "display:flex;justify-content:center;";
@@ -109,7 +130,7 @@ const createAuthPanel = () => {
         });
 
     const open = (user) => {
-      usernameSpan.innerText = user;
+      usernameSpan.innerText = `License Key: ${user}`;
       panel.style.display = "block";
     };
 
@@ -125,7 +146,6 @@ const createAuthPanel = () => {
   const accountPanel = populateAccountPanel();
 
   firebase.auth().onAuthStateChanged((user) => {
-    console.log("state in login: ", user);
     if (user) {
       var uid = user.uid;
       accountPanel.open(uid);
@@ -142,7 +162,8 @@ const createAuthPanel = () => {
     open,
   };
 };
-
-const LoginUI = createAuthPanel();
+if (ShouldRun) {
+  const LoginUI = createAuthPanel();
+}
 
 //LoginUI.open();
