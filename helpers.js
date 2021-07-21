@@ -365,8 +365,8 @@ const blueButton = (text) => {
   button.className = "textButtonV1 green";
   button.innerText = text;
   button.style.backgroundImage = "none";
-  button.style.backgroundColor = "#23b5d3";
+  button.style.backgroundColor = "#759eb8";
   button.style.boxShadow =
-    "box-shadow: inset 2px 0 1px -1px #3d6076, inset -2px 0 1px -1px #3d6076, inset 0 3px 1px -1px hsl(203deg 91% 76%), inset 0 -3px 1px -1px #3d607699";
+    "inset 2px 0 1px -1px #23B5D3, inset -2px 0 1px -1px #23B5D3, inset 0 3px 1px -1px hsl(203deg 91% 76%), inset 0 -3px 1px -1px #23B5D399";
   return button;
 };

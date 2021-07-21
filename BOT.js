@@ -121,12 +121,12 @@ const initBOT = () => {
   };
 
   const continueUpgrade = ({ did, job }) => {
-    console.log("continuing old upgrade");
+    console.log("continuing upgrade");
     console.log("progress job:", job);
     if (location.pathname.includes("build.php")) {
       const params = getParams();
       let currentLvl = 0;
-      //check if job was done to this leve and if so, complete it
+      //check if job was done to this level and if so, complete it
       if (Object.keys(params).includes("gid")) {
         currentLvl = Number(
           document.querySelector("div#build").classList[1].slice(-1)
@@ -201,10 +201,7 @@ const initBOT = () => {
             } else {
               b ? b.click() : console.log("could not find build button");
             }
-            //TODO: Job should be auto cleared after reload if level exists already?? check if working
-            // JobsManager.complete(inProgress.job);
             localStorage.setItem(BOT_IN_PROGRESS, "");
-            //   b.click();
           }, Status.update("Perssing build Button"));
           return timeout;
         } else console.log("Error! Button for upgrade not found!");
@@ -357,9 +354,27 @@ const initBOT = () => {
   };
 
   const start = () => {
-    if (inProgress && inProgress.timestamp > Date.now())
-      continueUpgrade(inProgress);
-    else if (!Dorf1Slots && !Dorf2Slots) {
+    if (inProgress) {
+      if (
+        inProgress.timestamp > Date.now() &&
+        inProgress.did === CurrentVillage.did
+      ) {
+        continueUpgrade(inProgress);
+      } else {
+        localStorage.setItem(BOT_IN_PROGRESS, "");
+        if (!Dorf1Slots && !Dorf2Slots) {
+          timeout = setTimeout(
+            () => navigateTo(inProgress.job.gid > 4 ? 2 : 1),
+            Status.update("Wrong started job found. Going back.")
+          );
+        } else {
+          timeout = setTimeout(
+            startBuildingLoop,
+            Status.update("Wrong started job found. Resetting.")
+          );
+        }
+      }
+    } else if (!Dorf1Slots && !Dorf2Slots) {
       timeout = setTimeout(
         () => navigateTo(1),
         Status.update("Lost, navigating home")

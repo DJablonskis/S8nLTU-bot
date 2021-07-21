@@ -120,11 +120,11 @@ const initConstructionManager = () => {
         let s = b.finish - current;
         if (s > 0) {
           setTimeout(() => {
-            dot.style.color = "#578b11";
+            dot.style.color = "orange";
             Notifications.send(b, vil);
           }, s);
         } else {
-          dot.style.color = "#578b11";
+          dot.style.color = "orange";
         }
       });
 
@@ -136,10 +136,10 @@ const initConstructionManager = () => {
         let s = b.finish - current;
         if (s > 0) {
           setTimeout(() => {
-            dot.style.color = "#578b11";
+            dot.style.color = "orange";
           }, s);
         } else {
-          dot.style.color = "#578b11";
+          dot.style.color = "orange";
         }
       });
 
