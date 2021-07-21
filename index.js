@@ -5,6 +5,9 @@
 // @include        *.travian.*/*
 // @include        *media.oadts.com*
 
+// @resource IMPORTED_CSS styles.css
+// @grant        GM_getResourceText
+// @grant        GM_addStyle
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_addValueChangeListener
@@ -18,10 +21,10 @@
 // @require buildings.js
 
 // @require notifications.js
+// @require helpers.js
 // @require botPanel.js
 // @require login.js
 // @require statusUI.js
-// @require helpers.js
 
 // @require capital.js
 // @require productionManager.js
@@ -34,10 +37,14 @@
 // @require newBuildUI.js
 // @require contextUI.js
 
+// @require heroManager.js
 // @require BOT.js
 
-// @version        0.12.72
+// @version        0.12.8
 // ==/UserScript==
+
+const my_css = GM_getResourceText("IMPORTED_CSS");
+GM_addStyle(my_css);
 
 const start = () => {
   if (ShouldRun) {
