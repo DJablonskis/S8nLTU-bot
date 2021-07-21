@@ -12,10 +12,8 @@ const setUpNPC = (BOT, botPanel) => {
   npcTitle.innerText = "Auto NPC";
 
   const NPCPanel = npcS.appendChild(document.createElement("div"));
-  const addNpcButton = npcS.appendChild(document.createElement("button"));
-  addNpcButton.className = "textButtonV1 gold productionBoostButton";
+  const addNpcButton = npcS.appendChild(blueButton("Add new rule"));
   addNpcButton.style.cssText = "margin-top: 8px;";
-  addNpcButton.innerText = "Add new rule";
   addNpcButton.onclick = () => addNPCRule();
 
   const npcSubtitle = npcS.appendChild(document.createElement("p"));

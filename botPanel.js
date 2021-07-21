@@ -3,6 +3,11 @@ const createSidePanel = () => {
   const panel = document.createElement("div");
   panel.classList.add("sidebarBox");
 
+  panel.style.opacity = "0";
+  panel.style.overflow = "hidden";
+  panel.style.transition = "all 4s ease";
+  panel.style.maxHeight = "0px";
+
   let sidePanelHeader = panel.appendChild(document.createElement("div"));
   sidePanelHeader.classList.add("header");
 
@@ -124,7 +129,17 @@ const createSidePanel = () => {
     };
   }
 
-  return { panel, addSection };
+  const show = (yes) => {
+    if (yes) {
+      panel.style.opacity = "1";
+      panel.style.maxHeight = "2000px";
+    } else {
+      panel.style.opacity = "0";
+      panel.style.maxHeight = "0";
+    }
+  };
+
+  return { panel, addSection, show };
 };
 
 let BotPanel;
