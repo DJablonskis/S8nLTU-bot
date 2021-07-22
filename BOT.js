@@ -27,12 +27,16 @@ const initBOT = () => {
       let { upgradeCrop, upgradeRes } = AutoUpgrade.get(vil.did);
       let { prioritisePlanned } = JobsManager.settings(vil.did);
       let lastCheck = ConstructionManager.get(vil.did).timestamp;
-      console.log(`- d1q: ${wq1 > time ? "BUSY" : "EMPTY"}`);
-      console.log(`- d2q: ${wq2 > time ? "BUSY" : "EMPTY"}`);
-      console.log(`- prioritise: ${prioritisePlanned.toString()}`);
-      console.log(`- Autobuild: ${(upgradeCrop || upgradeRes).toString()}`);
-
-      console.log("last check", new Date(lastCheck).toLocaleTimeString());
+      console.log(
+        `- Q1: ${wq1 > time ? "BUSY" : "EMPTY"}, Q2: ${
+          wq2 > time ? "BUSY" : "EMPTY"
+        }`
+      );
+      console.log(
+        `- priority: ${prioritisePlanned.toString()}  Auto: ${(
+          upgradeCrop || upgradeRes
+        ).toString()}`
+      );
 
       p = {
         did: vil.did,
@@ -45,7 +49,15 @@ const initBOT = () => {
       let auto = upgradeCrop || upgradeRes;
       let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
 
-      console.log(`- nextMax: ${nextMax}`);
+      console.log(
+        `- Last check: ${new Date(
+          lastCheck
+        ).toLocaleTimeString()}, nextMax: ${new Date(
+          nextMax
+        ).toLocaleTimeString()}, nextMin: ${new Date(
+          nextCheckMin
+        ).toLocaleTimeString()}`
+      );
 
       const getNextAutoTime = () => {
         if (Tribe.id === ROMAN)
@@ -60,9 +72,7 @@ const initBOT = () => {
         console.log("- has job", job);
         //can be built?
         if (wmax < time) {
-          console.log("- resswait: ", ressWait);
-          console.log("- can build");
-
+          console.log(`- resswait: ${ressWait}, `);
           p.nextCheck = time;
         } else if (prioritisePlanned) {
           p.nextCheck = nextMax;

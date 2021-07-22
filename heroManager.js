@@ -1,7 +1,7 @@
 const initHeroManager = () => {
-  const HeroStatus = document.querySelector(
+  const heroStatus = document.querySelector(
     "#topBarHeroWrapper #topBarHero .heroStatus svg"
-  ).className;
+  ).classList[0];
 
   let mask = document.querySelector("#healthMask path").getAttribute("d");
 
@@ -23,12 +23,13 @@ const initHeroManager = () => {
     let dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 
     let ang = 2 * Math.asin(dist / (2 * radius)) * (180 / Math.PI);
-
-    console.log("calculation: ", ang);
+    return ang;
   };
 
   let h1 = getAngle(mask);
   let h2 = getAngle(bar);
+
+  let health = Math.round((h1 / h2) * 100);
 
   //console.log("dist", dist);
 
@@ -38,16 +39,21 @@ const initHeroManager = () => {
   //let ang = Math.asin((dist / (2 * 55)) * 2);
 
   //console.log("ang ", ang);
-
-  const heroButton = document.getElementById("heroImageButton");
   const adventuresButton = document.querySelector("#topBarHero a.adventure");
+
+  const openInventory = () => {
+    document.getElementById("heroImageButton").click();
+  };
+  const openAdventures = () => {
+    adventuresButton.click();
+  };
 
   let hasAdventure = adventuresButton.classList.contains("attention");
   let adventureCount = hasAdventure
     ? Number(adventuresButton.querySelector("div.content").innerText)
     : 0;
 
-  const heroStatus = [
+  const statusEnum = [
     "heroHome",
     "heroReinforcing",
     "heroRunning",
@@ -67,4 +73,16 @@ const initHeroManager = () => {
       }
     }
   }
+  return {
+    heroStatus,
+    health,
+    adventureCount,
+    openAdventures,
+    openInventory,
+  };
 };
+
+if (ShouldRun) {
+  const HeroManager = initHeroManager();
+  console.log("hero manager", HeroManager);
+}

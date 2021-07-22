@@ -23,6 +23,7 @@
 // @require notifications.js
 // @require helpers.js
 // @require botPanel.js
+// @require settingsSection.js
 // @require statusUI.js
 
 // @require capital.js
@@ -40,7 +41,7 @@
 // @require heroManager.js
 // @require BOT.js
 
-// @version        0.12.81
+// @version        0.12.82
 // ==/UserScript==
 
 const my_css = GM_getResourceText("IMPORTED_CSS");
