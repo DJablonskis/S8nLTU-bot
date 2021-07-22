@@ -1,7 +1,7 @@
 const APP_NAME = "S8nLTU BOT";
 
 const CITIES_STORAGE = "storedCities";
-const PANEL_POSITION = "positionPanel";
+const PANEL_OPTIONS = "panel_options";
 const NPC_RULES = "npcRules";
 const FARM_RULES = "farmRules";
 

@@ -400,3 +400,12 @@ const blueToggle = (path = "") => {
 
   return button;
 };
+
+const checkboxToggle = (checked) => {
+  let l = document.createElement("label");
+  l.className = "switch";
+  l.innerHTML = `<input type="checkbox" ${
+    checked ? "checked" : ""
+  }><span class="slider round"></span>`;
+  return l;
+};

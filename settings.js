@@ -39,6 +39,64 @@ initDetailedStats = () => {
 
 const DetailedStats = initDetailedStats();
 
+const optionKeys = {
+  keepOnTop: "keepOnTop",
+  settingsOpen: "settingsOpen",
+  sendToAdventures: "sendToAdventures",
+  sendToClosestFirst: "sendToClosestFirst",
+  sendToHardestFirst: "sendToHardestFirst",
+  minHealt: "minHealt",
+};
+
+const initBotOptions = () => {
+  let options = JSON.parse(localStorage.getItem(PANEL_OPTIONS));
+
+  if (!options) options = {};
+  options.keepOnTop = options.keepOnTop ? true : false;
+  options.settingsOpen = options.settingsOpen ? true : false;
+  options.sendToAdventures = options.sendToAdventures ? true : false;
+  options.sendToClosestFirst = options.sendToClosestFirst ? true : false;
+  options.sendToHardestFirst = options.sendToHardestFirst ? true : false;
+
+  if (!options.minHealt || options.minHealt < 1 || options.minHealt > 100)
+    options.minHealt = 100;
+
+  const subscribers = [];
+  const subscribe = (f) => {
+    subscribers.push(f);
+    f(options);
+  };
+
+  const get = (key = "") => {
+    if (key) return options[key];
+    else return options;
+  };
+
+  const set = (key, value) => {
+    options[key] = value;
+    save();
+  };
+
+  const notify = () => {
+    subscribers.forEach((f) => f(options));
+  };
+
+  const save = () => {
+    localStorage.setItem(PANEL_OPTIONS, JSON.stringify(options));
+  };
+
+  const toggle = (key) => {
+    options[key] = !options[key];
+    console.log("settings changed: ", options);
+    save();
+    notify();
+  };
+
+  return { get, toggle, subscribe, set };
+};
+
+const BotOptions = initBotOptions();
+
 const initBotPower = () => {
   let initialised = false;
   let BOT_ON = localStorage.getItem(BOT_POWER) === ON;
