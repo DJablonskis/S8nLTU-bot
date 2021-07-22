@@ -28,8 +28,7 @@ const createAuthPanel = () => {
 
   console.log("Server", Server);
 
-  let { header, content } = BotPanel.addSection("Authentication");
-  header.remove();
+  let { content } = SettingsSection;
 
   const populateLoginPanel = () => {
     const panel = document.createElement("div");
