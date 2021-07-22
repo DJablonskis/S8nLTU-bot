@@ -41,7 +41,7 @@
 // @require heroManager.js
 // @require BOT.js
 
-// @version        0.12.82
+// @version        0.12.90
 // ==/UserScript==
 
 const my_css = GM_getResourceText("IMPORTED_CSS");

@@ -364,7 +364,9 @@ const initBOT = () => {
   };
 
   const start = () => {
-    if (inProgress) {
+    if (HeroManager.canGo()) {
+      return HeroManager.startAdventure();
+    } else if (inProgress) {
       if (
         inProgress.timestamp > Date.now() &&
         inProgress.did === CurrentVillage.did

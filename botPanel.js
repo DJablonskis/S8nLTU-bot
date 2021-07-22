@@ -2,6 +2,7 @@ const createSidePanel = () => {
   const sideBar = document.querySelector("#sidebarBeforeContent > div");
   const panel = document.createElement("div");
   panel.classList.add("sidebarBox");
+  panel.id = "S8nLTU";
 
   panel.style.opacity = "0";
   panel.style.overflow = "hidden";
@@ -41,6 +42,7 @@ const createSidePanel = () => {
 
   if ("Notification" in window) {
     let btnNotif = btnWraper.appendChild(blueToggle(TogglePathNotifications));
+
     let svg = btnNotif.querySelector("svg");
     svg.style.fill = Notifications.on ? "red" : "white";
     btnNotif.onclick = (e) => {
@@ -59,34 +61,36 @@ const createSidePanel = () => {
 
   btnStats.onclick = (e) => DetailedStats.toggle();
 
-  let positionUp = localStorage.getItem(PANEL_POSITION);
-  positionUp = positionUp && positionUp === ON;
-  let btnPosition = btnWraper.appendChild(blueToggle(TogglePathSettings));
+  let btnSettings = btnWraper.appendChild(blueToggle(TogglePathSettings));
+  btnSettings.classList.add("bigger");
 
-  btnPosition.classList.add("bigger");
-  const displayPanel = (remove = false) => {
-    if (remove) panel.remove();
-    if (positionUp) {
+  BotOptions.subscribe(({ settingsOpen }) => {
+    btnSettings.querySelector("svg").style.fill = settingsOpen
+      ? "red"
+      : "white";
+  });
+
+  btnSettings.onclick = (e) => {
+    BotOptions.toggle(optionKeys.settingsOpen);
+  };
+
+  const displayPanel = (open) => {
+    panel.remove();
+    if (open) {
       sideBar.prepend(panel);
     } else {
       sideBar.appendChild(panel);
     }
   };
-  displayPanel();
 
-  btnPosition.onclick = (e) => {
-    localStorage.setItem(PANEL_POSITION, positionUp ? OFF : ON);
-    positionUp = !positionUp;
-    displayPanel(true);
-  };
+  BotOptions.subscribe(({ keepOnTop }) => {
+    displayPanel(keepOnTop);
+  });
 
   function addSection(title) {
-    if (title) {
-      let sidePanelHeader = block.appendChild(document.createElement("div"));
-      sidePanelHeader.classList.add("boxTitle");
-      sidePanelHeader.innerText = title;
-    }
-
+    let sidePanelHeader = block.appendChild(document.createElement("div"));
+    sidePanelHeader.classList.add("boxTitle");
+    sidePanelHeader.innerText = title;
     let sidePanelContent = block.appendChild(document.createElement("div"));
     sidePanelContent.classList.add("boxContent");
 
@@ -95,7 +99,7 @@ const createSidePanel = () => {
       content: sidePanelContent,
       destroy: () => {
         sidePanelContent.remove();
-        if (title) sidePanelHeader.remove();
+        sidePanelHeader.remove();
       },
     };
   }
@@ -112,7 +116,7 @@ const createSidePanel = () => {
 
   setTimeout(show, 200);
 
-  return { panel, addSection, show, settingsSection };
+  return { panel, addSection, show };
 };
 
 let BotPanel;
