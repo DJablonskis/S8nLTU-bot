@@ -1,7 +1,7 @@
 const initBOT = () => {
   const lag = 60000;
 
-  const { watchAds, prioritise, upgradeCrop, upgradeRes } = BotOptions.get();
+  const { watchAds, prioritise, upgradeCrop, upgradeRess } = BotOptions.get();
 
   let getInProgress = () => {
     let prog = localStorage.getItem(BOT_IN_PROGRESS);
@@ -43,7 +43,7 @@ const initBOT = () => {
       let nextCheckMin = lastCheck + MIN_WAIT;
       let nextCheckMax = lastCheck + MAX_WAIT;
       let wmax = queueWait > ressWait ? queueWait : ressWait;
-      let auto = upgradeCrop || upgradeRes;
+      let auto = upgradeCrop || upgradeRess;
       let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
 
       console.log(
@@ -110,7 +110,7 @@ const initBOT = () => {
 
   const getAutoUpgradeJob = () => {
     let upgradable = Dorf1Slots.filter((slot) => slot.status === "good");
-    if (!upgradeRes) upgradable = upgradable.filter((f) => f.gid === 4);
+    if (!upgradeRess) upgradable = upgradable.filter((f) => f.gid === 4);
     if (!upgradeCrop) upgradable = upgradable.filter((f) => f.gid !== 4);
     if (upgradable.length > 0) {
       upgradable = upgradable.sort((a, b) => a.lvl - b.lvl);
@@ -212,7 +212,7 @@ const initBOT = () => {
   };
 
   const startAutoUpgradeJob = () => {
-    if (upgradeCrop || upgradeRes) {
+    if (upgradeCrop || upgradeRess) {
       //Check if auto updater is on and available priority
       if (Dorf1Slots) {
         let job = getAutoUpgradeJob();
