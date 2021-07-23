@@ -10,7 +10,7 @@ const initHeroManager = () => {
     .getAttribute("d");
 
   let getAngle = (d, radius = 55) => {
-    angle = d.split("L")[1].split("A");
+    let angle = d.split("L")[1].split("A");
     let angle_start = angle[0].split(" ");
     let angle_end = angle[1].split(" ");
 
@@ -59,50 +59,10 @@ const initHeroManager = () => {
     "heroReviving",
   ];
 
-  const setUpSettingOn = (container) => {
-    settingOnRow = container.appendChild(document.createElement("div"));
-
-    settingOnRow.innerHTML = "<strong>Auto send to adventures </strong>";
-    settingOnRow.className = "settings-row";
-    settingOnRow.appendChild(
-      checkboxToggle(BotOptions.get(optionKeys.sendToAdventures))
-    );
-    settingOnRow.querySelector("input").onclick = (e) => {
-      if (e.target.checked !== BotOptions.get(optionKeys.sendToAdventures)) {
-        BotOptions.toggle(optionKeys.sendToAdventures);
-      }
-    };
-  };
-  const setUpSettingEasyFirst = (container) => {
-    settingOnRow = container.appendChild(document.createElement("div"));
-
-    settingOnRow.innerHTML = "<strong>Send to hardest first</strong>";
-    settingOnRow.className = "settings-row";
-    settingOnRow.appendChild(
-      checkboxToggle(BotOptions.get(optionKeys.sendToHardestFirst))
-    );
-    settingOnRow.querySelector("input").onclick = (e) => {
-      if (e.target.checked !== BotOptions.get(optionKeys.sendToHardestFirst)) {
-        BotOptions.toggle(optionKeys.sendToHardestFirst);
-      }
-    };
-  };
-  const setUpSettingClosestFirst = (container) => {
-    settingOnRow = container.appendChild(document.createElement("div"));
-
-    settingOnRow.innerHTML = "<strong>Send to closest first</strong>";
-    settingOnRow.className = "settings-row";
-    settingOnRow.appendChild(
-      checkboxToggle(BotOptions.get(optionKeys.sendToClosestFirst))
-    );
-    settingOnRow.querySelector("input").onclick = (e) => {
-      if (e.target.checked !== BotOptions.get(optionKeys.sendToClosestFirst)) {
-        BotOptions.toggle(optionKeys.sendToClosestFirst);
-      }
-    };
-  };
   const setUpSettingMinHealth = (container) => {
-    settingsMinHealthRow = container.appendChild(document.createElement("div"));
+    let settingsMinHealthRow = container.appendChild(
+      document.createElement("div")
+    );
 
     settingsMinHealthRow.innerHTML = `<strong>Minimal health </strong><input type="number" min="1" max="100" value="${BotOptions.get(
       optionKeys.minHealt
@@ -122,7 +82,8 @@ const initHeroManager = () => {
     return (
       BotOptions.get(optionKeys.sendToAdventures) &&
       heroStatus === "heroHome" &&
-      health >= BotOptions.get(optionKeys.minHealt)
+      health >= BotOptions.get(optionKeys.minHealt) &&
+      adventureCount > 0
     );
   };
 
@@ -140,16 +101,14 @@ const initHeroManager = () => {
     col1.style.flex = "1";
     let col2 = cols.appendChild(document.createElement("div"));
     col2.style.flex = "1";
-
-    setUpSettingOn(col1);
     setUpSettingMinHealth(col1);
-    setUpSettingClosestFirst(col1);
-    setUpSettingEasyFirst(col1);
 
-    // BotOptions.subscribe(({ settingsOpen }) => {
-    //   SettingsSection.header.style.display = settingsOpen ? "block" : "none";
-    //   SettingsSection.content.style.display = settingsOpen ? "block" : "none";
-    // });
+    col1.appendChild(
+      createOptionToggle("Do hardest first", optionKeys.sendToHardestFirst)
+    );
+    col1.appendChild(
+      createOptionToggle("Do closest first", optionKeys.sendToClosestFirst)
+    );
   }
 
   const startAdventure = () => {

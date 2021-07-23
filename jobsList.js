@@ -1,51 +1,24 @@
 const initJobsList = () => {
   const { content, header } = BotPanel.addSection("Planed upgrades");
   header.style.paddingTop = "10px";
+  content.appendChild(
+    createOptionToggle("Prioritise planned", optionKeys.prioritise)
+  );
+  content.appendChild(createOptionToggle("Watch ads", optionKeys.watchAds));
 
-  const settingsDiv = content.appendChild(document.createElement("div"));
-  settingsDiv.style.display = "flex";
+  content.appendChild(
+    createOptionToggle("Auto build resources", optionKeys.upgradeRess)
+  );
 
-  const watchAdsCB = settingsDiv.appendChild(document.createElement("div"));
-  watchAdsCB.style.marginRight = "16px";
-
-  watchAdsCB.innerHTML =
-    '<label for="cbWatchAds" style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbWatchAds" style="margin-right: 2px;">Watch ads</label>';
-
-  let cbAds = document.getElementById("cbWatchAds");
-  cbAds.checked = JobsManager.settings().watchAds;
-  cbAds.addEventListener("change", (e) => {
-    if (e.target.checked !== JobsManager.settings().watchAds) {
-      JobsManager.updateSettings({
-        ...JobsManager.settings(),
-        watchAds: e.target.checked,
-      });
-    }
-  });
-
-  const prioritiseCB = settingsDiv.appendChild(document.createElement("div"));
-
-  prioritiseCB.innerHTML =
-    '<label for="cbPrioritise" style="display:flex;margin-bottom:4px"><input type="checkbox" id="cbPrioritise" style="margin-right: 2px;">Prioritise planned</label>';
-
-  let cbPrioritise = document.getElementById("cbPrioritise");
-  cbPrioritise.checked = JobsManager.settings().prioritisePlanned;
-  cbPrioritise.addEventListener("change", (e) => {
-    if (e.target.checked !== JobsManager.settings().prioritisePlanned) {
-      JobsManager.updateSettings({
-        ...JobsManager.settings(),
-        prioritisePlanned: e.target.checked,
-      });
-    }
-  });
+  content.appendChild(
+    createOptionToggle("Auto build crop", optionKeys.upgradeCrop)
+  );
 
   const details = content.appendChild(document.createElement("details"));
-  details.open = JobsManager.settings().expanded;
+  details.open = BotOptions.get(optionKeys.jobsListExpanded);
   const summary = details.appendChild(document.createElement("summary"));
   summary.onclick = () => {
-    JobsManager.updateSettings({
-      ...JobsManager.settings(),
-      expanded: !details.open,
-    });
+    BotOptions.toggle(optionKeys.jobsListExpanded);
   };
   const detailsInner = details.appendChild(document.createElement("div"));
 

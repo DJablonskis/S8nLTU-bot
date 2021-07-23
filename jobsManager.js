@@ -3,18 +3,6 @@ const initJobs = () => {
   jobs = jobs ? jobs : {};
   cvJobs = jobs[CurrentVillage.did] ? jobs[CurrentVillage.did] : [];
 
-  let defaultSettings = {
-    prioritisePlanned: false,
-    watchAds: false,
-    expanded: true,
-  };
-
-  let settings = JSON.parse(localStorage.getItem(JOBS_SETTINGS_STORAGE));
-  settings = settings ? settings : {};
-  let cvSettings = settings[CurrentVillage.did]
-    ? settings[CurrentVillage.did]
-    : defaultSettings;
-
   const subscribers = [];
   const subscribe = (funk) => {
     subscribers.push(funk);
@@ -25,11 +13,6 @@ const initJobs = () => {
     jobs[CurrentVillage.did] = cvJobs;
     localStorage.setItem(JOBS_STORAGE, JSON.stringify(jobs));
     subscribers.forEach((f) => f(cvJobs));
-  };
-
-  const updateSettings = (s) => {
-    settings[CurrentVillage.did] = s;
-    localStorage.setItem(JOBS_SETTINGS_STORAGE, JSON.stringify(settings));
   };
 
   const complete = (job) => {
@@ -127,10 +110,7 @@ const initJobs = () => {
   };
 
   return {
-    updateSettings,
     complete,
-    settings: (did = CurrentVillage.did) =>
-      settings[did] ? settings[did] : defaultSettings,
     remove,
     add,
     jobs,

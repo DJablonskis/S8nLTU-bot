@@ -1,13 +1,14 @@
 const initBOT = () => {
   const lag = 60000;
-  let prog = localStorage.getItem(BOT_IN_PROGRESS);
-  const inProgress = !prog ? null : JSON.parse(prog);
-  const { upgradeCrop, upgradeRes } = AutoUpgrade.get();
-  const { watchAds, prioritisePlanned } = JobsManager.settings();
+
+  const { watchAds, prioritise, upgradeCrop, upgradeRes } = BotOptions.get();
+
+  let getInProgress = () => {
+    let prog = localStorage.getItem(BOT_IN_PROGRESS);
+    return !prog ? null : JSON.parse(prog);
+  };
 
   let timeout = null;
-
-  const label = "trav";
 
   const switchCity = () => {
     if (!Dorf1Slots && !Dorf2Slots) {
@@ -24,18 +25,14 @@ const initBOT = () => {
       let time = Date.now();
 
       let { job, queueWait, ressWait, wq1, wq2 } = getNextJob(vil.did);
-      let { upgradeCrop, upgradeRes } = AutoUpgrade.get(vil.did);
-      let { prioritisePlanned } = JobsManager.settings(vil.did);
+      let { prioritise, upgradeCrop, upgradeRess } =
+        BotOptions.getVillageSettings(vil.did);
+      console.log("- vil options: ", BotOptions.getVillageSettings(vil.did));
       let lastCheck = ConstructionManager.get(vil.did).timestamp;
       console.log(
         `- Q1: ${wq1 > time ? "BUSY" : "EMPTY"}, Q2: ${
           wq2 > time ? "BUSY" : "EMPTY"
         }`
-      );
-      console.log(
-        `- priority: ${prioritisePlanned.toString()}  Auto: ${(
-          upgradeCrop || upgradeRes
-        ).toString()}`
       );
 
       p = {
@@ -74,7 +71,7 @@ const initBOT = () => {
         if (wmax < time) {
           console.log(`- resswait: ${ressWait}, `);
           p.nextCheck = time;
-        } else if (prioritisePlanned) {
+        } else if (prioritise) {
           p.nextCheck = nextMax;
         } else if (auto) {
           //TODO: need to store field values for villages for more acurate calculations
@@ -94,7 +91,6 @@ const initBOT = () => {
       console.log(" ");
     });
     planned.sort((a, b) => a.nextCheck - b.nextCheck);
-
     if (planned[0].did === CurrentVillage.did) {
       timeout = setTimeout(() => {
         startBuildingLoop();
@@ -115,8 +111,7 @@ const initBOT = () => {
   const getAutoUpgradeJob = () => {
     let upgradable = Dorf1Slots.filter((slot) => slot.status === "good");
     if (!upgradeRes) upgradable = upgradable.filter((f) => f.gid === 4);
-    if (!AutoUpgrade.get().upgradeCrop)
-      upgradable = upgradable.filter((f) => f.gid !== 4);
+    if (!upgradeCrop) upgradable = upgradable.filter((f) => f.gid !== 4);
     if (upgradable.length > 0) {
       upgradable = upgradable.sort((a, b) => a.lvl - b.lvl);
       let job = upgradable[0];
@@ -130,9 +125,8 @@ const initBOT = () => {
     return null;
   };
 
-  const continueUpgrade = ({ did, job }) => {
-    console.log("continuing upgrade");
-    console.log("progress job:", job);
+  const continueUpgrade = (prog) => {
+    let { job, did } = prog;
     if (location.pathname.includes("build.php")) {
       const params = getParams();
       let currentLvl = 0;
@@ -143,22 +137,15 @@ const initBOT = () => {
         );
       }
       if (currentLvl >= job.to) {
-        console.log("something wrong with levels");
-        // return setTimeout(() => {
-        //   localStorage.setItem(BOT_IN_PROGRESS, "");
-        //   this.completeJob(inProgress.job);
-        //   window.location.href = "/dorf1.php";
-        // }, 5000);
+        alert("something wrong with levels");
       }
-      console.log(params);
       if (did === CurrentVillage.did && Number(job.pos) === Number(params.id)) {
-        console.log("correct vil:");
         let b,
           b2 = undefined;
         if (job.to === 1) {
           if (job.cat) {
             let tab = document.querySelector(
-              `#content .contentNavi .scrollingContainer .content a[href*="category=${inProgress.job.cat}"]`
+              `#content .contentNavi .scrollingContainer .content a[href*="category=${job.cat}"]`
             );
             if (tab && !tab.classList.contains("active")) {
               timeout = setTimeout(
@@ -171,7 +158,7 @@ const initBOT = () => {
               return timeout;
             }
             b = document
-              .querySelector(`img.g${inProgress.job.gid}`)
+              .querySelector(`img.g${job.gid}`)
               .parentNode.parentNode.querySelector(".contractLink button");
             console.log("button found: ", b);
           }
@@ -216,6 +203,11 @@ const initBOT = () => {
           return timeout;
         } else console.log("Error! Button for upgrade not found!");
       }
+    } else {
+      timeout = setTimeout(() => {
+        localStorage.setItem(BOT_IN_PROGRESS, "");
+        start();
+      }, Status.update("Got interupted during job. Reseting..."));
     }
   };
 
@@ -247,9 +239,6 @@ const initBOT = () => {
   };
 
   const startBuildingLoop = () => {
-    prog = null;
-    localStorage.setItem(BOT_IN_PROGRESS, "");
-
     if (JobsManager.next()) {
       let { job, queueWait, ressWait } = getNextJob();
       let { gid, pos } = job;
@@ -294,7 +283,7 @@ const initBOT = () => {
             );
             return timeout;
           }
-        } else if (!prioritisePlanned) {
+        } else if (!prioritise) {
           // TODO: Not enough resources for job keep track of times here for switchingCities
           startAutoUpgradeJob();
         } else {
@@ -366,17 +355,16 @@ const initBOT = () => {
   const start = () => {
     if (HeroManager.canGo()) {
       return HeroManager.startAdventure();
-    } else if (inProgress) {
-      if (
-        inProgress.timestamp > Date.now() &&
-        inProgress.did === CurrentVillage.did
-      ) {
-        continueUpgrade(inProgress);
+    } else if (getInProgress()) {
+      let prog = getInProgress();
+
+      if (prog.timestamp > Date.now() && prog.did === CurrentVillage.did) {
+        continueUpgrade(prog);
       } else {
         localStorage.setItem(BOT_IN_PROGRESS, "");
         if (!Dorf1Slots && !Dorf2Slots) {
           timeout = setTimeout(
-            () => navigateTo(inProgress.job.gid > 4 ? 2 : 1),
+            () => navigateTo(prog.job.gid > 4 ? 2 : 1),
             Status.update("Wrong started job found. Going back.")
           );
         } else {
