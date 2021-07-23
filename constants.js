@@ -5,6 +5,8 @@ const PANEL_OPTIONS = "panel_options";
 const NPC_RULES = "npcRules";
 const FARM_RULES = "farmRules";
 
+const VILLAGE_OPTIONS = "village_options";
+
 const JOBS_STORAGE = "jobsManager";
 const JOBS_SETTINGS_STORAGE = "jobsManagerSettings";
 const CM_STORAGE = "constructionManager";

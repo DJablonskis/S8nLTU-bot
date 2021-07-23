@@ -2,20 +2,14 @@ let SettingsSection;
 
 if (ShouldRun) {
   SettingsSection = BotPanel.addSection("Settings");
-  let keepOnTopSection = SettingsSection.content.appendChild(
-    document.createElement("div")
-  );
-  keepOnTopSection.innerHTML = `<strong>Keep panel on top: </strong>`;
-  keepOnTopSection.className = "settings-row";
-  keepOnTopSection.appendChild(
-    checkboxToggle(BotOptions.get(optionKeys.keepOnTop))
+
+  SettingsSection.content.appendChild(
+    createOptionToggle("Keep panel on top", optionKeys.keepOnTop)
   );
 
-  keepOnTopSection.querySelector("input").onclick = (e) => {
-    if (e.target.checked !== BotOptions.get(optionKeys.keepOnTop)) {
-      BotOptions.toggle(optionKeys.keepOnTop);
-    }
-  };
+  SettingsSection.content.appendChild(
+    createOptionToggle("Send hero to adventures", optionKeys.sendToAdventures)
+  );
 
   BotOptions.subscribe(({ settingsOpen }) => {
     SettingsSection.header.style.display = settingsOpen ? "block" : "none";

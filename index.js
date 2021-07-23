@@ -32,7 +32,6 @@
 // @require jobsManager.js
 // @require ads.js
 
-// @require autoUpgradeUI.js
 // @require jobsList.js
 // @require login.js
 // @require newBuildUI.js
@@ -41,7 +40,7 @@
 // @require heroManager.js
 // @require BOT.js
 
-// @version        0.12.90
+// @version        0.13.01
 // ==/UserScript==
 
 const my_css = GM_getResourceText("IMPORTED_CSS");

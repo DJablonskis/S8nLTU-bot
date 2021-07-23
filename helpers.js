@@ -51,15 +51,6 @@ const msToTimeString = (t, hours = true) => {
   return string;
 };
 
-const getParams = (loc = window.location.search) =>
-  loc
-    .slice(1)
-    .split("&")
-    .reduce((acc, s) => {
-      const [k, v] = s.split("=");
-      return Object.assign(acc, { [k]: v });
-    }, {});
-
 //Reurns int current gold balance
 const getGoldBalance = () =>
   parseInt(
@@ -71,41 +62,6 @@ const getGoldBalance = () =>
 
 let GoldBalance;
 if (ShouldRun) GoldBalance = getGoldBalance();
-
-const getCurrentVillage = () => {
-  const active = document.querySelector(
-    "div#sidebarBoxVillagelist > div.content > ul > li.active"
-  );
-
-  let name = active.querySelector("span.name").textContent.trim();
-  let x = Number(
-    active
-      .querySelector("span.coordinateX")
-      .textContent.trim()
-      .slice(1)
-      .replace(/\u202c|\u202d|/g, "")
-      .replace(/\u2212/g, "-")
-  );
-  let y = Number(
-    active
-      .querySelector("span.coordinateY")
-      .textContent.trim()
-      .slice(0, -1)
-      .replace(/\u202c|\u202d|/g, "")
-      .replace(/\u2212/g, "-")
-  );
-  let did = getParams(
-    "?" + active.querySelector("a").href.split("?")[1]
-  ).newdid;
-
-  return {
-    name,
-    did,
-    coords: { x, y },
-  };
-};
-let CurrentVillage;
-if (ShouldRun) CurrentVillage = getCurrentVillage();
 
 //Returns int of warehouse capacity
 const getWarehouseCapacity = () =>
@@ -408,4 +364,25 @@ const checkboxToggle = (checked) => {
     checked ? "checked" : ""
   }><span class="slider round"></span>`;
   return l;
+};
+
+const createOptionToggle = (title, option) => {
+  let l = document.createElement("label");
+  l.className = "switch";
+  l.innerHTML = `<input type="checkbox" ${
+    BotOptions.get(option) ? "checked" : ""
+  }><span class="slider round"></span>`;
+
+  let section = document.createElement("div");
+
+  section.innerHTML = `<strong>${title}</strong>`;
+  section.className = "settings-row";
+  section.appendChild(l);
+
+  l.querySelector("input").onclick = (e) => {
+    if (e.target.checked !== BotOptions.get(option)) {
+      BotOptions.toggle(option);
+    }
+  };
+  return section;
 };
