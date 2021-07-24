@@ -355,6 +355,11 @@ const initBOT = () => {
   const start = () => {
     if (HeroManager.canGo()) {
       return HeroManager.startAdventure();
+    } else if (
+      RewardManager.hasReward &&
+      BotOptions.get(optionKeys.collectRewards)
+    ) {
+      RewardManager.collect();
     } else if (getInProgress()) {
       let prog = getInProgress();
 

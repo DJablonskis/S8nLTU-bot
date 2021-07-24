@@ -150,7 +150,7 @@ const initHeroManager = () => {
         }
         if (canGo()) {
           setTimeout(() => {
-            // adventures[0].submit();
+            aadventures[0].submit();
             console.log(adventures[0].id);
           }, Status.update("Sending to adventure " + adventures[0].id));
         } else {

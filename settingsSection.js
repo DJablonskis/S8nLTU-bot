@@ -11,6 +11,10 @@ if (ShouldRun) {
     createOptionToggle("Send hero to adventures", optionKeys.sendToAdventures)
   );
 
+  SettingsSection.content.appendChild(
+    createOptionToggle("Collect rewards", optionKeys.collectRewards)
+  );
+
   BotOptions.subscribe(({ settingsOpen }) => {
     SettingsSection.header.style.display = settingsOpen ? "block" : "none";
     SettingsSection.content.style.display = settingsOpen ? "block" : "none";
