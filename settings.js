@@ -95,6 +95,7 @@ const optionKeys = {
   jobsListExpanded: "jobsListExpanded",
   upgradeRess: "upgradeRess",
   upgradeCrop: "upgradeCrop",
+  collectRewards: "collectRewards",
 };
 
 let botOptionsArray = [
@@ -103,6 +104,7 @@ let botOptionsArray = [
   optionKeys.sendToHardestFirst,
   optionKeys.keepOnTop,
   optionKeys.settingsOpen,
+  optionKeys.collectRewards,
 ];
 
 let villOptionsArray = [

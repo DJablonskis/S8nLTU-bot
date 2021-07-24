@@ -38,9 +38,10 @@
 // @require contextUI.js
 
 // @require heroManager.js
+// @require collectRewards.js
 // @require BOT.js
 
-// @version        0.13.01
+// @version        0.13.02
 // ==/UserScript==
 
 const my_css = GM_getResourceText("IMPORTED_CSS");

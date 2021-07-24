@@ -6,7 +6,7 @@ const createSidePanel = () => {
 
   panel.style.opacity = "0";
   panel.style.overflow = "hidden";
-  panel.style.transition = "all 1.4s ease";
+  panel.style.transition = "all 0.8s linear";
   panel.style.maxHeight = "0px";
 
   let sidePanelHeader = panel.appendChild(document.createElement("div"));
@@ -114,7 +114,7 @@ const createSidePanel = () => {
     }
   };
 
-  setTimeout(show, 200);
+  setTimeout(show, 20);
 
   return { panel, addSection, show };
 };
