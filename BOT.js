@@ -113,7 +113,19 @@ const initBOT = () => {
     if (!upgradeRess) upgradable = upgradable.filter((f) => f.gid === 4);
     if (!upgradeCrop) upgradable = upgradable.filter((f) => f.gid !== 4);
     if (upgradable.length > 0) {
-      upgradable = upgradable.sort((a, b) => a.lvl - b.lvl);
+      upgradable = upgradable.sort((a, b) => {
+        let totalA = 0;
+        let totalB = 0;
+        if (unsafeWindow.bld) {
+          bld.forEach((x) => {
+            if (Number(x.aid) === a.pos) totalA++;
+            if (Number(x.aid) === b.pos) totalB++;
+          });
+          console.log(`Auto upgrade totals -  a:${totalA}, b:${totalB}`);
+        }
+
+        return a.lvl + totalA - b.lvl + totalB;
+      });
       let job = upgradable[0];
       return {
         gid: job.gid,
@@ -356,9 +368,10 @@ const initBOT = () => {
     if (HeroManager.canGo()) {
       return HeroManager.startAdventure();
     } else if (
-      RewardManager.hasReward &&
+      RewardManager.hasReward() &&
       BotOptions.get(optionKeys.collectRewards)
     ) {
+      console.log(RewardManager.hasReward());
       RewardManager.collect();
     } else if (getInProgress()) {
       let prog = getInProgress();

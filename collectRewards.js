@@ -1,4 +1,6 @@
 const initRewardManager = () => {
+  let questsLink = document.querySelector("#questmasterButton");
+
   const wait = (time, f) =>
     new Promise((resolve, reject) =>
       setTimeout(() => {
@@ -14,13 +16,14 @@ const initRewardManager = () => {
   }
 
   async function villageTaskSteps() {
-    let questsLink = document.querySelector("#questmasterButton");
-
-    if (questsLink.querySelector(".bigSpeechBubble.newQuestSpeechBubble")) {
+    if (
+      questsLink &&
+      questsLink.querySelector(".bigSpeechBubble.newQuestSpeechBubble")
+    ) {
       if (location.pathname !== "/tasks") {
         setTimeout(() => {
           questsLink.click();
-        }, Status.update("Collecting quest reward"));
+        }, Status.update("Going to collect quest reward"));
       } else {
         let opositeTested = false;
         let opositeTab = document.querySelector(
@@ -33,15 +36,16 @@ const initRewardManager = () => {
         if (questButtons.length > 0) {
           setTimeout(() => {
             questButtons[0].click();
-          });
+            villageTaskSteps();
+          }, Status.update("Collecting reward"));
         } else if (!opositeTested) {
           await wait(Status.update("Switching tab"), () => opositeTab.click())
-            .then(
+            .then(() =>
               wait(Status.update("Collecting reward"), () => {
                 questButtons = [
                   ...document.querySelectorAll("#tasks button.collect"),
                 ];
-                questButtons[0].click();
+                if (questButtons.length > 0) questButtons[0].click();
               })
             )
             .then(() => {
@@ -65,7 +69,10 @@ const initRewardManager = () => {
 
       // https://ttq.x2.america.travian.com/tasks?t=1 - tasks for town, https://ttq.x2.america.travian.com/tasks?t=2 - general tasks
       //
-    }
+    } else
+      setTimeout(() => {
+        navigateTo(1);
+      }, Status.update("all tasks collected"));
   }
 
   const hasReward = () =>
@@ -75,6 +82,7 @@ const initRewardManager = () => {
   // const collectTask = () => {};
 
   const collect = () => {
+    console.log("collect reward called");
     villageTaskSteps();
   };
 

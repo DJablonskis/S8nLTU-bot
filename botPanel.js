@@ -6,7 +6,7 @@ const createSidePanel = () => {
 
   panel.style.opacity = "0";
   panel.style.overflow = "hidden";
-  panel.style.transition = "all 0.8s linear";
+  panel.style.transition = "all 0.4s ease-in-out";
   panel.style.maxHeight = "0px";
 
   let sidePanelHeader = panel.appendChild(document.createElement("div"));
@@ -20,6 +20,12 @@ const createSidePanel = () => {
 
   let btnPower = btnWraper.appendChild(blueToggle(TogglePathPower));
   btnPower.style.cssText = "transition: all 1s ease; opacity:0";
+  let heroimg = document.querySelector("#heroImageButton img");
+  heroimg.style.transition = "all 1s ease-in-out";
+
+  BotPower.subscribe((power) => {
+    heroimg.style.top = power ? "12px" : "-12px";
+  });
 
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
@@ -114,7 +120,7 @@ const createSidePanel = () => {
     }
   };
 
-  setTimeout(show, 20);
+  setTimeout(show, 400);
 
   return { panel, addSection, show };
 };

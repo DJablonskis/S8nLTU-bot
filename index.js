@@ -41,7 +41,7 @@
 // @require collectRewards.js
 // @require BOT.js
 
-// @version        0.13.02
+// @version        0.13.03
 // ==/UserScript==
 
 const my_css = GM_getResourceText("IMPORTED_CSS");

@@ -101,15 +101,18 @@ const initConstructionManager = () => {
       const nameRow = vil.node.querySelector("span.name");
       let flexBlock = document.createElement("div");
       flexBlock.style.cssText =
-        "position: absolute;flex-direction: column; display: inline-flex; font-size: 18px; padding-left: 2px; line-height: 0.35;";
+        "position: absolute;flex-direction: column; display: inline-flex; font-size: 24px; padding-left: 2px; line-height: 0.35;";
       nameRow.appendChild(flexBlock);
 
       let getDot = () => {
         let dot = document.createElement("span");
         dot.innerText = "•";
-        dot.style.cssText =
-          "font-weight: bold; text-stroke: 1px #759eb8; color:#23b5d3 ;padding-right:2px;";
+        dot.style.cssText = "color:#e91e63 ;padding-right:2px;";
         return dot;
+      };
+
+      let completeDot = (dot) => {
+        dot.style.color = "#00ff00";
       };
 
       let q1Node = flexBlock.appendChild(document.createElement("div"));
@@ -120,11 +123,11 @@ const initConstructionManager = () => {
         let s = b.finish - current;
         if (s > 0) {
           setTimeout(() => {
-            dot.style.color = "orange";
+            completeDot(dot);
             Notifications.send(b, vil);
           }, s);
         } else {
-          dot.style.color = "orange";
+          completeDot(dot);
         }
       });
 
@@ -136,10 +139,10 @@ const initConstructionManager = () => {
         let s = b.finish - current;
         if (s > 0) {
           setTimeout(() => {
-            dot.style.color = "orange";
+            completeDot(dot);
           }, s);
         } else {
-          dot.style.color = "orange";
+          completeDot(dot);
         }
       });
 
