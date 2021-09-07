@@ -21,19 +21,13 @@ const initBOT = () => {
 
     let planned = [];
     Villages.all.forEach((vil) => {
-      console.log(`# ${vil.name} `);
       let time = Date.now();
 
       let { job, queueWait, ressWait, wq1, wq2 } = getNextJob(vil.did);
       let { prioritise, upgradeCrop, upgradeRess } =
         BotOptions.getVillageSettings(vil.did);
-      console.log("- vil options: ", BotOptions.getVillageSettings(vil.did));
+
       let lastCheck = ConstructionManager.get(vil.did).timestamp;
-      console.log(
-        `- Q1: ${wq1 > time ? "BUSY" : "EMPTY"}, Q2: ${
-          wq2 > time ? "BUSY" : "EMPTY"
-        }`
-      );
 
       p = {
         did: vil.did,
@@ -45,17 +39,6 @@ const initBOT = () => {
       let wmax = queueWait > ressWait ? queueWait : ressWait;
       let auto = upgradeCrop || upgradeRess;
       let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
-
-      console.log(
-        `- Last check: ${new Date(
-          lastCheck
-        ).toLocaleTimeString()}, nextMax: ${new Date(
-          nextMax
-        ).toLocaleTimeString()}, nextMin: ${new Date(
-          nextCheckMin
-        ).toLocaleTimeString()}`
-      );
-
       const getNextAutoTime = () => {
         if (Tribe.id === ROMAN)
           if (wq1 < time) return nextCheckMin < time ? time : nextCheckMin;
@@ -64,12 +47,9 @@ const initBOT = () => {
           return queueWait > nextCheckMax ? nextCheckMax : queueWait;
         else return nextCheckMin < time ? time : nextCheckMin;
       };
-
       if (job) {
-        console.log("- has job", job);
         //can be built?
         if (wmax < time) {
-          console.log(`- resswait: ${ressWait}, `);
           p.nextCheck = time;
         } else if (prioritise) {
           p.nextCheck = nextMax;
@@ -83,12 +63,6 @@ const initBOT = () => {
         p.nextCheck = getNextAutoTime();
       }
       planned.push(p);
-      console.log(
-        `- next check in: ${Math.ceil(
-          (p.nextCheck - Date.now()) / 1000 / 60
-        )} min`
-      );
-      console.log(" ");
     });
     planned.sort((a, b) => a.nextCheck - b.nextCheck);
     if (planned[0].did === CurrentVillage.did) {
@@ -102,7 +76,6 @@ const initBOT = () => {
         planned[0].nextCheck - Date.now().valueOf()
       );
       timeout = setTimeout(() => {
-        console.log(Villages.get(planned[0].did).node);
         Villages.get(planned[0].did).node.querySelector("a").click();
       }, delay);
     }
@@ -121,7 +94,6 @@ const initBOT = () => {
             if (Number(x.aid) === a.pos) totalA++;
             if (Number(x.aid) === b.pos) totalB++;
           });
-          console.log(`Auto upgrade totals -  a:${totalA}, b:${totalB}`);
         }
 
         return a.lvl + totalA - b.lvl + totalB;
@@ -172,7 +144,6 @@ const initBOT = () => {
             b = document
               .querySelector(`img.g${job.gid}`)
               .parentNode.parentNode.querySelector(".contractLink button");
-            console.log("button found: ", b);
           }
           //New res field
           else {
@@ -190,10 +161,8 @@ const initBOT = () => {
             return timeout;
           }
           b = document.querySelector(".section1 button.green.build");
-          if (b) console.log("first button found");
           if (watchAds) {
             b2 = document.querySelector(".section2 button.green.build");
-            console.log("second button found:", b ? true : false);
           }
         }
         if (b || b2) {
@@ -284,7 +253,6 @@ const initBOT = () => {
               );
             } else {
               //something not right
-              console.log("job not possible at the moment");
               switchCity();
             }
           } else {

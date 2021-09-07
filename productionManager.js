@@ -56,8 +56,38 @@ const initProductionManager = () => {
     if (wait !== 0) enough = Date.now() + Math.ceil(wait);
     return enough;
   };
+
+  const setProductionInfo = (did, element) => {
+    const setContents = () => {
+      let storage = currentStorage(did);
+      let { maxStorage, production } = productionStorage[did];
+      let string = "";
+      for (let i = 0; i < 4; i++) {
+        let index = "l" + (i + 1);
+        let percent = storage[index] / maxStorage[index];
+        let color = "green";
+
+        if (percent > 0.95 || production[index] < 0) {
+          color = "red";
+        } else if (percent > 0.75) {
+          color = "orange";
+        }
+        string += `<span style="color:${color}">${icon(i, 12)} ${
+          storage[index]
+        } </span>`;
+      }
+      element.innerHTML = string;
+    };
+    if (currentStorage(did)) {
+      setContents();
+      setInterval(setContents, 2000);
+    } else {
+      element.innerHTML = `<div style="font-size:10px">No info yet.</div>`;
+    }
+  };
   return {
     all: productionStorage,
+    setProductionInfo,
     get: (did = CurrentVillage.did) =>
       productionStorage[did] ? productionStorage[did] : null,
     current: currentStorage,

@@ -63,45 +63,6 @@ const getGoldBalance = () =>
 let GoldBalance;
 if (ShouldRun) GoldBalance = getGoldBalance();
 
-//Returns int of warehouse capacity
-const getWarehouseCapacity = () =>
-  parseInt(
-    document
-      .querySelector("#stockBar .warehouse .capacity .value")
-      .innerText.trim()
-      .replace(/\D/g, "")
-  );
-
-//Returns int of granary capacity
-const getGranaryCapacity = () =>
-  parseInt(
-    document
-      .querySelector("#stockBar .granary .capacity .value")
-      .innerText.trim()
-      .replace(/\D/g, "")
-  );
-
-//Returns array of storage percentage
-const getResoursesPercent = () => {
-  let percent = [];
-  document
-    .querySelectorAll("#stockBar .barBox .bar")
-    .forEach((b) => percent.push(parseInt(b.style.width.replace("%", ""))));
-
-  return percent;
-};
-
-//Returns int array of current storage
-const getResoursesCount = () => {
-  let storage = [];
-  document
-    .querySelectorAll("#stockBar .stockBarButton .value")
-    .forEach((b) =>
-      storage.push(parseInt(b.innerText.trim().replace(/\D/g, "")))
-    );
-  return storage;
-};
-
 function shuffleArray(array) {
   var currentIndex = array.length,
     temporaryValue,
@@ -121,9 +82,6 @@ function shuffleArray(array) {
 
   return array;
 }
-
-//DETECTS incoming attacks
-//document.querySelectorAll("table#movements > tbody > tr >td.typ > a > img.att1 ").length>0
 
 const icon = (type, x = 20) => {
   const t = ["lumber", "clay", "iron", "crop"];
@@ -176,8 +134,10 @@ const getAllVillages = () => {
   const citiesO = {};
   const citiesA = [];
   let villages = document.querySelectorAll(
-    "div#sidebarBoxVillagelist > div.content > ul > li"
+    "div.content div.villageList .listEntry"
   );
+  console.log("villages found", villages);
+
   villages.forEach((vil) => {
     let name = vil.querySelector("span.name").textContent.trim();
     let x = Number(
@@ -386,3 +346,46 @@ const createOptionToggle = (title, option) => {
   };
   return section;
 };
+
+// #### map crawler ###
+
+if (ShouldRun && location.pathname.includes("karte.php")) {
+  let mapTilesObject = localStorage.getItem("MAP_TILES");
+
+  mapTilesObject
+    ? (mapTilesObject = {})
+    : (mapTilesObject = JSON.parse(mapTilesObject));
+
+  let button = document.createElement("button");
+  button.innerText = "get tiles";
+  button.style.position = "absolute";
+  button.style.top = "30px";
+  button.style.left = "30px";
+  document.querySelector("#mapContainer").appendChild(button);
+
+  button.onclick = () => {
+    let tiles = [...document.querySelectorAll("#mapContainer .tileRow .tile")];
+
+    let scanned = tiles.reduce((obj, tile) => {
+      let x = Number(
+        tile.classList[2].substring(2, tile.classList[2].length - 1)
+      );
+      let y = Number(
+        tile.classList[3].substring(2, tile.classList[3].length - 1)
+      );
+      let type = tile.classList[4].split("-");
+      if (type.length > 1) {
+        obj[`${x}|${y}`] = {
+          x,
+          y,
+          type,
+        };
+      }
+      return obj;
+    }, {});
+
+    mapTilesObject = { ...scanned, ...mapTilesObject };
+
+    localStorage.setItem("MAP_TILES", JSON.stringify(mapTilesObject));
+  };
+}
