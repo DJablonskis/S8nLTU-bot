@@ -1,10 +1,4 @@
-const ShouldRun = (() => {
-  return (
-    document.querySelectorAll(
-      "div#sidebarBoxVillagelist > div.content > ul > li"
-    ).length > 0
-  );
-})();
+const ShouldRun = unsafeWindow.resources;
 
 const getParams = (loc = window.location.search) =>
   loc
@@ -16,9 +10,7 @@ const getParams = (loc = window.location.search) =>
     }, {});
 
 const getCurrentVillage = () => {
-  const active = document.querySelector(
-    "div#sidebarBoxVillagelist > div.content > ul > li.active"
-  );
+  const active = document.querySelector(".villageList .listEntry.active");
 
   let name = active.querySelector("span.name").textContent.trim();
   let x = Number(

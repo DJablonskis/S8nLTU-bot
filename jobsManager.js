@@ -59,8 +59,8 @@ const initJobs = () => {
       }
     }
 
-    const w = getWarehouseCapacity();
-    const g = getGranaryCapacity();
+    const w = unsafeWindow.resources.maxStorage["l1"];
+    const g = unsafeWindow.resources.maxStorage["l4"];
 
     //TODO: check for granary and warehouse jobs planed in job queue
     const stats = BDB.stats(job.gid, job.to);

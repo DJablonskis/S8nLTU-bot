@@ -159,34 +159,11 @@ const initConstructionManager = () => {
       prodRow.style.fontSize = "10px";
       prodRow.style.display = "flex";
       prodRow.style.justifyContent = "space-between";
-
       block.appendChild(prodRow);
+      ProductionManager.setProductionInfo(vil.did, prodRow);
 
       const queRow = document.createElement("div");
       block.appendChild(queRow);
-
-      if (ProductionManager.current(vil.did)) {
-        let { l1, l2, l3, l4 } = ProductionManager.current(vil.did);
-        prodRow.innerHTML = `<span>${icon(0, 12)} ${l1} </span> <span>${icon(
-          1,
-          12
-        )}${l2} </span> <span>${icon(2, 12)}${l3} </span> <span>${icon(
-          3,
-          12
-        )}${l4} </span>`;
-        setInterval(() => {
-          let { l1, l2, l3, l4 } = ProductionManager.current(vil.did);
-          prodRow.innerHTML = `<span>${icon(0, 12)} ${l1} </span> <span>${icon(
-            1,
-            12
-          )}${l2} </span> <span>${icon(2, 12)}${l3} </span> <span>${icon(
-            3,
-            12
-          )}${l4} </span>`;
-        }, 2000);
-      } else {
-        prodRow.innerHTML = `<div style="font-size:10px">No info yet.</div>`;
-      }
 
       get(vil.did).all.forEach((x) => {
         const task = document.createElement("div");

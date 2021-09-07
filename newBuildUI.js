@@ -37,7 +37,6 @@ if (window.location.pathname.includes("build.php")) {
     let building = Dorf2Slots[job.pos - 19];
     if (building.status === "empty") {
       building.link.parentNode.style.display = "block";
-      console.log(building.link);
       if (building.pos !== 40) {
         let image = building.link.nextSibling;
         image.classList.add("g" + job.gid);
@@ -54,7 +53,6 @@ if (window.location.pathname.includes("build.php")) {
         //  let imgTop = imgBottom.cloneNode(true);
         //   imgTop.className = classTop;
         imgBottom.className = classBottom;
-        console.log(Tribe);
         building.link.parentNode.appendChild(imgBottom);
         // building.link.parentNode.nextSibling.appendChild(imgTop);
       }
