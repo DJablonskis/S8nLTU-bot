@@ -40,7 +40,7 @@ const initBOT = () => {
       let auto = upgradeCrop || upgradeRess;
       let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
       const getNextAutoTime = () => {
-        if (Tribe.id === ROMAN)
+        if (Tribe.id === 1)
           if (wq1 < time) return nextCheckMin < time ? time : nextCheckMin;
           else return wq1 > nextCheckMax ? nextCheckMax : wq1;
         else if (queueWait > time)
@@ -292,7 +292,7 @@ const initBOT = () => {
       let d1 = nextJob.gid < 5;
       if (!q1.empty || !q2.empty || ressWait > Date.now()) {
         if (
-          Tribe.id === ROMAN &&
+          Tribe.id === 1 &&
           ((d1 && JobsManager.nextDorf2(did)) ||
             (!d1 && JobsManager.nextDorf1(did)))
         ) {
@@ -333,6 +333,7 @@ const initBOT = () => {
   };
 
   const start = () => {
+    console.log("start called");
     if (HeroManager.canGo()) {
       return HeroManager.startAdventure();
     } else if (
@@ -370,6 +371,7 @@ const initBOT = () => {
   };
 
   const stop = () => {
+    console.log("stop called");
     if (timeout) clearTimeout(timeout);
     Status.update("Bot off", true, 0);
   };
@@ -379,6 +381,7 @@ const initBOT = () => {
 
 const BOT = initBOT();
 
-BotPower.subscribe((power) =>
-  power && firebase.auth().currentUser ? BOT.start() : BOT.stop()
-);
+BotPower.subscribe((power) => {
+  console.log("Bot informed", power);
+  power ? BOT.start() : BOT.stop();
+});

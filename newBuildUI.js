@@ -43,8 +43,8 @@ if (window.location.pathname.includes("build.php")) {
         image.style.opacity = "0.6";
         image.style.filter = "grayscale(100%)";
       } else {
-        classBottom = `wall g${Tribe.wall}Bottom ${Tribe}`;
-        classTop = `wall g${Tribe.wall}Top ${Tribe}`;
+        classBottom = `wall g${Tribe.wall_gid}Bottom ${Tribe.name}`;
+        classTop = `wall g${Tribe.wall_gid}Top ${Tribe.name}`;
         let imgBottom = document.createElement("img");
         imgBottom.style.filter = "grayscale(100%)";
         imgBottom.src = "/img/x.gif";

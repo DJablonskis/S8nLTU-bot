@@ -12,10 +12,6 @@
 // @grant        GM_getValue
 // @grant        GM_addValueChangeListener
 
-// @require https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js
-// @require https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js
-// @require firebase.js
-
 // @require constants.js
 // @require settings.js
 // @require buildings.js
@@ -34,7 +30,6 @@
 // @require ads.js
 
 // @require jobsList.js
-// @require login.js
 // @require newBuildUI.js
 // @require contextUI.js
 
@@ -42,7 +37,7 @@
 // @require collectRewards.js
 // @require BOT.js
 
-// @version        0.13.06
+// @version        0.14.0
 // ==/UserScript==
 
 const my_css = GM_getResourceText("IMPORTED_CSS");

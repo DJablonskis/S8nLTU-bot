@@ -19,7 +19,6 @@ const createSidePanel = () => {
   btnWraper.classList.add("buttonsWrapper");
 
   let btnPower = btnWraper.appendChild(blueToggle(TogglePathPower));
-  btnPower.style.cssText = "transition: all 1s ease; opacity:0";
   let heroimg = document.querySelector("#heroImageButton img");
   heroimg.style.transition = "all 1s ease-in-out";
 
@@ -27,24 +26,13 @@ const createSidePanel = () => {
     heroimg.style.top = power ? "12px" : "-12px";
   });
 
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      btnPower.style.opacity = "1";
-      btnPower.classList.add("bigger");
-      btnPower.querySelector("svg").style.fill = BotPower.get()
-        ? "red"
-        : "white";
-      btnPower.onclick = (e) => {
-        btnPower.querySelector("svg").style.fill = BotPower.toggle()
-          ? "red"
-          : "white";
-      };
-    } else {
-      btnPower.style.opacity = "0";
-      btnPower.onclick = null;
-      // LoginUI.open();
-    }
-  });
+  btnPower.classList.add("bigger");
+  btnPower.querySelector("svg").style.fill = BotPower.get() ? "red" : "white";
+  btnPower.onclick = (e) => {
+    btnPower.querySelector("svg").style.fill = BotPower.toggle()
+      ? "red"
+      : "white";
+  };
 
   if ("Notification" in window) {
     let btnNotif = btnWraper.appendChild(blueToggle(TogglePathNotifications));

@@ -250,38 +250,44 @@ const Dorf2Slots = window.location.pathname.includes("dorf2")
   : null;
 
 const getTribe = () => {
-  let index;
-  // "tribe" + id
-  const id = ["1", "2", "3", "6", "7"];
-  const name = ["roman", "teuton", "gaul", "egyptian", "egiptian"];
-  const wall = [31, 32, 33, 42, 43];
-
-  const getIndex = (x) => {
-    let i;
-    if (x === "1" || x === "roman") i = 0;
-    else if (x === "2" || x === "teuton") i = 1;
-    else if (x === "3" || x === "gaul") i = 2;
-    else if (x === "6" || x === "egyptian") i = 3;
-    else if (x === "7" || x === "hun") i = 4;
-
-    return i;
-  };
+  let t_id = 1;
+  let t_name = "roman";
+  let tribeNames = [
+    "roman",
+    "teuton",
+    "gaul",
+    "natar",
+    "nature",
+    "egyptian",
+    "hun",
+  ];
   if (Dorf1Slots) {
-    index = getIndex(
+    t_id = parseInt(
       [...document.querySelector("#resourceFieldContainer").classList]
         .pop()
         .slice(-1)
     );
-  } else if (Dorf2Slots) {
-    index = getIndex(
-      [...document.querySelector(".village2 .buildingSlot").classList].pop()
-    );
-  }
 
-  return index ? { id: id[index], name: name[index], wall: WALL[index] } : null;
+    t_name = tribeNames[t_id - 1];
+  }
+  if (Dorf2Slots) {
+    t_name = [
+      ...document.querySelector("#villageContent div.buildingSlot").classList,
+    ]
+      .pop()
+      .toLowerCase();
+    t_id = tribeNames.indexOf(t_name) + 1;
+  }
+  return {
+    wall_gid: t_id < 4 ? t_id + 30 : t_id + 38,
+    id: t_id,
+    name: t_name,
+  };
 };
-let Tribe;
-if (ShouldRun) Tribe = getTribe();
+
+const Tribe = getTribe();
+
+console.log(Tribe);
 
 const blueButton = (text) => {
   let button = document.createElement("button");
