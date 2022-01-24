@@ -85,7 +85,7 @@ const setUpContextUI = () => {
       // fill in fields, slider, header, jobs....};
       console.log("right click on: ", slot);
 
-      if (slot.pos === 40) slot.gid = Tribe.wall;
+      if (slot.pos === 40) slot.gid = Tribe.wall_gid;
 
       let newBuildJob = JobsManager.get().filter(
         (job) => job.pos === slot.pos && job.to === 1

@@ -211,7 +211,6 @@ let BotOptions;
 if (ShouldRun) BotOptions = initBotOptions(CurrentVillage.did);
 
 const initBotPower = () => {
-  let initialised = false;
   let BOT_ON = localStorage.getItem(BOT_POWER) === ON;
   const subscribers = [];
 
@@ -224,22 +223,14 @@ const initBotPower = () => {
     return BOT_ON;
   };
 
-  const notify = () => {
-    if (initialised) subscribers.forEach((f) => f(BOT_ON));
-  };
+  const notify = () => subscribers.forEach((f) => f(BOT_ON));
 
   const toggle = () => {
-    if (!BOT_ON) BOT_ON = firebase.auth().currentUser ? true : false;
-    else BOT_ON = false;
+    BOT_ON = !BOT_ON;
     localStorage.setItem(BOT_POWER, BOT_ON ? ON : OFF);
     notify();
     return BOT_ON;
   };
-
-  firebase.auth().onAuthStateChanged((user) => {
-    initialised = true;
-    notify();
-  });
 
   return { get, toggle, subscribe };
 };

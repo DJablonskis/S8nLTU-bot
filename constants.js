@@ -9,8 +9,11 @@ const VILLAGE_OPTIONS = "village_options";
 
 const JOBS_STORAGE = "jobsManager";
 const JOBS_SETTINGS_STORAGE = "jobsManagerSettings";
+
 const CM_STORAGE = "constructionManager";
+const DM_STORAGE = "demolitionManager";
 const PROD_STORAGE = "productionManager";
+
 const SETTINGS_STORAGE = "storedSettings";
 const BOT_POWER = "bot_enabled";
 const BOT_NOTIFICATIONS = "bot_notifications";
@@ -22,13 +25,6 @@ const CAPITAL = "capital";
 
 const BOT_IN_PROGRESS = "bot_progress";
 const NPC_IN_PROGRESS = "npc_progress";
-
-const TRIBE = "tribe";
-const ROMAN = "1"; //
-const TEUTON = "2"; //
-const GAUL = "3"; //
-const EGIPT = "6"; //
-const HUN = "7"; //
 
 const WALL = [31, 32, 33, 42, 43];
 
