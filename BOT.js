@@ -34,7 +34,7 @@ const initBOT = () => {
         nextCheck: lastCheck + MAX_WAIT,
       };
 
-      let nextCheckMin = lastCheck + MIN_WAIT + Math.floor(Math.random() * 120));
+      let nextCheckMin = lastCheck + MIN_WAIT + Math.floor(Math.random() * 120);
       let nextCheckMax = lastCheck + MAX_WAIT;
       let wmax = queueWait > ressWait ? queueWait : ressWait;
       let auto = upgradeCrop || upgradeRess;
