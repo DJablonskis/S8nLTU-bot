@@ -87,16 +87,25 @@ const initBOT = () => {
     if (!upgradeCrop) upgradable = upgradable.filter((f) => f.gid !== 4);
     if (upgradable.length > 0) {
       upgradable = upgradable.sort((a, b) => {
-        let totalA = 0;
-        let totalB = 0;
-        if (unsafeWindow.bld) {
-          bld.forEach((x) => {
-            if (Number(x.aid) === a.pos) totalA++;
-            if (Number(x.aid) === b.pos) totalB++;
-          });
+        let upA = 0;
+        let upB = 0;
+        // if (unsafeWindow.bld) {
+        //   bld.forEach((x) => {
+        //     if (Number(x.aid) === a.pos) totalA++;
+        //     if (Number(x.aid) === b.pos) totalB++;
+        //   });
+        // }
+
+        if (a.upgrading) {
+          upA = 1;
+          console.log("upgrading ", a);
+        }
+        if (b.upgrading) {
+          upB = 1;
+          console.log("upgrading ", b);
         }
 
-        return a.lvl + totalA - b.lvl + totalB;
+        return a.lvl + upA - (b.lvl + upB);
       });
       let job = upgradable[0];
       return {
