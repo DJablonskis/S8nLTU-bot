@@ -1,0 +1,19 @@
+{
+  "name": "s8nltu-bot",
+  "version": "1.0.0",
+  "description": "Travian bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DJablonskis/S8nLTU-bot.git"
+  },
+  "author": "Deividas Jablonskis",
+  "license": "CC-BY-NC-4.0",
+  "bugs": {
+    "url": "https://github.com/DJablonskis/S8nLTU-bot/issues"
+  },
+  "homepage": "https://github.com/DJablonskis/S8nLTU-bot#readme"
+}

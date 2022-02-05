@@ -8,39 +8,39 @@ const initConstructionManager = () => {
     };
     if (window.location.pathname.includes("dorf")) {
       let buildingQ = document.querySelectorAll("div.buildingList > ul > li");
-      if (buildingQ && buildingQ.length > 0) {
-        let scripts = [
-          ...document.querySelectorAll(
-            `#center .village${Dorf1Slots ? "1" : "2"} script`
-          ),
-        ];
+      // if (buildingQ && buildingQ.length > 0) {
+      //   let scripts = [
+      //     ...document.querySelectorAll(
+      //       `#center .village${Dorf1Slots ? "1" : "2"} script`
+      //     ),
+      //   ];
 
-        buildString = scripts.find((s) =>
-          s.textContent.startsWith("var bld")
-        ).text;
+      //   buildString = scripts.find((s) =>
+      //     s.textContent.startsWith("var bld")
+      //   ).text;
 
-        let buildingLevels = buildString.split("=").pop();
-        const jsonQ = JSON.parse(buildingLevels);
+      //   let buildingLevels = buildString.split("=").pop();
+      //   const jsonQ = JSON.parse(buildingLevels);
 
-        buildingQ.forEach((element, index) => {
-          let b = {};
+      //   buildingQ.forEach((element, index) => {
+      //     let b = {};
 
-          b.lvl = jsonQ[index].stufe;
-          b.gid = jsonQ[index].gid;
-          b.pos = Number(jsonQ[index].aid);
-          b.finish =
-            Date.now() +
-            Number(
-              element
-                .querySelector("div.buildDuration > span")
-                .getAttribute("value")
-            ) *
-              1000;
+      //     b.lvl = jsonQ[index].stufe;
+      //     b.gid = jsonQ[index].gid;
+      //     b.pos = Number(jsonQ[index].aid);
+      //     b.finish =
+      //       Date.now() +
+      //       Number(
+      //         element
+      //           .querySelector("div.buildDuration > span")
+      //           .getAttribute("value")
+      //       ) *
+      //         1000;
 
-          b.gid < 5 ? q.dorf1.push(b) : q.dorf2.push(b);
-          q.all.push(b);
-        });
-      }
+      //     b.gid < 5 ? q.dorf1.push(b) : q.dorf2.push(b);
+      //     q.all.push(b);
+      //   });
+      // }
     } else return null;
     return q;
   };

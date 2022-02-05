@@ -56,6 +56,10 @@ if (ShouldRun) {
   statusSection = BotPanel.addSection(
     `v${GM_info.script.version} (${BotPower.on ? "On" : "Off"})`
   );
+
+  let updateInfo = BotPanel.addSection("Update Changelog");
+  updateInfo.content.innerText =
+    "This is a quick fix. After Travian updated their game, construction tracking is broken. That means that bot does not know if anything is under construction and that will result in more freaquent village checks. Please be patient as im working on a solution.";
   BotPower.subscribe((power) => {
     statusSection.header.innerText = `v${GM_info.script.version} (${
       power ? "On" : "Off"
