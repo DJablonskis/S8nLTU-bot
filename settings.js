@@ -45,8 +45,8 @@ if (ShouldRun) CurrentVillage = getCurrentVillage();
 const MIN_WAIT = 5 * 1000 * 60;
 const MAX_WAIT = 25 * 1000 * 60;
 const NPC_COOLDOWN = 10 * 1000 * 60;
-const DELAY_FAST = 1;
-const DELAY_SLOW = 3;
+const DELAY_FAST = 3;
+const DELAY_SLOW = 7;
 
 initDetailedStats = () => {
   let ON_S = localStorage.getItem(BOT_STATS) === ON;

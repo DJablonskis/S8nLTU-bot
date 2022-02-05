@@ -59,7 +59,7 @@ if (ShouldRun) {
 
   let updateInfo = BotPanel.addSection("Update Changelog");
   updateInfo.content.innerText =
-    "This is a quick fix. After Travian updated their game, construction tracking is broken. That means that bot does not know if anything is under construction and that will result in more freaquent village checks. Please be patient as im working on a solution.";
+    "This is a quick fix. After Travian updated their game, construction tracking is broken and will require localised bot versions. Im working on a fix for english game version at the moment.";
   BotPower.subscribe((power) => {
     statusSection.header.innerText = `v${GM_info.script.version} (${
       power ? "On" : "Off"

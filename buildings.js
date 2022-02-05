@@ -734,6 +734,7 @@ const initialiseBDB = () => {
     stats: getStat,
     name: (gid) => buildings[gid - 1].name,
     data: (gid) => buildings[gid - 1],
+    gidFromName: (n) => buildings.find((o) => o.name === n).gid,
   };
 };
 
