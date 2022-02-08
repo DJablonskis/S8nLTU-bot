@@ -127,6 +127,10 @@ function clickGid(gid) {
   }, Status.update("Clicking " + buildings[gid - 1].name));
 }
 
+const PAGE = unsafeWindow?.Travian?.Game?.currentPage;
+
+console.log("Page: ", PAGE);
+
 const navigateTo = (n) =>
   document.querySelector(`#navigation>a[accessKey="${n}"] `).click();
 
@@ -136,7 +140,6 @@ const getAllVillages = () => {
   let villages = document.querySelectorAll(
     "div.content div.villageList .listEntry"
   );
-  console.log("villages found", villages);
 
   villages.forEach((vil) => {
     let name = vil.querySelector("span.name").textContent.trim();
