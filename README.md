@@ -44,3 +44,17 @@ Press **_Eye_** icon on the panel to start/stop the script.
 ![Opening dashboard](/tut/stats.gif)
 
 Village list displays predicted resources amounts based on last seen production. It does not take into account increased/decreased production and consumption of troops or completed buildings. It also does not account for trade routes and market movements.
+
+## Unstable builds
+
+You can also install unstable version of script from here:
+
+> https://raw.githubusercontent.com/DJablonskis/S8nLTU-bot/nightly-builds/index.js
+
+Once stable all features from nightly builds are merged with the main branch.
+
+Im currently working on:
+
+- Roman building queue not fully working
+- Farm list auto sender
+- Fixes for build queue after travian got updated.

@@ -284,6 +284,14 @@ const initBOT = () => {
   };
 
   const getNextJob = (did = CurrentVillage.did) => {
+    let isRoman = getTribe().name === "roman";
+
+    let plusOn = document
+      .querySelector("#sidebarBoxActiveVillage .buttonsWrapper a.market")
+      .classList.contains("green");
+
+    let maxQueue = plusOn ? 2 : 1;
+
     let nextJob = null;
     let queueWait = 0;
 
@@ -342,7 +350,6 @@ const initBOT = () => {
   };
 
   const start = () => {
-    console.log("start called");
     if (HeroManager.canGo()) {
       return HeroManager.startAdventure();
     } else if (
@@ -380,7 +387,6 @@ const initBOT = () => {
   };
 
   const stop = () => {
-    console.log("stop called");
     if (timeout) clearTimeout(timeout);
     Status.update("Bot off", true, 0);
   };
@@ -390,7 +396,4 @@ const initBOT = () => {
 
 const BOT = initBOT();
 
-BotPower.subscribe((power) => {
-  console.log("Bot informed", power);
-  power ? BOT.start() : BOT.stop();
-});
+BotPower.subscribe((power) => (power ? BOT.start() : BOT.stop()));
