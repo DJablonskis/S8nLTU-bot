@@ -25,7 +25,6 @@
 // @require capital.js
 // @require productionManager.js
 // @require constructionManager.js
-// @require demolitionManager.js
 // @require jobsManager.js
 // @require ads.js
 

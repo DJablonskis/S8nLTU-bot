@@ -171,7 +171,7 @@ const initialiseBDB = () => {
       tribe: 0,
       gid: 12,
       xgid: [],
-      name: "Blacksmith",
+      name: "Smithy",
       cost: [170, 200, 380, 130],
       k: 1.28,
       cu: 4,
