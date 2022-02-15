@@ -96,4 +96,5 @@ const initProductionManager = () => {
   };
 };
 let ProductionManager;
-if (ShouldRun) ProductionManager = initProductionManager();
+if (unsafeWindow.resources.production)
+  ProductionManager = initProductionManager();
