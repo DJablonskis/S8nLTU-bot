@@ -129,7 +129,7 @@ function clickGid(gid) {
 
 const PAGE = unsafeWindow?.Travian?.Game?.currentPage;
 
-console.log("Page: ", PAGE);
+//
 
 const navigateTo = (n) =>
   document.querySelector(`#navigation>a[accessKey="${n}"] `).click();

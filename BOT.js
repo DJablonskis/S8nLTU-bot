@@ -98,11 +98,11 @@ const initBOT = () => {
 
         if (a.upgrading) {
           upA = 1;
-          console.log("upgrading ", a);
+          // console.log("upgrading ", a);
         }
         if (b.upgrading) {
           upB = 1;
-          console.log("upgrading ", b);
+          // console.log("upgrading ", b);
         }
 
         return a.lvl + upA - (b.lvl + upB);

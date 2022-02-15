@@ -32,11 +32,13 @@
 // @require newBuildUI.js
 // @require contextUI.js
 
+// @require farmer.js
+
 // @require heroManager.js
 // @require collectRewards.js
 // @require BOT.js
 
-// @version        0.14.51n
+// @version        0.15.001n
 // ==/UserScript==
 
 const my_css = GM_getResourceText("IMPORTED_CSS");
