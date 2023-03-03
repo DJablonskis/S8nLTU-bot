@@ -10,7 +10,7 @@ Promise.doAfter = function (fn, t) {
   // fn is an optional argument
   if (!t) {
     t = fn;
-    fn = function () {};
+    fn = function () { };
   }
   return doAfter(t).then(fn);
 };
@@ -290,8 +290,6 @@ const getTribe = () => {
 
 const Tribe = getTribe();
 
-console.log(Tribe);
-
 const blueButton = (text) => {
   let button = document.createElement("button");
   button.className = "textButtonV1 green blue";
@@ -329,18 +327,16 @@ const blueToggle = (path = "") => {
 const checkboxToggle = (checked) => {
   let l = document.createElement("label");
   l.className = "switch";
-  l.innerHTML = `<input type="checkbox" ${
-    checked ? "checked" : ""
-  }><span class="slider round"></span>`;
+  l.innerHTML = `<input type="checkbox" ${checked ? "checked" : ""
+    }><span class="slider round"></span>`;
   return l;
 };
 
 const createOptionToggle = (title, option) => {
   let l = document.createElement("label");
   l.className = "switch";
-  l.innerHTML = `<input type="checkbox" ${
-    BotOptions.get(option) ? "checked" : ""
-  }><span class="slider round"></span>`;
+  l.innerHTML = `<input type="checkbox" ${BotOptions.get(option) ? "checked" : ""
+    }><span class="slider round"></span>`;
 
   let section = document.createElement("div");
 
