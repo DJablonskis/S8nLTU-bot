@@ -57,14 +57,14 @@ if (ShouldRun) {
     `v${GM_info.script.version} (${BotPower.on ? "On" : "Off"})`
   );
 
-  let updateInfo = BotPanel.addSection("Update Changelog");
-  updateInfo.content.innerText =
-    "This is a quick fix. After Travian updated their game, construction tracking is broken and will require localised bot versions. Im working on a fix for english game version at the moment.";
-  BotPower.subscribe((power) => {
-    statusSection.header.innerText = `v${GM_info.script.version} (${
-      power ? "On" : "Off"
-    })`;
-  });
+  // let updateInfo = BotPanel.addSection("Update Changelog");
+  // updateInfo.content.innerText =
+  //   "This is a quick fix. After Travian updated their game, construction tracking is broken and will require localised bot versions. Im working on a fix for english game version at the moment.";
+  // BotPower.subscribe((power) => {
+  //   statusSection.header.innerText = `v${GM_info.script.version} (${
+  //     power ? "On" : "Off"
+  //   })`;
+  // });
 
   Status = setUpStatusBar();
 }

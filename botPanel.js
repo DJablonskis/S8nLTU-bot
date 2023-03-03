@@ -46,8 +46,6 @@ const createSidePanel = () => {
 
   let btnStats = btnWraper.appendChild(blueToggle(TogglePathStatistics));
 
-  // let svg = btnStats.querySelector("svg");
-  //   svg.style.fill = DetailedStats.get() ? "red" : "white"
 
   DetailedStats.subscribe((on) => {
     btnStats.querySelector("svg").style.fill = on ? "red" : "white";

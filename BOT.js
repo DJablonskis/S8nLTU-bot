@@ -21,11 +21,13 @@ const initBOT = () => {
 
     let planned = [];
     Villages.all.forEach((vil) => {
+
+
       let time = Date.now();
 
+
       let { job, queueWait, ressWait, wq1, wq2 } = getNextJob(vil.did);
-      let { prioritise, upgradeCrop, upgradeRess } =
-        BotOptions.getVillageSettings(vil.did);
+      let { prioritise, upgradeCrop, upgradeRess } = BotOptions.getVillageSettings(vil.did);
 
       let lastCheck = ConstructionManager.get(vil.did).timestamp;
 
@@ -54,7 +56,6 @@ const initBOT = () => {
         } else if (prioritise) {
           p.nextCheck = nextMax;
         } else if (auto) {
-          //TODO: need to store field values for villages for more acurate calculations
           p.nextCheck = getNextAutoTime();
         }
       } else if (nextCheckMax < time) {
@@ -64,7 +65,10 @@ const initBOT = () => {
       }
       planned.push(p);
     });
+    console.log(CurrentVillage)
+    console.log(planned)
     planned.sort((a, b) => a.nextCheck - b.nextCheck);
+    console.log(planned)
     if (planned[0].did === CurrentVillage.did) {
       timeout = setTimeout(() => {
         startBuildingLoop();
@@ -89,21 +93,10 @@ const initBOT = () => {
       upgradable = upgradable.sort((a, b) => {
         let upA = 0;
         let upB = 0;
-        // if (unsafeWindow.bld) {
-        //   bld.forEach((x) => {
-        //     if (Number(x.aid) === a.pos) totalA++;
-        //     if (Number(x.aid) === b.pos) totalB++;
-        //   });
-        // }
 
-        if (a.upgrading) {
-          upA = 1;
-          // console.log("upgrading ", a);
-        }
-        if (b.upgrading) {
-          upB = 1;
-          // console.log("upgrading ", b);
-        }
+        if (a.upgrading) upA = 1;
+        if (b.upgrading) upB = 1;
+
 
         return a.lvl + upA - (b.lvl + upB);
       });
