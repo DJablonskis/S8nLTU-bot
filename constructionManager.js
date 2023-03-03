@@ -1,23 +1,5 @@
 const initConstructionManager = () => {
 
-  let cmStorage = JSON.parse(localStorage.getItem(CM_STORAGE));
-  if (!cmStorage) {
-    cmStorage = {};
-  }
-
-  const get = (did = CurrentVillage.did) => cmStorage[did] ? cmStorage[did]
-    : {
-      dorf1: [],
-      dorf2: [],
-      all: [],
-      timestamp: Date.now(),
-      q: { d1: 0, d2: 0 },
-    };
-
-  console.log(cmStorage)
-
-
-
   const updateBuildingQueue = () => {
     let dorf1 = [];
     let dorf2 = [];
@@ -38,8 +20,7 @@ const initConstructionManager = () => {
           .pop()
       );
 
-      let finish = Date.now() +
-        Number(element.querySelector("span").getAttribute("value")) * 1000;
+      let finish = Date.now() + Number(element.querySelector("span").getAttribute("value")) * 1000;
 
       let gid = BDB.gidFromName(name);
       let o = { name, lvl, gid, finish };
@@ -83,17 +64,24 @@ const initConstructionManager = () => {
     };
   };
 
+  const get = (did = CurrentVillage.did) => cmStorage[did] ? cmStorage[did]
+    : {
+      dorf1: [],
+      dorf2: [],
+      all: [],
+      timestamp: Date.now(),
+      q: { d1: 0, d2: 0 },
+    };
 
+  let cmStorage = JSON.parse(localStorage.getItem(CM_STORAGE));
+
+  if (!cmStorage) cmStorage = {}
 
   if (PAGE === "dorf1" || PAGE === "dorf2") {
-    let updated = updateBuildingQueue();
-    if (updated) {
-      cmStorage[CurrentVillage.did] = updated;
-    } else {
-      console.log("Update Building queue returned falsy value?");
-      cmStorage[CurrentVillage.did] = {};
-    }
+    cmStorage[CurrentVillage.did] = updateBuildingQueue();
   }
+
+  console.log("updated", cmStorage)
 
   localStorage.setItem(CM_STORAGE, JSON.stringify(cmStorage));
 
@@ -179,8 +167,9 @@ const initConstructionManager = () => {
       vil.node.appendChild(block);
     });
   };
-
   showDots();
+
+
   return {
     all: cmStorage,
     get,
@@ -189,6 +178,7 @@ const initConstructionManager = () => {
       finish: get(did).q[`d${d}`],
     }),
   };
+
 };
 
 
