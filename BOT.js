@@ -350,17 +350,8 @@ const initBOT = () => {
   };
 
   const start = () => {
-    if (HeroManager.canGo()) {
-      return HeroManager.startAdventure();
-    } else if (
-      RewardManager.hasReward() &&
-      BotOptions.get(optionKeys.collectRewards)
-    ) {
-      console.log(RewardManager.hasReward());
-      RewardManager.collect();
-    } else if (getInProgress()) {
+    if (getInProgress()) {
       let prog = getInProgress();
-
       if (prog.timestamp > Date.now() && prog.did === CurrentVillage.did) {
         continueUpgrade(prog);
       } else {
