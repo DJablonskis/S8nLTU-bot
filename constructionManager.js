@@ -1,4 +1,23 @@
 const initConstructionManager = () => {
+
+  let cmStorage = JSON.parse(localStorage.getItem(CM_STORAGE));
+  if (!cmStorage) {
+    cmStorage = {};
+  }
+
+  const get = (did = CurrentVillage.did) => cmStorage[did] ? cmStorage[did]
+    : {
+      dorf1: [],
+      dorf2: [],
+      all: [],
+      timestamp: Date.now(),
+      q: { d1: 0, d2: 0 },
+    };
+
+  console.log(cmStorage)
+
+
+
   const updateBuildingQueue = () => {
     let dorf1 = [];
     let dorf2 = [];
@@ -18,8 +37,8 @@ const initConstructionManager = () => {
           .split(" ")
           .pop()
       );
-      let finish =
-        Date.now() +
+
+      let finish = Date.now() +
         Number(element.querySelector("span").getAttribute("value")) * 1000;
 
       let gid = BDB.gidFromName(name);
@@ -64,21 +83,7 @@ const initConstructionManager = () => {
     };
   };
 
-  let cmStorage = JSON.parse(localStorage.getItem(CM_STORAGE));
-  if (!cmStorage) {
-    cmStorage = {};
-  }
 
-  const get = (did = CurrentVillage.did) =>
-    cmStorage[did]
-      ? cmStorage[did]
-      : {
-          dorf1: [],
-          dorf2: [],
-          all: [],
-          timestamp: 0,
-          q: { d1: 0, d2: 0 },
-        };
 
   if (PAGE === "dorf1" || PAGE === "dorf2") {
     let updated = updateBuildingQueue();
@@ -89,6 +94,7 @@ const initConstructionManager = () => {
       cmStorage[CurrentVillage.did] = {};
     }
   }
+
   localStorage.setItem(CM_STORAGE, JSON.stringify(cmStorage));
 
   const checkTime = (completion) => {
@@ -149,17 +155,15 @@ const initConstructionManager = () => {
         let timer = checkTime(x.finish);
         task.innerHTML = `<span style="font-size:11px; padding-left: 15px; padding-right:8px">${BDB.name(
           x.gid
-        )} level ${x.lvl}</span><span style="font-size:11px;  ${
-          timer.completed ? "color:green;" : ""
-        } align-items:center;">${timer.timer}</span>`;
+        )} level ${x.lvl}</span><span style="font-size:11px;  ${timer.completed ? "color:green;" : ""
+          } align-items:center;">${timer.timer}</span>`;
         if (!timer.completed) {
           let updater = setInterval(() => {
             timer = checkTime(x.finish);
             task.innerHTML = `<span style="font-size:11px; padding-left: 15px; padding-right:8px">${BDB.name(
               x.gid
-            )} level ${x.lvl}</span><span style="font-size:11px; ${
-              timer.completed ? "color:green;" : ""
-            } align-items:center;">${timer.timer}</span>`;
+            )} level ${x.lvl}</span><span style="font-size:11px; ${timer.completed ? "color:green;" : ""
+              } align-items:center;">${timer.timer}</span>`;
 
             if (timer.completed) {
               clearInterval(updater);
@@ -175,6 +179,7 @@ const initConstructionManager = () => {
       vil.node.appendChild(block);
     });
   };
+
   showDots();
   return {
     all: cmStorage,
@@ -185,8 +190,6 @@ const initConstructionManager = () => {
     }),
   };
 };
-let ConstructionManager;
 
-if (ShouldRun) {
-  ConstructionManager = initConstructionManager();
-}
+
+let ConstructionManager = ShouldRun ? initConstructionManager() : null

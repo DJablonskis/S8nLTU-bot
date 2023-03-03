@@ -1,10 +1,10 @@
 const initJobsList = () => {
   const { content, header } = BotPanel.addSection("Planed upgrades");
   header.style.paddingTop = "10px";
-  content.appendChild(
-    createOptionToggle("Prioritise planned", optionKeys.prioritise)
-  );
-  content.appendChild(createOptionToggle("Watch ads", optionKeys.watchAds));
+
+
+  // content.appendChild(createOptionToggle("Prioritise planned", optionKeys.prioritise));
+  // content.appendChild(createOptionToggle("Watch ads", optionKeys.watchAds));
 
   content.appendChild(
     createOptionToggle("Auto build resources", optionKeys.upgradeRess)
@@ -41,9 +41,8 @@ const initJobsList = () => {
           JobsManager.remove(job);
         };
         detailsInner.appendChild(node);
-        nodeText.textContent = `[${job.pos}] ${BDB.name(job.gid)} to level ${
-          job.to
-        }`;
+        nodeText.textContent = `[${job.pos}] ${BDB.name(job.gid)} to level ${job.to
+          }`;
       });
     }
     summary.onclick;

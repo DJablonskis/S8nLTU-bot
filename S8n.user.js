@@ -37,7 +37,7 @@
 // ### @require heroManager.js
 // ###  @require collectRewards.js
 
-// @version        0.16.02
+// @version        0.16.03
 // ==/UserScript==
 
 const my_css = GM_getResourceText("IMPORTED_CSS");
