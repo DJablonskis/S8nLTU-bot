@@ -2,28 +2,11 @@
 
 **_Please use on your own risks. Using scripts like this is strictly against game rules. It was created purely for educational purposes_**
 
-## Experimental features and known bugs
-
-Thease features are not complete or broken and should not be used without supervision:
-
-- building new wall (upgrades should be working fine)
-- watching ads to speed up building
-- collecting rewards
-- building demolition from main building
-
 ## Instalation
 
 Script uses **relative path** required files. For it to correctly load needed files it needs to be loaded from url below:
 
-> https://djablonskis.github.io/S8nLTU-bot/index.js
-
-To correctly install it please open dashboard **_1_** & **_2_**:
-
-![Opening dashboard](/tut/step1.jpg)
-
-Then select utilities **_3_**, paste URL into **_4_** marked field
-
-![Opening dashboard](/tut/step2.jpg)
+> https://djablonskis.github.io/S8nLTU-bot/S8n.user.js
 
 When script runs for the first time it will ask to confirm the capital city:
 

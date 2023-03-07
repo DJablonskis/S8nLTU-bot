@@ -1,5 +1,7 @@
 const ShouldRun = unsafeWindow.resources;
 
+const KEY = {}
+
 const getParams = (loc = window.location.search) =>
   loc
     .slice(1)

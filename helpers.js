@@ -281,14 +281,36 @@ const getTribe = () => {
       .toLowerCase();
     t_id = tribeNames.indexOf(t_name) + 1;
   }
+
+  let wall_gid;
+
+  switch (t_name) {
+    case "roman":
+      wall_gid = 31;
+      break;
+    case "teuton":
+      wall_gid = 32;
+      break;
+    case "gaul":
+      wall_gid = 33;
+      break;
+    case "egyptian":
+      wall_gid = 42;
+      break;
+    case "hun":
+      wall_gid = 43;
+      break;
+  }
   return {
-    wall_gid: t_id < 4 ? t_id + 30 : t_id + 38,
+    wall_gid,
     id: t_id,
     name: t_name,
   };
 };
 
 const Tribe = getTribe();
+
+console.log(Tribe)
 
 const blueButton = (text) => {
   let button = document.createElement("button");

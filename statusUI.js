@@ -1,11 +1,10 @@
 let statusSection, Status;
 
 const setUpStatusBar = () => {
+
+
   let interval = null;
-  const status = statusSection.content.appendChild(
-    document.createElement("div")
-  );
-  //statusSection.header.style.marginTop = "12px";
+  const status = statusSection.content.appendChild(document.createElement("div"));
 
   let statusMessage = status.appendChild(document.createElement("div"));
   statusMessage.innerText = "Waiting for instructions";
@@ -52,19 +51,22 @@ const setUpStatusBar = () => {
 
   return { update: updateStatus };
 };
+
+
 if (ShouldRun) {
   statusSection = BotPanel.addSection(
     `v${GM_info.script.version} (${BotPower.on ? "On" : "Off"})`
   );
 
-  // let updateInfo = BotPanel.addSection("Update Changelog");
-  // updateInfo.content.innerText =
-  //   "This is a quick fix. After Travian updated their game, construction tracking is broken and will require localised bot versions. Im working on a fix for english game version at the moment.";
-  // BotPower.subscribe((power) => {
-  //   statusSection.header.innerText = `v${GM_info.script.version} (${
-  //     power ? "On" : "Off"
-  //   })`;
-  // });
+  BotPower.subscribe((power) => {
+    statusSection.header.innerText = `v${GM_info.script.version} (${power ? "On" : "Off"
+      })`;
+  });
+
+  let LOG = BotPanel.addSection("Log");
+  LOG.content.innerText =
+    "this is log";
+
 
   Status = setUpStatusBar();
 }
