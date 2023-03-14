@@ -127,7 +127,7 @@ function clickGid(gid) {
   }, Status.update("Clicking " + buildings[gid - 1].name));
 }
 
-const PAGE = unsafeWindow?.Travian?.Game?.currentPage;
+const PAGE = location.pathname
 
 //
 
@@ -309,8 +309,6 @@ const getTribe = () => {
 };
 
 const Tribe = getTribe();
-
-console.log(Tribe)
 
 const blueButton = (text) => {
   let button = document.createElement("button");

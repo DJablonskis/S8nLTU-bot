@@ -39,10 +39,6 @@
 const my_css = GM_getResourceText("IMPORTED_CSS");
 GM_addStyle(my_css);
 
-
-
-
-
 const initBOT = () => {
     const lag = 60000;
 
@@ -56,81 +52,97 @@ const initBOT = () => {
     let timeout = null;
 
     const switchCity = () => {
-        if (!Dorf1Slots && !Dorf2Slots) {
-            timeout = setTimeout(
-                () => navigateTo(1),
-                Status.update("Lost, navigating home")
-            );
-            return timeout;
-        }
+        console.log("called switch city")
+        // if (!Dorf1Slots && !Dorf2Slots) {
+        //     timeout = setTimeout(
+        //         () => navigateTo(1),
+        //         Status.update("Lost, navigating home")
+        //     );
+        //     return timeout;
+        // }
 
-        let planned = [];
-        Villages.all.forEach((vil) => {
+        // let planned = [];
+
+        // Villages.all.forEach((vil) => {
 
 
-            let time = Date.now();
+        //     let time = Date.now();
 
 
-            let { job, queueWait, ressWait, wq1, wq2 } = getNextJob(vil.did);
-            let { prioritise, upgradeCrop, upgradeRess } = BotOptions.getVillageSettings(vil.did);
+        //     let { job, queueWait, ressWait, wq1, wq2 } = getNextJob(vil.did);
 
-            let lastCheck = ConstructionManager.get(vil.did).timestamp;
 
-            p = {
-                did: vil.did,
-                nextCheck: lastCheck + MAX_WAIT,
-            };
+        //     let { prioritise, upgradeCrop, upgradeRess } = BotOptions.getVillageSettings(vil.did);
 
-            let nextCheckMin = lastCheck + MIN_WAIT + Math.floor(Math.random() * 120);
-            let nextCheckMax = lastCheck + MAX_WAIT;
-            let wmax = queueWait > ressWait ? queueWait : ressWait;
-            let auto = upgradeCrop || upgradeRess;
-            let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
-            const getNextAutoTime = () => {
-                if (Tribe.id === 1)
-                    if (wq1 < time) return nextCheckMin < time ? time : nextCheckMin;
-                    else return wq1 > nextCheckMax ? nextCheckMax : wq1;
-                else if (queueWait > time)
-                    return queueWait > nextCheckMax ? nextCheckMax : queueWait;
-                else return nextCheckMin < time ? time : nextCheckMin;
-            };
-            if (job) {
-                //can be built?
-                if (wmax < time) {
-                    p.nextCheck = time;
-                } else if (prioritise) {
-                    p.nextCheck = nextMax;
-                } else if (auto) {
-                    p.nextCheck = getNextAutoTime();
-                }
-            } else if (nextCheckMax < time) {
-                p.nextCheck = time;
-            } else if (auto) {
-                p.nextCheck = getNextAutoTime();
-            }
-            planned.push(p);
-        });
-        console.log(CurrentVillage)
-        console.log(planned)
-        planned.sort((a, b) => a.nextCheck - b.nextCheck);
-        console.log(planned)
-        if (planned[0].did === CurrentVillage.did) {
-            timeout = setTimeout(() => {
-                startBuildingLoop();
-            }, Status.update("Waiting.", false, planned[0].nextCheck - Date.now().valueOf()));
-        } else {
-            let delay = Status.update(
-                `Checking ${Villages.get(planned[0].did).name}`,
-                false,
-                planned[0].nextCheck - Date.now().valueOf()
-            );
-            timeout = setTimeout(() => {
-                Villages.get(planned[0].did).node.querySelector("a").click();
-            }, delay);
-        }
+
+
+        //     let lastCheck = ConstructionManager.get(vil.did).timestamp;
+
+        //     p = {
+        //         did: vil.did,
+        //         nextCheck: lastCheck + MAX_WAIT,
+        //     };
+
+        //     let nextCheckMin = lastCheck + MIN_WAIT + Math.floor(Math.random() * 120);
+        //     let nextCheckMax = lastCheck + MAX_WAIT;
+
+
+        //     let wmax = queueWait > ressWait ? queueWait : ressWait;
+        //     let auto = upgradeCrop || upgradeRess;
+        //     let nextMax = wmax > nextCheckMax ? nextCheckMax : wmax;
+
+
+        //     const getNextAutoTime = () => {
+        //         if (Tribe.id === 1)
+        //             if (wq1 < time) return nextCheckMin < time ? time : nextCheckMin;
+        //             else return wq1 > nextCheckMax ? nextCheckMax : wq1;
+        //         else if (queueWait > time)
+        //             return queueWait > nextCheckMax ? nextCheckMax : queueWait;
+        //         else return nextCheckMin < time ? time : nextCheckMin;
+        //     };
+
+
+        //     if (job) {
+        //         //can be built?
+        //         if (wmax < time) {
+        //             p.nextCheck = time;
+        //         } else if (prioritise) {
+        //             p.nextCheck = nextMax;
+        //         } else if (auto) {
+        //             p.nextCheck = getNextAutoTime();
+        //         }
+        //     } else if (nextCheckMax < time) {
+        //         p.nextCheck = time;
+        //     } else if (auto) {
+        //         p.nextCheck = getNextAutoTime();
+        //     }
+        //     planned.push(p);
+        // });
+
+        // planned.sort((a, b) => a.nextCheck - b.nextCheck);
+
+
+
+
+        // if (planned[0].did === CurrentVillage.did) {
+        //     timeout = setTimeout(() => {
+        //         startBuildingLoop();
+        //     }, Status.update("Waiting.", false, planned[0].nextCheck - Date.now().valueOf()));
+        // } else {
+        //     let delay = Status.update(
+        //         `Checking ${Villages.get(planned[0].did).name}`,
+        //         false,
+        //         planned[0].nextCheck - Date.now().valueOf()
+        //     );
+        //     timeout = setTimeout(() => {
+        //         Villages.get(planned[0].did).node.querySelector("a").click();
+        //     }, delay);
+        // }
     };
 
     const getAutoUpgradeJob = () => {
+
+        // TODO: generate array
         let upgradable = Dorf1Slots.filter((slot) => slot.status === "good");
         if (!upgradeRess) upgradable = upgradable.filter((f) => f.gid === 4);
         if (!upgradeCrop) upgradable = upgradable.filter((f) => f.gid !== 4);
@@ -208,24 +220,13 @@ const initBOT = () => {
                         return timeout;
                     }
                     b = document.querySelector(".section1 button.green.build");
-                    if (watchAds) {
-                        b2 = document.querySelector(".section2 button.green.build");
-                    }
+                    // if (watchAds) {
+                    //     b2 = document.querySelector(".section2 button.green.build");
+                    // }
                 }
                 if (b || b2) {
                     timeout = setTimeout(() => {
-                        if (b2 && watchAds) {
-                            b2.click();
-                            //sending message to other script to start video in 5 seconds
-                            timeout = setTimeout(() => {
-                                GM_setValue(
-                                    "trav_ads_main",
-                                    " pressed on build with add " + Math.random
-                                );
-                            }, 3000);
-                        } else {
-                            b ? b.click() : console.log("could not find build button");
-                        }
+                        b ? b.click() : console.log("could not find build button");
                         localStorage.setItem(BOT_IN_PROGRESS, "");
                     }, Status.update("Perssing build Button"));
                     return timeout;
@@ -241,6 +242,7 @@ const initBOT = () => {
 
     const startAutoUpgradeJob = () => {
         if (upgradeCrop || upgradeRess) {
+
             //Check if auto updater is on and available priority
             if (Dorf1Slots) {
                 let job = getAutoUpgradeJob();
@@ -267,58 +269,60 @@ const initBOT = () => {
     };
 
     const startBuildingLoop = () => {
-        if (JobsManager.next()) {
-            let { job, queueWait, ressWait } = getNextJob();
-            let { gid, pos } = job;
-            //can job be done?
-            if (queueWait < Date.now()) {
-                if (ressWait < Date.now()) {
-                    //correct dorf
-                    if ((gid > 4 && Dorf2Slots) || (gid < 5 && Dorf1Slots)) {
-                        d1 = gid < 5;
-                        let i = d1 ? pos - 1 : pos - 19;
-                        let slots = d1 ? Dorf1Slots : Dorf2Slots;
-                        let slot = slots[i];
-                        //possible to upgrade
-                        if (
-                            slot.status === "good" ||
-                            (slot.status === "empty" && slot.upgrading === false)
-                        ) {
-                            //check fields classes if "good"
-                            //TODO: Check if levels including current builds are right here too
-                            localStorage.setItem(
-                                BOT_IN_PROGRESS,
-                                JSON.stringify({
-                                    did: CurrentVillage.did,
-                                    job,
-                                    timestamp: Date.now() + lag,
-                                })
-                            );
-                            return clickSite(
-                                job.pos,
-                                `Upgrading ${BDB.data(gid).name} to level ${job.to}`
-                            );
-                        } else {
-                            //something not right
-                            switchCity();
-                        }
-                    } else {
-                        //wrong dorf switch to correct dorf if job can be done
-                        timeout = setTimeout(
-                            () => navigateTo(Dorf1Slots ? 2 : 1),
-                            Status.update("Switching tab.")
-                        );
-                        return timeout;
-                    }
-                } else if (!prioritise) {
-                    // TODO: Not enough resources for job keep track of times here for switchingCities
-                    startAutoUpgradeJob();
-                } else {
-                    // TODO: Not enough resources for job keep track of times here for switchingCities
-                    switchCity();
-                }
-            } else switchCity(); // TODO: Queue busy keep track of times here for switchingCities
-        } else startAutoUpgradeJob();
+
+        // if (JobsManager.next()) {
+        //     let { job, queueWait, ressWait } = getNextJob();
+        //     let { gid, pos } = job;
+        //     //can job be done?
+        //     if (queueWait < Date.now()) {
+        //         if (ressWait < Date.now()) {
+        //             //correct dorf
+        //             if ((gid > 4 && Dorf2Slots) || (gid < 5 && Dorf1Slots)) {
+        //                 d1 = gid < 5;
+        //                 let i = d1 ? pos - 1 : pos - 19;
+        //                 let slots = d1 ? Dorf1Slots : Dorf2Slots;
+        //                 let slot = slots[i];
+        //                 //possible to upgrade
+        //                 if (
+        //                     slot.status === "good" ||
+        //                     (slot.status === "empty" && slot.upgrading === false)
+        //                 ) {
+        //                     //check fields classes if "good"
+        //                     //TODO: Check if levels including current builds are right here too
+        //                     localStorage.setItem(
+        //                         BOT_IN_PROGRESS,
+        //                         JSON.stringify({
+        //                             did: CurrentVillage.did,
+        //                             job,
+        //                             timestamp: Date.now() + lag,
+        //                         })
+        //                     );
+        //                     return clickSite(
+        //                         job.pos,
+        //                         `Upgrading ${BDB.data(gid).name} to level ${job.to}`
+        //                     );
+        //                 } else {
+        //                     //something not right
+        //                     switchCity();
+        //                 }
+        //             } else {
+        //                 //wrong dorf switch to correct dorf if job can be done
+        //                 timeout = setTimeout(
+        //                     () => navigateTo(Dorf1Slots ? 2 : 1),
+        //                     Status.update("Switching tab.")
+        //                 );
+        //                 return timeout;
+        //             }
+        //         } else if (!prioritise) {
+        //             // TODO: Not enough resources for job keep track of times here for switchingCities
+        //             startAutoUpgradeJob();
+        //         } else {
+        //             // TODO: Not enough resources for job keep track of times here for switchingCities
+        //             switchCity();
+        //         }
+        //     } else switchCity(); // TODO: Queue busy keep track of times here for switchingCities
+        // } else 
+        startAutoUpgradeJob();
     };
 
     const getNextJob = (did = CurrentVillage.did) => {
@@ -422,5 +426,6 @@ const initBOT = () => {
 
     return { start, stop };
 };
+
 const BOT = initBOT();
 BotPower.subscribe((power) => (power ? BOT.start() : BOT.stop()));

@@ -62,11 +62,5 @@ if (ShouldRun) {
     statusSection.header.innerText = `v${GM_info.script.version} (${power ? "On" : "Off"
       })`;
   });
-
-  let LOG = BotPanel.addSection("Log");
-  LOG.content.innerText =
-    "this is log";
-
-
   Status = setUpStatusBar();
 }

@@ -10,7 +10,7 @@ const VILLAGE_OPTIONS = "village_options";
 const JOBS_STORAGE = "jobsManager";
 const JOBS_SETTINGS_STORAGE = "jobsManagerSettings";
 
-const CM_STORAGE = "constructionManager";
+
 const DM_STORAGE = "demolitionManager";
 const PROD_STORAGE = "productionManager";
 

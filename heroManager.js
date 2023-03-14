@@ -31,14 +31,7 @@ const initHeroManager = () => {
 
   let health = Math.round((h1 / h2) * 100);
 
-  //console.log("dist", dist);
 
-  //let health = Math.round((dist / 85.45) * 100);
-  //console.log("h: ", health);
-
-  //let ang = Math.asin((dist / (2 * 55)) * 2);
-
-  //console.log("ang ", ang);
   const adventuresButton = document.querySelector("#topBarHero a.adventure");
 
   const openInventory = () => {
@@ -139,7 +132,6 @@ const initHeroManager = () => {
           return { id, duration: seconds, submit, danger };
         });
 
-        console.log(adventures);
         if (adventures > 1) {
           //do sorting
           if (BotOptions.get(optionKeys.sendToClosestFirst))
@@ -151,7 +143,6 @@ const initHeroManager = () => {
         if (canGo()) {
           setTimeout(() => {
             adventures[0].submit();
-            console.log(adventures[0].id);
           }, Status.update("Sending to adventure " + adventures[0].id));
         } else {
           setTimeout(() => {

@@ -124,6 +124,6 @@ const initJobs = () => {
 };
 let JobsManager;
 if (ShouldRun) {
-  JobsManager = initJobs();
-  JobsManager.checkJobs();
+  // JobsManager = initJobs();
+  // JobsManager.checkJobs();
 }

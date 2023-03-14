@@ -82,11 +82,7 @@ const setUpContextUI = () => {
     boxContent.appendChild(controls);
 
     const setUp = (slot) => {
-      // fill in fields, slider, header, jobs....};
-      console.log("right click on: ", slot);
-
       if (slot.pos === 40) {
-        console.log(Tribe)
         slot.gid = Tribe.wall_gid;
       }
 
